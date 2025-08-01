@@ -4,6 +4,8 @@ from app.config import settings
 from app.utils.logger import LOGGER
 
 async def required_headers_middleware(request: Request, call_next):
+    LOGGER.info(f"[RequiredHeaders] Checking headers for {request.method} {request.url.path}")
+
     missing = [
         header for header in settings.required_headers
         if header.lower() not in request.headers
