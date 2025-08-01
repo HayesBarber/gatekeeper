@@ -6,20 +6,27 @@ from curveauth.challenge import generate_challenge
 from curveauth.api_keys import generate_api_key
 import secrets
 from datetime import datetime, timedelta, timezone
+from app.utils.redis_client import redis_client, Namespace, get_ttl
 
-def generate_challenge_response(req: ChallengeRequest, ttl_seconds: int = 30) -> ChallengeResponse:
+def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
    challenge_id = secrets.token_hex(16)
    challenge = generate_challenge()
+   ttl_seconds = get_ttl(Namespace.CHALLENGES)
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
-   return ChallengeResponse(
+   response = ChallengeResponse(
       challenge_id=challenge_id,
       challenge=challenge,
       expires_at=expires
    )
 
-def generate_challenge_response(req: ChallengeVerificationRequest, ttl_seconds: int = 300) -> ChallengeVerificationResponse:
+   redis_client.set_model(Namespace.CHALLENGES, req.client_id, response)
+
+   return response
+
+def generate_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
    api_key = generate_api_key(prefix="api")
+   ttl_seconds = get_ttl(Namespace.API_KEYS)
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
    return ChallengeVerificationResponse(
