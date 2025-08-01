@@ -2,6 +2,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from app.utils.logger import LOGGER
 from app.config import settings
+from app.utils.redis_client import redis_client
 
 async def proxy_middleware(request: Request, call_next):
     LOGGER.info(f"[Proxy] Checking for proxy eligibility for {request.method} {request.url.path}")
