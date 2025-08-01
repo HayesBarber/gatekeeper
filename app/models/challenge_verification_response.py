@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 class ChallengeVerificationResponse(BaseModel):
     api_key: str = Field(..., description="Issued API key tied to this client")
-    expires_at: str = Field(..., description="UTC timestamp when this API key expires")
+    expires_at: datetime = Field(..., description="UTC timestamp when this API key expires")
 
     class Config:
         schema_extra = {
