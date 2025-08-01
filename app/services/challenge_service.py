@@ -2,7 +2,7 @@ from app.models.challenge_response import ChallengeResponse
 from app.models.challenge_request import ChallengeRequest
 from app.models.challenge_verification_request import ChallengeVerificationRequest
 from app.models.challenge_verification_response import ChallengeVerificationResponse
-from app.models.exceptions import ClientNotFound
+from app.models.exceptions import ClientNotFound, ChallengeNotVerified
 from curveauth.challenge import generate_challenge
 from curveauth.api_keys import generate_api_key
 from curveauth.signatures import verify_signature
@@ -41,6 +41,8 @@ def verify_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVer
       raise ClientNotFound(req.client_id)
    
    verified = verify_signature(stored.challenge, req.signature, public_key, True)
+   if not verified:
+      raise ChallengeNotVerified(req.client_id)
 
    api_key = generate_api_key(prefix="api")
    ttl_seconds = get_ttl(Namespace.API_KEYS)
