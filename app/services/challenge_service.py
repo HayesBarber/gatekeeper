@@ -35,6 +35,8 @@ def verify_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVer
       raise ClientNotFound(req.client_id)
    if stored.challenge_id != req.challenge_id:
       raise ValueError("Challenge ID mismatch")
+   if stored.expires_at < datetime.now(timezone.utc):
+      raise ValueError("Challenge has expired")
    
    public_key = redis_client.get(Namespace.USERS, req.client_id)
    if not public_key:
