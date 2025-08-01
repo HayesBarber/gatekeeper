@@ -33,7 +33,9 @@ def generate_challenge_response(req: ChallengeVerificationRequest) -> ChallengeV
    ttl_seconds = get_ttl(Namespace.API_KEYS)
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
-   return ChallengeVerificationResponse(
+   response = ChallengeVerificationResponse(
       api_key=api_key,
       expires_at=expires
    )
+
+   return response
