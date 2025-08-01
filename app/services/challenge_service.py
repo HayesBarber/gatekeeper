@@ -29,7 +29,7 @@ def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
 
    return response
 
-def verify_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
+def verify_challenge(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
    stored = redis_client.get_model(Namespace.CHALLENGES, req.client_id, ChallengeResponse)
    if not stored:
       raise ClientNotFound(req.client_id)
