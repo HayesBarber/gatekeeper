@@ -28,7 +28,13 @@ def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
 
    return response
 
-def generate_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
+def verify_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
+   stored = redis_client.get_model(Namespace.CHALLENGES, req.client_id, ChallengeResponse)
+   if not stored:
+      raise ClientNotFound(req.client_id)
+   if stored.challenge_id != req.challenge_id:
+      raise ValueError("Challenge ID mismatch")
+
    api_key = generate_api_key(prefix="api")
    ttl_seconds = get_ttl(Namespace.API_KEYS)
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
