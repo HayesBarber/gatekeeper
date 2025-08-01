@@ -5,12 +5,13 @@ from app.models.challenge_verification_response import ChallengeVerificationResp
 from app.models.exceptions import ClientNotFound
 from curveauth.challenge import generate_challenge
 from curveauth.api_keys import generate_api_key
+from curveauth.signatures import verify_signature
 import secrets
 from datetime import datetime, timedelta, timezone
 from app.utils.redis_client import redis_client, Namespace, get_ttl
 
 def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
-   if not redis_client.get(req.client_id):
+   if not redis_client.get(Namespace.USERS, req.client_id):
       raise ClientNotFound(req.client_id)
 
    challenge_id = secrets.token_hex(16)
@@ -34,6 +35,12 @@ def verify_challenge_response(req: ChallengeVerificationRequest) -> ChallengeVer
       raise ClientNotFound(req.client_id)
    if stored.challenge_id != req.challenge_id:
       raise ValueError("Challenge ID mismatch")
+   
+   public_key = redis_client.get(Namespace.USERS, req.client_id)
+   if not public_key:
+      raise ClientNotFound(req.client_id)
+   
+   verified = verify_signature(stored.challenge, req.signature, public_key, True)
 
    api_key = generate_api_key(prefix="api")
    ttl_seconds = get_ttl(Namespace.API_KEYS)
