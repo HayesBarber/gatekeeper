@@ -55,4 +55,6 @@ def verify_challenge(req: ChallengeVerificationRequest) -> ChallengeVerification
       expires_at=expires
    )
 
+   redis_client.delete(Namespace.CHALLENGES, req.client_id)
+
    return response
