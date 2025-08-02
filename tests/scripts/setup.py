@@ -3,6 +3,7 @@ from curveauth.keys import ECCKeyPair
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from app.main import app
 
 def seed_redis():
     client_id = "Test_User"
@@ -42,4 +43,6 @@ def run_dummy_upstream():
     server.run()
 
 def start_app():
-    pass
+    config = uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info")
+    server = uvicorn.Server(config)
+    server.run()
