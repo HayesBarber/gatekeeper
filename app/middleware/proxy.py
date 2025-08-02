@@ -44,7 +44,8 @@ async def proxy_middleware(request: Request, call_next):
                 method=request.method,
                 url=forward_url,
                 headers=headers,
-                content=await request.body()
+                content=await request.body(),
+                follow_redirects=True
             )
             return Response(
                 status_code=proxy_response.status_code,
