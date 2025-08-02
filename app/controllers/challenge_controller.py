@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.models import ChallengeRequest, ChallengeVerificationRequest, ChallengeVerificationResponse
-from app.models.exceptions import ClientNotFound, ChallengeNotVerified
+from app.models import ChallengeRequest, ChallengeVerificationRequest, ChallengeVerificationResponse, ClientNotFound, ChallengeNotVerified
 from app.services import challenge_service
 
 router = APIRouter(prefix="/challenge", tags=["Challenge"])

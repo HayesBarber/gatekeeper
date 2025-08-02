@@ -1,7 +1,7 @@
-from .logger import logger
-from .redis_client import RedisClient
+from .logger import LOGGER
+from .redis_client import redis_client
 
 __all__ = [
-    "logger",
-    "RedisClient",
+    "LOGGER",
+    "redis_client",
 ]
