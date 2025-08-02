@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse, Response
 from app.utils.logger import LOGGER
 from app.config import settings
 from app.utils.redis_client import redis_client, Namespace
-from app.models.challenge_verification_response import ChallengeVerificationResponse
+from app.models import ChallengeVerificationResponse
 import httpx
 
 async def proxy_middleware(request: Request, call_next):
