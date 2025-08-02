@@ -61,20 +61,17 @@ def start_app():
     server.run()
 
 if __name__ == "__main__":
-    from time import sleep
-
     seed_redis()
 
     upstream_proc = Process(target=run_dummy_upstream)
     app_proc = Process(target=start_app)
 
+    print("Services starting...")
+
     upstream_proc.start()
     app_proc.start()
 
-    print("Services starting...")
-    sleep(1)
-
-    print("Ready. Use your scripts to test.")
+    print("Ready. Run tests with pytest")
 
     try:
         upstream_proc.join()
