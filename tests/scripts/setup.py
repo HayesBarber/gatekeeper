@@ -30,8 +30,7 @@ def seed_redis():
 
     return client_id, keypair
 
-def load_seeded_user():
-    data_path = Path(__file__).parent.parent / "seeded_user.json"
+def load_seeded_user(data_path: Path):
     loaded = json.loads(data_path.read_text())
 
     client_id = loaded["client_id"]
