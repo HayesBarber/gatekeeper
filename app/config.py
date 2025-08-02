@@ -14,3 +14,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+LOGGER.info(f"Loaded settings: {settings.model_dump_json()}")
