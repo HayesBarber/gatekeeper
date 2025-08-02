@@ -25,7 +25,8 @@ def seed_redis():
         "public_key": public_key,
     }
 
-    data_path = Path(__file__).parent.parent / "seeded_user.json"
+    data_path = Path(__file__).parent.parent / "generated/seeded_user.json"
+    data_path.parent.mkdir(parents=True, exist_ok=True)
     data_path.write_text(json.dumps(test_data))
 
     return client_id, keypair
