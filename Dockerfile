@@ -1,14 +1,19 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS builder
 
-WORKDIR /gatekeeper
+WORKDIR /app
 
 RUN apt-get update
 RUN apt-get install -y git
 
 COPY requirements.txt .
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --prefix=/install -r requirements.txt
 
+FROM python:3.11-slim
+
+WORKDIR /gatekeeper
+
+COPY --from=builder /install /usr/local
 COPY . .
 
 EXPOSE 8000
