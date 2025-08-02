@@ -1,4 +1,5 @@
 fastapi
+redis
 uvicorn
 httpx
 pydantic-settings
