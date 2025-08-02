@@ -48,11 +48,12 @@ def run_dummy_upstream():
 
 def start_app():
     from app.config import settings
-    settings.blacklisted_paths = ["/proxy/blocked"]
+    settings.blacklisted_paths = ["/proxy/blocked", "/blocked"]
     settings.required_headers = {
         "User-Agent": "test-user-agent",
     }
     settings.upstream_base_url = "http://127.0.0.1:8080"
+    settings.proxy_path = "/proxy"
 
     from app.main import app
     config = uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info")
