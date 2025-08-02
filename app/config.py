@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    required_headers: list[str] = []
+    required_headers: dict[str, str | None] = {}
     proxy_path: str = "/proxy"
     api_key_header: str = "x-api-key"
     client_id_header: str = "x-requestor-id"
