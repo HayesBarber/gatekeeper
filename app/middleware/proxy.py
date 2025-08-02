@@ -36,7 +36,7 @@ async def proxy_middleware(request: Request, call_next):
     LOGGER.info(f"[Proxy] Authorized request for client {client_id}, forwarding")
 
     async with httpx.AsyncClient() as client:
-        forward_url = f"{settings.upstream_base_url}{request.url.path.removeprefix(settings.proxy_path)}"
+        forward_url = f"{settings.upstream_base_url}{request.url.path.removeprefix(settings.proxy_path)}/"
         headers = dict(request.headers)
         headers.pop("host", None)
         try:
@@ -48,7 +48,7 @@ async def proxy_middleware(request: Request, call_next):
             )
             return JSONResponse(
                 status_code=proxy_response.status_code,
-                content=proxy_response.content,
+                content=proxy_response.json(),
                 headers=dict(proxy_response.headers)
             )
         except httpx.RequestError as e:
