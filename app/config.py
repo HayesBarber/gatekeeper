@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from app.utils.logger import LOGGER
 
 class Settings(BaseSettings):
     required_headers: dict[str, str | None] = {}
@@ -13,3 +14,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+LOGGER.info(f"Loaded settings: {settings.model_dump_json()}")
