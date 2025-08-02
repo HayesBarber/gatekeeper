@@ -1,8 +1,4 @@
-from app.models.challenge_response import ChallengeResponse
-from app.models.challenge_request import ChallengeRequest
-from app.models.challenge_verification_request import ChallengeVerificationRequest
-from app.models.challenge_verification_response import ChallengeVerificationResponse
-from app.models.exceptions import ClientNotFound, ChallengeNotVerified
+from app.models import ChallengeResponse, ChallengeRequest, ChallengeVerificationRequest, ChallengeVerificationResponse, ClientNotFound, ChallengeNotVerified
 from curveauth.challenge import generate_challenge
 from curveauth.api_keys import generate_api_key
 from curveauth.signatures import verify_signature
