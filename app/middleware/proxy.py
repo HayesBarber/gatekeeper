@@ -4,6 +4,7 @@ from app.utils.logger import LOGGER
 from app.config import settings
 from app.utils.redis_client import redis_client, Namespace
 from app.models.challenge_verification_response import ChallengeVerificationResponse
+import httpx
 
 async def proxy_middleware(request: Request, call_next):
     LOGGER.info(f"[Proxy] Checking for proxy eligibility for {request.method} {request.url.path}")
@@ -33,4 +34,23 @@ async def proxy_middleware(request: Request, call_next):
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     LOGGER.info(f"[Proxy] Authorized request for client {client_id}, forwarding")
-    return await call_next(request)
+
+    async with httpx.AsyncClient() as client:
+        forward_url = f"{settings.upstream_base_url}{request.url.path.removeprefix(settings.proxy_path)}"
+        headers = dict(request.headers)
+        headers.pop("host", None)
+        try:
+            proxy_response = await client.request(
+                method=request.method,
+                url=forward_url,
+                headers=headers,
+                content=await request.body()
+            )
+            return JSONResponse(
+                status_code=proxy_response.status_code,
+                content=proxy_response.content,
+                headers=dict(proxy_response.headers)
+            )
+        except httpx.RequestError as e:
+            LOGGER.error(f"[Proxy] Error forwarding request: {e}")
+            return JSONResponse(status_code=502, content={"detail": "Bad gateway"})
