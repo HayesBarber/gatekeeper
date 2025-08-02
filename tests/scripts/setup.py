@@ -8,6 +8,9 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from multiprocessing import Process
+import json
+import base64
+from pathlib import Path
 
 def seed_redis():
     client_id = "Test_User"
@@ -16,7 +19,16 @@ def seed_redis():
 
     redis_client.set(Namespace.USERS, client_id, public_key)
 
-    return (client_id, keypair)
+    test_data = {
+        "client_id": client_id,
+        "private_key": base64.b64encode(keypair.private_pem()).decode("utf-8"),
+        "public_key": public_key,
+    }
+
+    data_path = Path(__file__).parent.parent / "seeded_user.json"
+    data_path.write_text(json.dumps(test_data))
+
+    return client_id, keypair
 
 def create_dummy_upstream_app() -> FastAPI:
     app = FastAPI()
