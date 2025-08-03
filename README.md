@@ -50,7 +50,13 @@ A typical request flow involves:
    The client submits the signature, challenge ID, and client ID. If valid, gatekeeper returns a temporary API key.
 
 4. **Authenticated Proxy Request**
-   The client includes the API key, client id, and other required headers when making a request through gatekeeper. If all validations pass, the request is proxied to the upstream service.
+   The client includes the API key, client id, and any other required headers when making a request through gatekeeper. If all validations pass, the request is proxied to the upstream service.
+
+   ```bash
+   curl http://localhost:8000/proxy/echo \
+     -H "x-api-key: your-api-key" \
+     -H "x-requestor-id: your-client-id"
+   ```
 
 ## Configuration
 
