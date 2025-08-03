@@ -39,7 +39,7 @@ A typical request flow involves:
 1. **Challenge Request**
    The client sends its ID to request a challenge string and challenge ID.
 
-   > gatekeeper assumes the client ID is already registered, it does not handle user creation
+   > gatekeeper assumes the client ID and public key are already registered, it does not handle user creation
 
 2. **Challenge Signing**
    The client signs the received challenge using its ECC private key.
