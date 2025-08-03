@@ -41,6 +41,7 @@ def test_challenge_flow():
         },
     )
     assert proxy_resp.status_code == 200
+    assert proxy_resp.json()["path"] == "/echo"
 
 def test_verify_challenge_invalid_signature():
     client_id, _ = load_seeded_user(
