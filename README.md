@@ -1,19 +1,56 @@
 # gatekeeper
 
-1 / 2 sentence overview
+FastAPI-based API gateway that protects upstream services by requiring cryptographic authentication and fine-grained request filtering.
 
 ## Features
 
-list of features
+- **Challenge-Response Authentication**: Clients must solve a cryptographic challenge before receiving an API key.
+- **API Key Management**: Time-limited API keys are issued after successful challenge verification.
+- **Proxying Requests**: Authorized requests are forwarded to an upstream service.
+- **Blacklist Middleware**: Requests to configured paths/methods can be blocked entirely.
+- **Header Enforcement**: Configurable headers must be present (and optionally match expected values).
 
 ## Configuration
 
-discuss config.py and an example .env
+Configuration is handled in `app/config.py`, which loads values from a `.env` file. Here's an example `.env` file:
+
+```
+# .env
+CLIENT_ID_HEADER=x-client-id
+API_KEY_HEADER=x-api-key
+PROXY_PATH=/proxy
+UPSTREAM_BASE_URL=http://localhost:8001
+REQUIRED_HEADERS={"x-custom-header": "expected-value"}
+BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
+```
 
 ## Running
 
-run with uvicorn or docker build and docker run
+To run locally with Uvicorn:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+To build and run with Docker:
+
+```bash
+docker build -t gatekeeper .
+docker run --network host gatekeeper
+```
+
+> **Note:** The service expects a running Redis instance.
 
 ## Testing
 
-First run the setup.py, then run pytest
+First, run the setup script to seed Redis with a test user, setup a dummy upstream API, and run gatekeeper itself:
+
+```bash
+python tests/scripts/setup.py
+```
+
+Then, in another terminal, run the tests:
+
+```bash
+pytest
+```
