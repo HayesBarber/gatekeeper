@@ -5,6 +5,7 @@ from app.config import settings
 from app.utils.redis_client import redis_client, Namespace
 from app.models import ChallengeVerificationResponse
 import httpx
+from datetime import datetime, timezone
 
 async def proxy_middleware(request: Request, call_next):
     LOGGER.info(f"[Proxy] Checking for proxy eligibility for {request.method} {request.url.path}")
@@ -31,6 +32,10 @@ async def proxy_middleware(request: Request, call_next):
 
     if stored.api_key != api_key:
         LOGGER.warn(f"[Proxy] Invalid API key for client {client_id}")
+        return JSONResponse(status_code=403, content={"detail": "Forbidden"})
+    
+    if stored.expires_at < datetime.now(timezone.utc):
+        LOGGER.warn(f"[Proxy] API key expired for client {client_id}")
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     LOGGER.info(f"[Proxy] Authorized request for client {client_id}, forwarding")
