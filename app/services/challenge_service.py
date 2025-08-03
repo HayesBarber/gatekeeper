@@ -13,6 +13,8 @@ def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
    challenge_id = secrets.token_hex(16)
    challenge = generate_challenge()
    ttl_seconds = get_ttl(Namespace.CHALLENGES)
+   if not ttl_seconds:
+      ttl_seconds = 1
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
    response = ChallengeResponse(
@@ -44,6 +46,8 @@ def verify_challenge(req: ChallengeVerificationRequest) -> ChallengeVerification
 
    api_key = generate_api_key(prefix="api")
    ttl_seconds = get_ttl(Namespace.API_KEYS)
+   if not ttl_seconds:
+      ttl_seconds = 1
    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
    response = ChallengeVerificationResponse(
