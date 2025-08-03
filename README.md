@@ -72,7 +72,7 @@ REQUIRED_HEADERS={"x-custom-header": "expected-value"}
 BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
 ```
 
-> **Note:** All configuration keys have defaults defined in `app/config.py`. For example, if a path is listed in `BLACKLISTED_PATHS` with an empty method list (`[]`), **all HTTP methods** to that path will be blocked.
+> **Note:** All configuration keys have defaults defined in `app/config.py`. There are also some nuances. For example, if a path is listed in `BLACKLISTED_PATHS` with an empty method list (`[]`), **all HTTP methods** to that path will be blocked.
 
 ## Testing
 
