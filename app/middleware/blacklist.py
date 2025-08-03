@@ -4,7 +4,7 @@ from app.config import settings
 from app.utils.logger import LOGGER
 
 async def blacklist_middleware(request: Request, call_next):
-    request_path = request.url.path
+    request_path = request.url.path.rstrip("/") or "/"
     LOGGER.info(f"[Blacklist] Checking if path is black listed {request_path}")
 
     if request_path in settings.blacklisted_paths:
