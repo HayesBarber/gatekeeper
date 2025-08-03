@@ -71,7 +71,10 @@ def run_dummy_upstream():
 
 def start_app():
     from app.config import settings
-    settings.blacklisted_paths = ["/proxy/blocked", "/blocked"]
+    settings.blacklisted_paths = {
+       "/proxy/blocked": [],
+       "/blocked": [],
+    }
     settings.required_headers = {
         "User-Agent": "test-user-agent",
     }
