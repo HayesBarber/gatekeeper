@@ -45,6 +45,7 @@ A typical request flow involves:
    The client signs the received challenge using its ECC private key.
 
    > gatekeeper expects signatures using Elliptic Curve Cryptography (ECC). The [`curveauth-py`](https://github.com/HayesBarber/curveauth-py) or [`curveauth-dart`](https://github.com/HayesBarber/curveauth-dart) libraries can be used to handle key generation and signing.
+   > Signature verification expects a base64-encoded signature and a base64-encoded raw public key.
 
 3. **Challenge Verification**
    The client submits the signature, challenge ID, and client ID. If valid, gatekeeper returns a temporary API key.
