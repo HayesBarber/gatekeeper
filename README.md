@@ -36,7 +36,7 @@ To build and run with Docker:
 
 ```bash
 docker build -t gatekeeper .
-docker run --network host gatekeeper
+docker run -d --network host --name gatekeeper gatekeeper
 ```
 
 > **Note:** The service expects a running Redis instance.
