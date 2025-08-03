@@ -8,7 +8,9 @@ async def blacklist_middleware(request: Request, call_next):
     LOGGER.info(f"[Blacklist] Checking if path is black listed {request_path}")
 
     if request_path in settings.blacklisted_paths:
-        LOGGER.warn(f"Blocking request to blacklisted path: {request_path}")
-        return JSONResponse(status_code=403, content={"detail": "Access to this path is forbidden."})
+        blacklisted_methods = settings.blacklisted_paths[request_path]
+        if not blacklisted_methods or request.method.upper() in blacklisted_methods:
+            LOGGER.warn(f"Blocking {request.method} request to blacklisted path: {request_path}")
+            return JSONResponse(status_code=403, content={"detail": "Access to this path is forbidden."})
 
     return await call_next(request)
