@@ -24,6 +24,8 @@ REQUIRED_HEADERS={"x-custom-header": "expected-value"}
 BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
 ```
 
+> **Note:** All configuration keys have defaults defined in `app/config.py`. For example, if a path is listed in `BLACKLISTED_PATHS` with an empty method list (`[]`), **all HTTP methods** to that path will be blocked.
+
 ## Running
 
 To run locally with Uvicorn:
@@ -39,7 +41,12 @@ docker build -t gatekeeper .
 docker run -d --network host --name gatekeeper gatekeeper
 ```
 
-> **Note:** The service expects a running Redis instance.
+> **Note:** The service expects a running Redis instance. You can run Redis however you prefer — for example, with Homebrew:
+
+```bash
+brew install redis
+brew services start redis
+```
 
 ## Testing
 
