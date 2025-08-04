@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from app.models import ChallengeRequest, ChallengeVerificationRequest, ChallengeVerificationResponse, ClientNotFound, ChallengeNotVerified
+from app.models import ChallengeRequest, ChallengeResponse, ChallengeVerificationRequest, ChallengeVerificationResponse, ClientNotFound, ChallengeNotVerified
 from app.services import challenge_service
 
 router = APIRouter(prefix="/challenge", tags=["Challenge"])
 
-@router.post("/")
+@router.post("/", response_model=ChallengeResponse)
 def generate_challenge(req: ChallengeRequest):
     try:
         return challenge_service.generate_challenge_response(req)
