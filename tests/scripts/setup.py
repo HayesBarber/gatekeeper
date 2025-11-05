@@ -72,9 +72,9 @@ def create_dummy_upstream_app() -> FastAPI:
     return app
 
 
-def run_dummy_upstream():
+def run_dummy_upstream(port: int = 8080):
     app = create_dummy_upstream_app()
-    config = uvicorn.Config(app, host="127.0.0.1", port=8080, log_level="info")
+    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="info")
     server = uvicorn.Server(config)
     server.run()
 
@@ -102,20 +102,24 @@ def start_app():
 if __name__ == "__main__":
     seed_redis()
 
-    upstream_proc = Process(target=run_dummy_upstream)
+    upstream1 = Process(target=run_dummy_upstream, args=(8080,))
+    upstream2 = Process(target=run_dummy_upstream, args=(8081,))
     app_proc = Process(target=start_app)
 
     print("Services starting...")
 
-    upstream_proc.start()
+    upstream1.start()
+    upstream2.start()
     app_proc.start()
 
     print("Ready. Run tests with pytest")
 
     try:
-        upstream_proc.join()
+        upstream1.join()
+        upstream2.join()
         app_proc.join()
     except KeyboardInterrupt:
         print("Shutting down...")
-        upstream_proc.terminate()
+        upstream1.terminate()
+        upstream2.terminate()
         app_proc.terminate()
