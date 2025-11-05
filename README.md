@@ -68,7 +68,16 @@ A typical request flow involves:
 
 ## Configuration
 
-Configuration is handled in `app/config.py`, which loads values from a `.env` file. Here's an example `.env` file:
+Configuration is handled in `app/config.py`, which loads values from a `.env` file.
+
+- CLIENT_ID_HEADER: Required header to identify the client for API keys / Challenges
+- API_KEY_HEADER: Required header for the API key
+- PROXY_PATH: Prefix path that identifies a request wanting to be forwarded
+- UPSTREAMS: JSON mapping of prefix -> base URL (e.g. {"": "http://localhost:8080", "/api/v1": "http://localhost:8081"})
+- REQUIRED_HEADERS: JSON mapping of header -> expected value (null to only require presence)
+- BLACKLISTED_PATHS: JSON mapping of path -> list of allowed methods ["GET", "POST", etc...] (empty list disables all methods to that path)
+
+Example `.env`:
 
 ```
 # .env
