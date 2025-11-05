@@ -55,6 +55,7 @@ async def proxy_middleware(request: Request, call_next):
 
     resolved = settings.resolve_upstream(rel_path)
     if not resolved:
+        LOGGER.info(f"[Proxy] No resolved upstream path for {rel_path}")
         return JSONResponse(
             status_code=502, content={"detail": "No upstream configured"}
         )
@@ -62,6 +63,7 @@ async def proxy_middleware(request: Request, call_next):
     base, trimmed_path = resolved
 
     forward_url = f"{base}{trimmed_path}"
+    LOGGER.info(f"[Proxy] Forward URL: {forward_url}")
 
     async with httpx.AsyncClient() as client:
         headers = dict(request.headers)
