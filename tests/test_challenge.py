@@ -3,6 +3,7 @@ from tests.scripts.setup import load_seeded_user
 from pathlib import Path
 from curveauth.signatures import sign_message
 
+
 def test_challenge_flow():
     client_id, keypair = load_seeded_user(
         Path(__file__).parent / "generated/seeded_user.json"
@@ -42,6 +43,7 @@ def test_challenge_flow():
     )
     assert proxy_resp.status_code == 200
     assert proxy_resp.json()["path"] == "/echo"
+
 
 def test_verify_challenge_invalid_signature():
     client_id, _ = load_seeded_user(
