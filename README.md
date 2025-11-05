@@ -68,7 +68,7 @@ Configuration is handled in `app/config.py`, which loads values from a `.env` fi
 CLIENT_ID_HEADER=x-client-id
 API_KEY_HEADER=x-api-key
 PROXY_PATH=/proxy
-UPSTREAM_BASE_URL=http://localhost:8001
+UPSTREAMS={"": "http://localhost:8080", "/home-api": "http://localhost:8081", "/api/v2": "http://localhost:8082"}
 REQUIRED_HEADERS={"x-custom-header": "expected-value"}
 BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
 ```
