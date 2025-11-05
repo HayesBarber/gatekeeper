@@ -15,13 +15,20 @@ FastAPI-based API gateway that protects upstream services by requiring cryptogra
 To run locally with Uvicorn:
 
 ```bash
+# install deps first (one time only)
+pip install -r requirements.txt
+
+# run the app
 uvicorn app.main:app --reload
 ```
 
 To build and run with Docker:
 
 ```bash
+# build the image
 docker build -t gatekeeper .
+
+# run it
 docker run -d --network host --name gatekeeper gatekeeper
 ```
 
