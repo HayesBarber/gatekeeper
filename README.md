@@ -74,6 +74,7 @@ Configuration is handled in `app/config.py`, which loads values from a `.env` fi
 - API_KEY_HEADER: Name of the header containing the API key used to authenticate proxied requests
 - PROXY_PATH: URL prefix that marks requests to be forwarded to an upstream
 - UPSTREAMS: JSON mapping of prefix -> base URL (e.g. {"": "http://localhost:8080", "/api/v1": "http://localhost:8081"})
+  - PROXY_PATH is stripped from the incoming request before resolving an upstream. The remaining path is matched using longest-prefix match against UPSTREAMS, and the matched prefix is removed before constructing the final upstream URL. See example below
 - REQUIRED_HEADERS: JSON mapping of header -> expected value (null to only require presence)
 - BLACKLISTED_PATHS: JSON mapping of path -> list of allowed methods ["GET", "POST", etc...] (empty list disables all methods to that path)
 
@@ -90,6 +91,22 @@ BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
 ```
 
 > **Note:** All configuration keys have defaults defined in `app/config.py`. There are also some nuances. For example, if a path is listed in `BLACKLISTED_PATHS` with an empty method list (`[]`), **all HTTP methods** to that path will be blocked.
+
+## Example: how a proxied request resolves
+
+- Settings:
+
+  - PROXY_PATH = /proxy
+  - UPSTREAMS = { "/home-api": "http://localhost:8081", "": "http://localhost:8080" }
+
+- Incoming request to gatekeeper:
+  - URL: http://localhost:8000/proxy/home-api/health
+  - After removing PROXY_PATH -> "/home-api/health"
+  - Longest-prefix match -> "/home-api" -> upstream base "http://localhost:8081"
+  - Remaining (trimmed) path -> "/health"
+  - Forwarded request to upstream -> http://localhost:8081/health
+
+The empty-string key ("") in UPSTREAMS acts as the default fallback and will match any path not matched by a longer prefix.
 
 ## Testing
 
