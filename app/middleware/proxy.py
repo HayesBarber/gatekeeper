@@ -51,8 +51,19 @@ async def proxy_middleware(request: Request, call_next):
 
     LOGGER.info(f"[Proxy] Authorized request for client {client_id}, forwarding")
 
+    rel_path = request.url.path.removeprefix(settings.proxy_path)
+
+    resolved = settings.resolve_upstream(rel_path)
+    if not resolved:
+        return JSONResponse(
+            status_code=502, content={"detail": "No upstream configured"}
+        )
+
+    base, trimmed_path = resolved
+
+    forward_url = f"{base}{trimmed_path}"
+
     async with httpx.AsyncClient() as client:
-        forward_url = f"{settings.upstream_base_url}{request.url.path.removeprefix(settings.proxy_path)}"
         headers = dict(request.headers)
         headers.pop("host", None)
         try:
