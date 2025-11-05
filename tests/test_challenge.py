@@ -33,16 +33,17 @@ def test_challenge_flow():
     api_key = verify_resp.json()["api_key"]
     assert api_key
 
-    proxy_resp = requests.get(
-        "http://localhost:8000/proxy/api1/echo",
-        headers={
-            "x-api-key": api_key,
-            "x-requestor-id": client_id,
-            "User-Agent": "test-user-agent",
-        },
-    )
-    assert proxy_resp.status_code == 200
-    assert proxy_resp.json()["path"] == "/echo"
+    for i in range(1, 3):
+        proxy_resp = requests.get(
+            f"http://localhost:8000/proxy/api{i}/echo",
+            headers={
+                "x-api-key": api_key,
+                "x-requestor-id": client_id,
+                "User-Agent": "test-user-agent",
+            },
+        )
+        assert proxy_resp.status_code == 200
+        assert proxy_resp.json()["path"] == "/echo"
 
 
 def test_verify_challenge_invalid_signature():
