@@ -89,7 +89,10 @@ def start_app():
     settings.required_headers = {
         "User-Agent": "test-user-agent",
     }
-    settings.upstreams = {"": "http://127.0.0.1:8080"}
+    settings.upstreams = {
+        "/api1": "http://127.0.0.1:8080",
+        "/api2": "http://127.0.0.1:8081",
+    }
     settings.proxy_path = "/proxy"
 
     from app.main import app

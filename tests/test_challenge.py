@@ -34,7 +34,7 @@ def test_challenge_flow():
     assert api_key
 
     proxy_resp = requests.get(
-        "http://localhost:8000/proxy/echo",
+        "http://localhost:8000/proxy/api1/echo",
         headers={
             "x-api-key": api_key,
             "x-requestor-id": client_id,
