@@ -14,11 +14,10 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    def get_upstream_for_path(self, path: str) -> str | None:
+    def get_upstream_for_path(self, path: str) -> tuple[str, str] | None:
         """
-        Return the upstream base URL that best matches `path` using
-        longest-prefix match. `path` is expected to be the portion
-        after the proxy_path (may start with '/').
+        Return (matched_prefix, upstream_base_url) using longest-prefix match.
+        `path` is the portion after the proxy_path (may start with '/').
         """
         if not path.startswith("/"):
             path = "/" + path
@@ -26,7 +25,31 @@ class Settings(BaseSettings):
         if not matches:
             return None
         prefix, url = max(matches, key=lambda x: len(x[0]))
-        return url
+        return prefix, url
+
+    def resolve_upstream(self, path: str) -> tuple[str, str] | None:
+        """
+        Return (base_url, trimmed_path) where trimmed_path has the matched prefix removed.
+        Example:
+          path="/home-api/health", match prefix="/home-api" -> returns ("http://...:8081", "/health")
+        """
+        if not path.startswith("/"):
+            path = "/" + path
+        match = self.get_upstream_for_path(path)
+        if not match:
+            return None
+
+        prefix, base = match
+
+        if prefix:
+            trimmed = path[len(prefix) :]
+            if not trimmed:
+                trimmed = "/"
+            elif not trimmed.startswith("/"):
+                trimmed = "/" + trimmed
+        else:
+            trimmed = path
+        return base, trimmed
 
 
 settings = Settings()
