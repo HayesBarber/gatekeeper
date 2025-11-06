@@ -29,7 +29,7 @@ To build and run with Docker:
 docker build -t gatekeeper .
 
 # run it
-docker run -d --network host --name gatekeeper gatekeeper
+docker run -d --network host --env-file .gatekeeper.env --name gatekeeper gatekeeper
 ```
 
 > **Note:** The service expects a running Redis instance. You can run Redis however you prefer — for example, with Homebrew:
