@@ -20,6 +20,8 @@ class Settings(BaseSettings):
         Return (matched_prefix, upstream_base_url) using longest-prefix match.
         `path` is the portion after the proxy_path (may start with '/').
         """
+        if not path:
+            path = "/"
         if not path.startswith("/"):
             path = "/" + path
         matches = [(p, u) for p, u in self.upstreams.items() if path.startswith(p)]
@@ -34,6 +36,8 @@ class Settings(BaseSettings):
         Example:
           path="/home-api/health", match prefix="/home-api" -> returns ("http://...:8081", "/health")
         """
+        if not path:
+            path = "/"
         if not path.startswith("/"):
             path = "/" + path
         match = self.get_upstream_for_path(path)
