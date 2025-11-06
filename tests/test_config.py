@@ -28,6 +28,7 @@ def test_resolve_upstream_exact_prefix_returns_root_path():
     s = Settings(
         upstreams={
             "/api": "http://a",
+            "/api2": "http://b",
         }
     )
     base, trimmed = s.resolve_upstream("/api")
