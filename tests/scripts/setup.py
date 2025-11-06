@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from app.utils.redis_client import redis_client, Namespace
@@ -11,6 +12,7 @@ from multiprocessing import Process
 import json
 import base64
 from pathlib import Path
+
 
 def seed_redis():
     client_id = "Test_User"
@@ -31,78 +33,85 @@ def seed_redis():
 
     return client_id, keypair
 
-def load_seeded_user(data_path: Path):
-    loaded = json.loads(data_path.read_text())
-
-    client_id = loaded["client_id"]
-    private_pem = base64.b64decode(loaded["private_key"])
-
-    keypair = ECCKeyPair.load_private_pem(private_pem)
-
-    return client_id, keypair
 
 def create_dummy_upstream_app() -> FastAPI:
     app = FastAPI()
 
     @app.get("/echo")
     async def echo_get(request: Request):
-        return JSONResponse({
-            "method": "GET",
-            "headers": dict(request.headers),
-            "path": str(request.url.path),
-        })
+        return JSONResponse(
+            {
+                "method": "GET",
+                "headers": dict(request.headers),
+                "path": str(request.url.path),
+            }
+        )
 
     @app.post("/echo")
     async def echo_post(request: Request):
         body = await request.json()
-        return JSONResponse({
-            "method": "POST",
-            "headers": dict(request.headers),
-            "body": body,
-        })
+        return JSONResponse(
+            {
+                "method": "POST",
+                "headers": dict(request.headers),
+                "body": body,
+            }
+        )
 
     return app
 
-def run_dummy_upstream():
+
+def run_dummy_upstream(port: int = 8080):
     app = create_dummy_upstream_app()
-    config = uvicorn.Config(app, host="127.0.0.1", port=8080, log_level="info")
+    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="info")
     server = uvicorn.Server(config)
     server.run()
 
+
 def start_app():
     from app.config import settings
+
     settings.blacklisted_paths = {
-       "/proxy/blocked": [],
-       "/blocked": [],
+        "/proxy/blocked": [],
+        "/blocked": [],
     }
     settings.required_headers = {
         "User-Agent": "test-user-agent",
     }
-    settings.upstream_base_url = "http://127.0.0.1:8080"
+    settings.upstreams = {
+        "/api1": "http://127.0.0.1:8080",
+        "/api2": "http://127.0.0.1:8081",
+    }
     settings.proxy_path = "/proxy"
 
     from app.main import app
+
     config = uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info")
     server = uvicorn.Server(config)
     server.run()
 
+
 if __name__ == "__main__":
     seed_redis()
 
-    upstream_proc = Process(target=run_dummy_upstream)
+    upstream1 = Process(target=run_dummy_upstream, args=(8080,))
+    upstream2 = Process(target=run_dummy_upstream, args=(8081,))
     app_proc = Process(target=start_app)
 
     print("Services starting...")
 
-    upstream_proc.start()
+    upstream1.start()
+    upstream2.start()
     app_proc.start()
 
     print("Ready. Run tests with pytest")
 
     try:
-        upstream_proc.join()
+        upstream1.join()
+        upstream2.join()
         app_proc.join()
     except KeyboardInterrupt:
         print("Shutting down...")
-        upstream_proc.terminate()
+        upstream1.terminate()
+        upstream2.terminate()
         app_proc.terminate()
