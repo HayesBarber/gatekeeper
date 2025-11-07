@@ -23,3 +23,13 @@ def handle(args, console: Console):
 def get_instances() -> GkInstances:
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
     return instances_model
+
+
+def get_active_instance() -> GkInstance | None:
+    instances = get_instances()
+
+    for instance in instances.instances:
+        if instance.active:
+            return instance
+
+    return None
