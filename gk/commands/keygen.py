@@ -1,4 +1,5 @@
 from rich.console import Console
+from curveauth.keys import ECCKeyPair
 
 
 def add_subparser(subparsers):
@@ -9,4 +10,4 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    pass
+    keypair = ECCKeyPair.generate()
