@@ -8,4 +8,6 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    pass
+    base_url = console.input("Base URL of the gatekeeper instance: ")
+    api_key_header = console.input("API key header name (e.g. x-api-key): ")
+    client_id_header = console.input("Client ID header name (e.g. x-requestor-id): ")
