@@ -1,6 +1,6 @@
 from rich.console import Console
 from gk.models.gk_instance import GkInstance, GkInstances
-from gk.storage import StorageKey, ensure_data_dir, load_model, save_model
+from gk.storage import StorageKey, load_model, save_model
 
 
 def add_subparser(subparsers):
