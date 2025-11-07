@@ -23,7 +23,7 @@ def handle(args, console: Console):
 
     is_active = str(active).strip().lower().startswith("y")
 
-    kwargs = {"name": base_url, "active": is_active}
+    kwargs = {"base_url": base_url, "active": is_active}
     if api_key_header:
         kwargs["api_key_header"] = api_key_header
     if client_id_header:
@@ -33,14 +33,16 @@ def handle(args, console: Console):
 
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
     for i, existing in enumerate(instances_model.instances):
-        if existing.name == instance.name:
+        if existing.base_url == instance.base_url:
             instances_model.instances[i] = instance
             save_model(StorageKey.INSTANCES, instances_model)
             console.print(
-                f"Overwrote instance '{instance.name}' (active={instance.active})"
+                f"Overwrote instance '{instance.base_url}' (active={instance.active})"
             )
             break
     else:
         instances_model.instances.append(instance)
         save_model(StorageKey.INSTANCES, instances_model)
-        console.print(f"Added instance '{instance.name}' (active={instance.active})")
+        console.print(
+            f"Added instance '{instance.base_url}' (active={instance.active})"
+        )

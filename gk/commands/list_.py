@@ -1,6 +1,7 @@
 from rich.console import Console
 from gk.models.gk_instance import GkInstance, GkInstances
 from gk.storage import StorageKey, load_model
+from rich.table import Table
 
 
 def add_subparser(subparsers):
@@ -17,7 +18,31 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    pass
+    if args.active:
+        active = get_active_instance()
+        if active:
+            console.print(
+                f"[bold green]Active Instance:[/bold green] {active.base_url}"
+            )
+        else:
+            console.print("[yellow]No active instance set.[/yellow]")
+        return
+
+    instances_model = get_instances()
+    instances = instances_model.instances
+    if not instances:
+        console.print("[yellow]No instances found.[/yellow]")
+        return
+
+    table = Table(title="Gatekeeper Instances")
+    table.add_column("Base URL", style="bold")
+    table.add_column("Active", justify="center")
+
+    for instance in instances:
+        active_mark = "yes" if instance.active else "no"
+        table.add_row(instance.base_url, active_mark)
+
+    console.print(table)
 
 
 def get_instances() -> GkInstances:
