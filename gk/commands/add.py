@@ -32,7 +32,15 @@ def handle(args, console: Console):
     instance = GkInstance(**kwargs)
 
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-    instances_model.instances.append(instance)
-    save_model(StorageKey.INSTANCES, instances_model)
-
-    console.print(f"Added instance '{instance.name}' (active={instance.active})")
+    for i, existing in enumerate(instances_model.instances):
+        if existing.name == instance.name:
+            instances_model.instances[i] = instance
+            save_model(StorageKey.INSTANCES, instances_model)
+            console.print(
+                f"Overwrote instance '{instance.name}' (active={instance.active})"
+            )
+            break
+    else:
+        instances_model.instances.append(instance)
+        save_model(StorageKey.INSTANCES, instances_model)
+        console.print(f"Added instance '{instance.name}' (active={instance.active})")
