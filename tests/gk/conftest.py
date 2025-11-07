@@ -1,6 +1,6 @@
 import pytest
 from gk import cli
-from gk.models.gk_instance import GkInstance, GkInstances
+from gk.models.gk_instance import GkInstances
 from gk.storage import StorageKey
 from rich.console import Console
 

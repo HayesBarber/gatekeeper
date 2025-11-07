@@ -8,11 +8,11 @@ def test_list_command_parsing(parser):
     args = parser.parse_args(["list"])
     assert args.command == "list"
     assert hasattr(args, "handler")
-    assert args.active == False
+    assert not args.active
 
 
 def test_list_command_parsing_with_active(parser):
     args = parser.parse_args(["list", "-a"])
     assert args.command == "list"
     assert hasattr(args, "handler")
-    assert args.active == True
+    assert args.active
