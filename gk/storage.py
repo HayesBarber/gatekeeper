@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 from enum import Enum
 from typing import Type, Dict
 from pydantic import BaseModel
@@ -39,7 +38,8 @@ def load_model(key: StorageKey) -> BaseModel:
     model_cls = MODEL_FOR_KEY[key]
     if not file_path.exists():
         return model_cls()
-    return model_cls.parse_file(file_path)
+    text = file_path.read_text()
+    return model_cls.model_validate_json(text)
 
 
 def save_model(key: StorageKey, model: BaseModel):
@@ -48,4 +48,4 @@ def save_model(key: StorageKey, model: BaseModel):
     """
     file_path = path_for(key)
     with open(file_path, "w") as f:
-        f.write(model.json(indent=2))
+        f.write(model.model_dump_json(indent=2))
