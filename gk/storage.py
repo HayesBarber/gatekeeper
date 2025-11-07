@@ -1,6 +1,9 @@
 from pathlib import Path
 import json
 from enum import Enum
+from typing import Type, Dict
+from pydantic import BaseModel
+from gk.models.gk_instance import GkInstances
 
 DATA_DIR = Path.home() / ".gk"
 
@@ -22,15 +25,27 @@ def path_for(key: StorageKey) -> Path:
     return DATA_DIR / FILE_NAMES[key]
 
 
-def load_json(key: StorageKey) -> dict[str]:
+MODEL_FOR_KEY: Dict[StorageKey, Type[BaseModel]] = {
+    StorageKey.INSTANCES: GkInstances,
+}
+
+
+def load_model(key: StorageKey) -> BaseModel:
+    """
+    Load and validate JSON file into the associated Pydantic model.
+    If file is missing returns an empty/default model instance.
+    """
     file_path = path_for(key)
+    model_cls = MODEL_FOR_KEY[key]
     if not file_path.exists():
-        return {}
-    with open(file_path, "r") as f:
-        return json.load(f)
+        return model_cls()
+    return model_cls.parse_file(file_path)
 
 
-def save_json(key: StorageKey, data: dict[str]):
+def save_model(key: StorageKey, model: BaseModel):
+    """
+    Save a Pydantic model to the file corresponding to key.
+    """
     file_path = path_for(key)
     with open(file_path, "w") as f:
-        json.dump(data, f, indent=2)
+        f.write(model.json(indent=2))
