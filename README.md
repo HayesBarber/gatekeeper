@@ -108,6 +108,10 @@ BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
 
 The empty-string key ("") in UPSTREAMS acts as the default fallback and will match any path not matched by a longer prefix.
 
+## gk CLI
+
+> WIP
+
 ## Testing
 
 First, run the setup script to seed Redis with a test user, setup a dummy upstream API, and run gatekeeper itself:
