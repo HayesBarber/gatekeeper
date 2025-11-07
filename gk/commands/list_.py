@@ -39,8 +39,13 @@ def handle(args, console: Console):
     table.add_column("Active", justify="center")
 
     for instance in instances:
-        active_mark = "yes" if instance.active else "no"
-        table.add_row(instance.base_url, active_mark)
+        active_mark = "[green]yes[/green]" if instance.active else "no"
+        url = (
+            f"[green]{instance.base_url}[/green]"
+            if instance.active
+            else instance.base_url
+        )
+        table.add_row(url, active_mark)
 
     console.print(table)
 
