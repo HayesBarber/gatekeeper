@@ -1,4 +1,6 @@
 from rich.console import Console
+from gk.models.gk_instance import GkInstance, GkInstances
+from gk.storage import StorageKey, load_model
 
 
 def add_subparser(subparsers):
@@ -16,3 +18,8 @@ def add_subparser(subparsers):
 
 def handle(args, console: Console):
     pass
+
+
+def get_instances() -> GkInstances:
+    instances_model: GkInstances = load_model(StorageKey.INSTANCES)
+    return instances_model
