@@ -13,6 +13,8 @@ def add_subparser(subparsers):
     parser.add_argument(
         "-i",
         "--instance",
+        dest="instance",
+        type=str,
         help="Base URL of the Gatekeeper instance. Active instance is used if not specified",
     )
     parser.set_defaults(handler=handle)
@@ -20,7 +22,15 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    pass
+    instance = None
+
+    if args.instance:
+        instance = list_mod.get_instance_by_base_url(args.instance)
+    else:
+        instance = list_mod.get_active_instance()
+
+    if not instance:
+        console.print("[yellow]No instance found[/yellow]")
 
 
 def request_challenge(instance: GkInstance) -> ChallengeResponse:

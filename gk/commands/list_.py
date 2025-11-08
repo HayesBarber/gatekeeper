@@ -24,7 +24,7 @@ def handle(args, console: Console):
             console.print_json(active.model_dump_json())
             sys.exit(0)
         else:
-            console.print("[yellow]No active instance set.[/yellow]")
+            console.print("[yellow]No active instance set[/yellow]")
             sys.exit(1)
 
     instances_model = get_instances()
