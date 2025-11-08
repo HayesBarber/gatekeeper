@@ -35,7 +35,7 @@ def test_apikey_invalid_instance(console):
     assert "Instance not found" in output
 
 
-def test_apikey_no_keypair(console, monkeypatch, local_base_url):
+def test_apikey_no_keypair(console, console_input, local_base_url):
     inputs = [
         local_base_url,
         "hello",
@@ -46,8 +46,7 @@ def test_apikey_no_keypair(console, monkeypatch, local_base_url):
         "",
         "y",
     ]
-    input_iter = iter(inputs)
-    monkeypatch.setattr(console, "input", lambda prompt="": next(input_iter))
+    console_input(inputs)
 
     args = type("Args", (), {})()
     add.handle(args, console)

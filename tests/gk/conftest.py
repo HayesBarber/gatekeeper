@@ -20,3 +20,13 @@ def parser():
 @pytest.fixture
 def console():
     return Console(record=True)
+
+
+@pytest.fixture
+def console_input(monkeypatch, console):
+
+    def _mock(inputs: list):
+        input_iter = iter(inputs)
+        monkeypatch.setattr(console, "input", lambda prompt="": next(input_iter))
+
+    return _mock
