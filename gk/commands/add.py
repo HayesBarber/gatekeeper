@@ -1,4 +1,5 @@
 from rich.console import Console
+from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance, GkInstances
 from gk.storage import StorageKey, load_model, save_model
 from gk.commands import keygen
@@ -45,7 +46,9 @@ def handle(args, console: Console):
         data={
             **instance.model_dump(),
             **{
-                "public_key": keypair.public_key,
+                "public_key": ECCKeyPair.load_private_pem(
+                    keypair.private_key
+                ).public_key_raw_base64(),
             },
         }
     )
