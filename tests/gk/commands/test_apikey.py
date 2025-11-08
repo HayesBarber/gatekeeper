@@ -33,3 +33,22 @@ def test_apikey_invalid_instance(console):
 
     output = console.export_text()
     assert "Instance not found" in output
+
+
+def test_apikey_no_keypair(console):
+    instances = [
+        GkInstance(
+            base_url="http://one.com",
+            client_id="test1",
+            active=False,
+        ),
+    ]
+    save_model(StorageKey.INSTANCES, GkInstances(instances=instances))
+
+    args = type("Args", (), {})()
+    args.instance = "http://one.com"
+    with pytest.raises(SystemExit):
+        apikey.handle(args, console)
+
+    output = console.export_text()
+    assert "No keypair found" in output
