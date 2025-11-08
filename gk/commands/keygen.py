@@ -22,18 +22,28 @@ def handle(args, console: Console):
         sys.exit(1)
 
     keypair = generate_keypair_for_instance(instance)
+    overwrote: bool = persist_keypair(keypair)
+    if overwrote:
+        console.print(f"Overwrote keypair for '{keypair.instance_base_url}'")
+    else:
+        console.print(f"Added keypair for '{keypair.instance_base_url}")
+
+
+def persist_keypair(keypair: GkKeyPair) -> bool:
+    """
+    returns true if keypair overwrote an existing
+    """
     instances_model: GkKeyPairs = get_keypairs()
 
     for i, existing in enumerate(instances_model.keypairs):
         if existing.instance_base_url == keypair.instance_base_url:
             instances_model.keypairs[i] = keypair
             save_model(StorageKey.KEYPAIRS, instances_model)
-            console.print(f"Overwrote keypair for '{keypair.instance_base_url}'")
-            break
-    else:
-        instances_model.keypairs.append(keypair)
-        save_model(StorageKey.KEYPAIRS, instances_model)
-        console.print(f"Added keypair for '{keypair.instance_base_url}")
+            return True
+
+    instances_model.keypairs.append(keypair)
+    save_model(StorageKey.KEYPAIRS, instances_model)
+    return False
 
 
 def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:
