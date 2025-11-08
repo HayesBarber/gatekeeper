@@ -52,5 +52,9 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
         headers=headers,
         json=req.model_dump(),
     )
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        print(response.json())
+        sys.exit(1)
+
     return ChallengeResponse.model_validate(response.json())
