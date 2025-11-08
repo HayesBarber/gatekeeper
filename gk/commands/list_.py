@@ -1,7 +1,6 @@
 from rich.console import Console
 from gk.models.gk_instance import GkInstance, GkInstances
 from gk.storage import StorageKey, load_model
-from rich.table import Table
 import sys
 
 
@@ -22,34 +21,15 @@ def handle(args, console: Console):
     if args.active:
         active = get_active_instance()
         if active:
-            console.print(
-                f"[bold green]Active Instance:[/bold green] {active.base_url}"
-            )
+            console.print_json(active.model_dump_json())
             sys.exit(0)
         else:
             console.print("[yellow]No active instance set.[/yellow]")
             sys.exit(1)
 
     instances_model = get_instances()
-    instances = instances_model.instances
-    if not instances:
-        console.print("[yellow]No instances found.[/yellow]")
-        sys.exit(1)
 
-    table = Table(title="Gatekeeper Instances")
-    table.add_column("Base URL", style="bold")
-    table.add_column("Active", justify="center")
-
-    for instance in instances:
-        active_mark = "[green]yes[/green]" if instance.active else "no"
-        url = (
-            f"[green]{instance.base_url}[/green]"
-            if instance.active
-            else instance.base_url
-        )
-        table.add_row(url, active_mark)
-
-    console.print(table)
+    console.print_json(instances_model.model_dump_json())
 
 
 def get_instances() -> GkInstances:
