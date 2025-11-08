@@ -11,10 +11,8 @@ from gk.storage import StorageKey, load_model, save_model
         (["http://another.com", "test2", "x-client-id", "x-api-key", "", "n"], False),
     ],
 )
-def test_add_new_instance(console, inputs, expected_active, monkeypatch):
-    # Patch console.input to return items from inputs list
-    input_iter = iter(inputs)
-    monkeypatch.setattr(console, "input", lambda prompt="": next(input_iter))
+def test_add_new_instance(console, inputs, expected_active, console_input):
+    console_input(inputs)
 
     args = type("Args", (), {})()
     add.handle(args, console)
@@ -25,7 +23,7 @@ def test_add_new_instance(console, inputs, expected_active, monkeypatch):
     assert instances[0].active == expected_active
 
 
-def test_add_overwrite_instance(console, monkeypatch):
+def test_add_overwrite_instance(console, console_input):
     # pre-populate storage with an instance
     existing = GkInstance(
         base_url="http://existing.com",
@@ -36,8 +34,7 @@ def test_add_overwrite_instance(console, monkeypatch):
     save_model(StorageKey.INSTANCES, GkInstances(instances=[existing]))
 
     inputs = ["http://existing.com", "y", "hello", "x-client-id", "x-api-key", "", "y"]
-    input_iter = iter(inputs)
-    monkeypatch.setattr(console, "input", lambda prompt="": next(input_iter))
+    console_input(inputs)
 
     args = type("Args", (), {})()
     add.handle(args, console)
