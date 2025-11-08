@@ -26,7 +26,7 @@ def handle(args, console: Console):
     if overwrote:
         console.print(f"Overwrote keypair for '{keypair.instance_base_url}'")
     else:
-        console.print(f"Added keypair for '{keypair.instance_base_url}")
+        console.print(f"Added keypair for '{keypair.instance_base_url}'")
 
 
 def persist_keypair(keypair: GkKeyPair) -> bool:

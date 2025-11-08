@@ -1,6 +1,7 @@
 from rich.console import Console
 from gk.models.gk_instance import GkInstance, GkInstances
 from gk.storage import StorageKey, load_model, save_model
+from gk.commands import keygen
 
 
 def add_subparser(subparsers):
@@ -15,7 +16,7 @@ def handle(args, console: Console):
         base_url = console.input("Base URL of the gatekeeper instance: ")
     client_id = None
     while not client_id:
-        base_url = console.input("Client ID: ")
+        client_id = console.input("Client ID: ")
     client_id_header = console.input(
         "Client ID header name (e.g. x-requestor-id) Enter to skip: "
     )
@@ -53,3 +54,6 @@ def handle(args, console: Console):
         console.print(
             f"Added instance '{instance.base_url}' (active={instance.active})"
         )
+
+    args.instance = instance.base_url
+    keygen.handle(args, console)
