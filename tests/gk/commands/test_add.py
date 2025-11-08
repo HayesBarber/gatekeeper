@@ -7,8 +7,8 @@ from gk.storage import StorageKey, load_model, save_model
 @pytest.mark.parametrize(
     "inputs,expected_active",
     [
-        (["http://new.com", "test", "", "", "y"], True),
-        (["http://another.com", "test2", "x-client-id", "x-api-key", "n"], False),
+        (["http://new.com", "test", "", "", "", "y"], True),
+        (["http://another.com", "test2", "x-client-id", "x-api-key", "", "n"], False),
     ],
 )
 def test_add_new_instance(console, inputs, expected_active, monkeypatch):
@@ -35,7 +35,7 @@ def test_add_overwrite_instance(console, monkeypatch):
 
     save_model(StorageKey.INSTANCES, GkInstances(instances=[existing]))
 
-    inputs = ["http://existing.com", "y", "hello", "x-api-key", "x-client-id", "y"]
+    inputs = ["http://existing.com", "y", "hello", "x-client-id", "x-api-key", "", "y"]
     input_iter = iter(inputs)
     monkeypatch.setattr(console, "input", lambda prompt="": next(input_iter))
 

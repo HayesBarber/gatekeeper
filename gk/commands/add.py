@@ -39,7 +39,7 @@ def handle(args, console: Console):
         keypair.private_key
     ).public_key_raw_base64()
 
-    persist_gk_instance(instance, instances_model)
+    persist_gk_instance(instance)
     console.print_json(instance.model_dump_json())
 
 
