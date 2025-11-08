@@ -48,7 +48,7 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
         **instance.other_headers,
     }
     response = httpx.post(
-        f"{instance.base_url}/challenge",
+        f"{instance.base_url}/challenge/",
         headers=headers,
         json=req.model_dump(),
     )
