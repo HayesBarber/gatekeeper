@@ -16,7 +16,7 @@ from curveauth.signatures import sign_message
 def add_subparser(subparsers):
     parser = subparsers.add_parser(
         "apikey",
-        help="Fetch an apikey from a gatekeeper instance",
+        help="Outputs the gatekeeper instance API key, fetching a new one if the current key has expired",
     )
     parser.add_argument(
         "-i",
