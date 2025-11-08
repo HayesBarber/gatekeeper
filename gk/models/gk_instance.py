@@ -6,6 +6,7 @@ class GkInstance(BaseModel):
     api_key_header: str = "x-api-key"
     client_id_header: str = "x-requestor-id"
     active: bool
+    client_id: str
 
 
 class GkInstances(BaseModel):

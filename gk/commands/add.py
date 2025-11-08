@@ -13,17 +13,24 @@ def handle(args, console: Console):
     base_url = None
     while not base_url:
         base_url = console.input("Base URL of the gatekeeper instance: ")
-    api_key_header = console.input(
-        "API key header name (e.g. x-api-key) Enter to skip: "
-    )
+    client_id = None
+    while not client_id:
+        base_url = console.input("Client ID: ")
     client_id_header = console.input(
         "Client ID header name (e.g. x-requestor-id) Enter to skip: "
+    )
+    api_key_header = console.input(
+        "API key header name (e.g. x-api-key) Enter to skip: "
     )
     active = console.input("Set as active? y/n: ")
 
     is_active = str(active).strip().lower().startswith("y")
 
-    kwargs = {"base_url": base_url, "active": is_active}
+    kwargs = {
+        "base_url": base_url,
+        "client_id": client_id,
+        "active": is_active,
+    }
     if api_key_header:
         kwargs["api_key_header"] = api_key_header
     if client_id_header:
