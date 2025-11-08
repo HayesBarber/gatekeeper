@@ -13,14 +13,9 @@ def add_subparser(subparsers):
 
 def handle(args, console: Console):
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-    base_url, client_id, client_id_header, api_key_header, is_active, exists = (
-        gather_input(console, instances_model)
+    base_url, client_id, client_id_header, api_key_header, is_active = gather_input(
+        console, instances_model
     )
-
-    if exists:
-        should_continue = console.input("Instance exists, overwrite? y/n: ")
-        if not should_continue.strip().lower().startswith("y"):
-            sys.exit(1)
 
     kwargs = {
         "base_url": base_url,
@@ -53,6 +48,11 @@ def gather_input(console: Console, instances_model: GkInstances):
     base_url = None
     while not base_url:
         base_url = console.input("Base URL of the gatekeeper instance: ")
+    exists = instance_exists(base_url, instances_model)
+    if exists:
+        should_continue = console.input("Instance exists, overwrite? y/n: ")
+        if not should_continue.strip().lower().startswith("y"):
+            sys.exit(1)
     client_id = None
     while not client_id:
         client_id = console.input("Client ID: ")
@@ -64,8 +64,7 @@ def gather_input(console: Console, instances_model: GkInstances):
     )
     active = console.input("Set as active? y/n: ")
     is_active = str(active).strip().lower().startswith("y")
-    exists = instance_exists(base_url, instances_model)
-    return base_url, client_id, client_id_header, api_key_header, is_active, exists
+    return base_url, client_id, client_id_header, api_key_header, is_active
 
 
 def instance_exists(
