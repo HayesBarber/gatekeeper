@@ -1,7 +1,7 @@
 from rich.console import Console
 from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance, GkInstances
-from gk.storage import StorageKey, load_model, save_model
+from gk.storage import StorageKey, load_model, persist_gk_instance, persist_keypair
 from gk.commands import keygen
 import sys
 
@@ -14,8 +14,8 @@ def add_subparser(subparsers):
 
 def handle(args, console: Console):
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-    base_url, client_id, client_id_header, api_key_header, is_active = gather_input(
-        console, instances_model
+    base_url, client_id, client_id_header, api_key_header, is_active, other_headers = (
+        gather_input(console, instances_model)
     )
 
     kwargs = {
@@ -27,17 +27,19 @@ def handle(args, console: Console):
         kwargs["api_key_header"] = api_key_header
     if client_id_header:
         kwargs["client_id_header"] = client_id_header
+    if other_headers:
+        kwargs["other_headers"] = other_headers
 
     instance = GkInstance(**kwargs)
 
     keypair = keygen.generate_keypair_for_instance(instance)
-    keygen.persist_keypair(keypair)
+    persist_keypair(keypair)
 
     instance.public_key = ECCKeyPair.load_private_pem(
         keypair.private_key
     ).public_key_raw_base64()
 
-    persist_gk_instance(instance, instances_model)
+    persist_gk_instance(instance)
     console.print_json(instance.model_dump_json())
 
 
@@ -61,11 +63,25 @@ def gather_input(console: Console, instances_model: GkInstances):
     api_key_header = console.input(
         "API key header name (e.g. x-api-key) Enter to skip: "
     )
+    other_headers = {}
+    while True:
+        header_key = console.input("Other header key (press Enter to finish): ")
+        if not header_key:
+            break
+        header_value = console.input(f"Value for header '{header_key}': ")
+        other_headers[header_key] = header_value
     active = None
     while active != "y" and active != "n":
         active = console.input("Set as active? y/n: ")
     is_active = active == "y"
-    return base_url, client_id, client_id_header, api_key_header, is_active
+    return (
+        base_url,
+        client_id,
+        client_id_header,
+        api_key_header,
+        is_active,
+        other_headers,
+    )
 
 
 def instance_exists(
@@ -75,25 +91,4 @@ def instance_exists(
     for existing in instances_model.instances:
         if existing.base_url == base_url:
             return True
-    return False
-
-
-def persist_gk_instance(
-    instance: GkInstance,
-    instances_model: GkInstances | None = None,
-) -> bool:
-    """
-    returns true if keypair overwrote an existing
-    """
-    if not instances_model:
-        instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-
-    for i, existing in enumerate(instances_model.instances):
-        if existing.base_url == instance.base_url:
-            instances_model.instances[i] = instance
-            save_model(StorageKey.INSTANCES, instances_model)
-            return True
-
-    instances_model.instances.append(instance)
-    save_model(StorageKey.INSTANCES, instances_model)
     return False

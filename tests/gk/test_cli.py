@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_add_command_parsing(parser):
     args = parser.parse_args(["add"])
     assert args.command == "add"
@@ -25,3 +22,24 @@ def test_keygen_command_parsing(parser):
     args = parser.parse_args(["keygen"])
     assert args.command == "keygen"
     assert hasattr(args, "handler")
+
+
+def test_apikey_command_parsing(parser):
+    args = parser.parse_args(["apikey"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance is None
+
+
+def test_apikey_command_parsing_with_instance_short_flag(parser):
+    args = parser.parse_args(["apikey", "-i", "test"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance == "test"
+
+
+def test_apikey_command_parsing_with_instance_full_flag(parser):
+    args = parser.parse_args(["apikey", "--instance", "test1"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance == "test1"

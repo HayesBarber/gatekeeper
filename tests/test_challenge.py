@@ -2,11 +2,11 @@ import requests
 from curveauth.signatures import sign_message
 
 
-def test_challenge_flow(seeded_user):
+def test_challenge_flow(seeded_user, local_base_url):
     client_id, keypair = seeded_user
 
     resp = requests.post(
-        "http://localhost:8000/challenge",
+        f"{local_base_url}/challenge",
         json={"client_id": client_id},
         headers={"User-Agent": "test-user-agent"},
     )
@@ -17,7 +17,7 @@ def test_challenge_flow(seeded_user):
     signature = sign_message(challenge, keypair.private_pem().decode("utf-8"))
 
     verify_resp = requests.post(
-        "http://localhost:8000/challenge/verify",
+        f"{local_base_url}/challenge/verify",
         json={
             "client_id": client_id,
             "challenge_id": challenge_id,
@@ -31,7 +31,7 @@ def test_challenge_flow(seeded_user):
 
     for i in range(1, 3):
         proxy_resp = requests.get(
-            f"http://localhost:8000/proxy/api{i}/echo",
+            f"{local_base_url}/proxy/api{i}/echo",
             headers={
                 "x-api-key": api_key,
                 "x-requestor-id": client_id,
@@ -42,11 +42,11 @@ def test_challenge_flow(seeded_user):
         assert proxy_resp.json()["path"] == "/echo"
 
 
-def test_verify_challenge_invalid_signature(seeded_user):
+def test_verify_challenge_invalid_signature(seeded_user, local_base_url):
     client_id, _ = seeded_user
 
     resp = requests.post(
-        "http://localhost:8000/challenge",
+        f"{local_base_url}/challenge",
         json={"client_id": client_id},
         headers={"User-Agent": "test-user-agent"},
     )
@@ -56,7 +56,7 @@ def test_verify_challenge_invalid_signature(seeded_user):
     invalid_signature = "invalid_signature"
 
     verify_resp = requests.post(
-        "http://localhost:8000/challenge/verify",
+        f"{local_base_url}/challenge/verify",
         json={
             "client_id": client_id,
             "challenge_id": challenge_id,
@@ -67,11 +67,11 @@ def test_verify_challenge_invalid_signature(seeded_user):
     assert verify_resp.status_code == 403
 
 
-def test_proxy_request_missing_api_key(seeded_user):
+def test_proxy_request_missing_api_key(seeded_user, local_base_url):
     client_id, _ = seeded_user
 
     proxy_resp = requests.get(
-        "http://localhost:8000/proxy/echo",
+        f"{local_base_url}/proxy/echo",
         headers={
             "x-requestor-id": client_id,
             "User-Agent": "test-user-agent",

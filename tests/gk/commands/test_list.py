@@ -1,6 +1,6 @@
 from gk.commands import list_ as list_cmd
 from gk.models.gk_instance import GkInstance, GkInstances
-from gk.storage import StorageKey, load_model, save_model
+from gk.storage import StorageKey, save_model
 import pytest
 
 
