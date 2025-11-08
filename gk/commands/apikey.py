@@ -101,7 +101,7 @@ def sign_challenge(
     challenge: ChallengeResponse,
     keypair: GkKeyPair,
 ) -> ChallengeVerificationRequest:
-    signature = sign_message(challenge, keypair.private_key.decode("utf-8"))
+    signature = sign_message(challenge.challenge, keypair.private_key.decode("utf-8"))
 
     return ChallengeVerificationRequest(
         signature=signature,
