@@ -30,3 +30,8 @@ def seeded_user():
     keypair = ECCKeyPair.load_private_pem(private_pem)
 
     return client_id, keypair
+
+
+@pytest.fixture
+def local_base_url():
+    return "http://localhost:8000"
