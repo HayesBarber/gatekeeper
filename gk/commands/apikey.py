@@ -59,6 +59,14 @@ def handle(args, console: Console):
         keypair,
     )
 
+    verification_res, error = request_challenge_verification(instance, verification_req)
+
+    if error:
+        console.print_json(error)
+        sys.exit(1)
+
+    console.print_json(verification_res.model_dump_json())
+
 
 def build_headers(instance: GkInstance) -> dict:
     headers = {
