@@ -36,8 +36,19 @@ def handle(args, console: Console):
         console.print("[yellow]No instance found[/yellow]")
         sys.exit(1)
 
-    res = request_challenge(instance, console)
-    console.print_json(res.model_dump_json())
+    challeng_res = request_challenge(instance, console)
+
+    keypair = keygen.get_keypair_for_instance(instance)
+
+    if not keypair:
+        console.print("[yellow]No keypair found[/yellow]")
+        sys.exit(1)
+
+    verification_req = sign_challenge(
+        instance,
+        challeng_res,
+        keypair,
+    )
 
 
 def request_challenge(
@@ -65,7 +76,7 @@ def request_challenge(
     return ChallengeResponse.model_validate(response.json())
 
 
-def sign_challeng(
+def sign_challenge(
     instance: GkInstance,
     challenge: ChallengeResponse,
     keypair: GkKeyPair,
