@@ -1,8 +1,15 @@
 import pytest
 from gk import cli
-from gk.models.gk_instance import GkInstances
-from gk.storage import StorageKey
 from rich.console import Console
+from gk import storage
+
+
+@pytest.fixture(autouse=True)
+def _tmp_data_dir(tmp_path, monkeypatch):
+    tmp_dir = tmp_path / ".gk"
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(storage, "DATA_DIR", tmp_dir)
+    return tmp_dir
 
 
 @pytest.fixture
@@ -13,16 +20,3 @@ def parser():
 @pytest.fixture
 def console():
     return Console(record=True)
-
-
-@pytest.fixture
-def tmp_storage():
-    storage = {}
-
-    def _load(key: StorageKey):
-        return storage.get(key, GkInstances())
-
-    def _save(key: StorageKey, model):
-        storage[key] = model
-
-    return _load, _save, storage

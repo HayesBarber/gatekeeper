@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_add_command_parsing(parser):
     args = parser.parse_args(["add"])
     assert args.command == "add"
@@ -16,3 +19,9 @@ def test_list_command_parsing_with_active(parser):
     assert args.command == "list"
     assert hasattr(args, "handler")
     assert args.active
+
+
+def test_keygen_command_parsing(parser):
+    args = parser.parse_args(["keygen"])
+    assert args.command == "keygen"
+    assert hasattr(args, "handler")

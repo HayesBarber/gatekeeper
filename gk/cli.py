@@ -1,5 +1,5 @@
 import argparse
-from gk.commands import add, list_
+from gk.commands import add, list_, keygen
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -8,5 +8,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     add.add_subparser(subparsers)
     list_.add_subparser(subparsers)
+    keygen.add_subparser(subparsers)
 
     return parser
