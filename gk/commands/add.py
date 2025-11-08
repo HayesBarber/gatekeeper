@@ -60,8 +60,10 @@ def gather_input(console: Console, instances_model: GkInstances):
         base_url = console.input("Base URL of the gatekeeper instance: ")
     exists = instance_exists(base_url, instances_model)
     if exists:
-        should_continue = console.input("Instance exists, overwrite? y/n: ")
-        if not should_continue.strip().lower().startswith("y"):
+        should_continue = None
+        while should_continue != "y" and should_continue != "n":
+            should_continue = console.input("Instance exists, overwrite? y/n: ")
+        if should_continue == "n":
             sys.exit(1)
     client_id = None
     while not client_id:
@@ -72,8 +74,10 @@ def gather_input(console: Console, instances_model: GkInstances):
     api_key_header = console.input(
         "API key header name (e.g. x-api-key) Enter to skip: "
     )
-    active = console.input("Set as active? y/n: ")
-    is_active = str(active).strip().lower().startswith("y")
+    active = None
+    while active != "y" and active != "n":
+        active = console.input("Set as active? y/n: ")
+    is_active = active == "y"
     return base_url, client_id, client_id_header, api_key_header, is_active
 
 
