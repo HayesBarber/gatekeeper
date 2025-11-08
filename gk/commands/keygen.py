@@ -59,3 +59,13 @@ def generate_keypair() -> tuple[bytes, bytes]:
 def get_keypairs() -> GkKeyPairs:
     instances_model: GkKeyPairs = load_model(StorageKey.KEYPAIRS)
     return instances_model
+
+
+def get_keypair_for_instance(instance: GkInstance) -> GkKeyPair | None:
+    keypairs = get_keypairs()
+
+    for pair in keypairs.keypairs:
+        if pair.instance_base_url == instance.base_url:
+            return pair
+
+    return None

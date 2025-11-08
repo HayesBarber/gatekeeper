@@ -1,5 +1,5 @@
 from rich.console import Console
-from app.models import ChallengeRequest, ChallengeResponse
+from app.models import ChallengeRequest, ChallengeResponse, ChallengeVerificationRequest
 from gk.models.gk_instance import GkInstance
 from gk.commands import list_ as list_mod
 import httpx
@@ -58,3 +58,10 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
         sys.exit(1)
 
     return ChallengeResponse.model_validate(response.json())
+
+
+def sign_challeng(
+    instance: GkInstance,
+    challenge: ChallengeResponse,
+) -> ChallengeVerificationRequest:
+    pass
