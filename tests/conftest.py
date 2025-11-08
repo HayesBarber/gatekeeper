@@ -14,6 +14,15 @@ def seeded_user():
     return client_id, keypair
 
 
+@pytest.fixture()
+def seed_user():
+
+    def _seed(client_id, public_key):
+        redis_client.set(Namespace.USERS, client_id, public_key)
+
+    return _seed
+
+
 @pytest.fixture
 def local_base_url():
     return "http://localhost:8000"
