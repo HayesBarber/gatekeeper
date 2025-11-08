@@ -44,6 +44,11 @@ def handle(args, console: Console):
         console.print("[yellow]No instance found[/yellow]")
         sys.exit(1)
 
+    curr_key = get_apikey_for_instance(instance)
+
+    if curr_key and not apikey_is_expired(curr_key):
+        console.print_json(curr_key.api_key.model_dump_json())
+
     api_key, error = fetch_api_key(instance)
 
     if error:
