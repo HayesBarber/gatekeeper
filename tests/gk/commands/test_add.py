@@ -22,6 +22,10 @@ def test_add_new_instance(console, inputs, expected_active, console_input):
     assert instances[0].base_url == inputs[0]
     assert instances[0].active == expected_active
 
+    keypairs = load_model(StorageKey.KEYPAIRS).keypairs
+    assert len(keypairs) == 1
+    assert keypairs[0].instance_base_url == instances[0].base_url
+
 
 def test_add_overwrite_instance(console, console_input):
     # pre-populate storage with an instance
