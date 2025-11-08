@@ -7,8 +7,8 @@ from gk.storage import StorageKey
 @pytest.mark.parametrize(
     "inputs,expected_active",
     [
-        (["http://new.com", "", "", "y"], True),
-        (["http://another.com", "x-api-key", "x-client-id", "n"], False),
+        (["http://new.com", "test", "", "", "y"], True),
+        (["http://another.com", "test2", "x-client-id", "x-api-key", "n"], False),
     ],
 )
 def test_add_new_instance(console, tmp_storage, inputs, expected_active, monkeypatch):
