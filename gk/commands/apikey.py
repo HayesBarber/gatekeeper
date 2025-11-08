@@ -69,6 +69,23 @@ def get_apikey_for_instance(instance: GkInstance) -> GkApiKey | None:
     return None
 
 
+def persist_apikey(key: GkApiKey) -> bool:
+    """
+    reutrns true if apikey overwrote existing
+    """
+    apikeys: GkApiKeys = storage.load_model(storage.StorageKey.APIKEYS)
+
+    for i, existing in enumerate(apikeys.api_keys):
+        if existing.instance_base_url == key.instance_base_url:
+            apikeys.api_keys[i] = key
+            storage.save_model(storage.StorageKey.APIKEYS, apikeys)
+            return True
+
+    apikeys.api_keys.append(key)
+    storage.save_model(storage.StorageKey.APIKEYS, apikeys)
+    return False
+
+
 def apikey_is_expired(key: GkApiKey) -> bool:
     return key.api_key.expires_at < datetime.now(timezone.utc)
 
