@@ -1,14 +1,11 @@
 from gk.commands import list_ as list_cmd
 from gk.models.gk_instance import GkInstance, GkInstances
-from gk.storage import StorageKey
+from gk.storage import StorageKey, load_model, save_model
 import pytest
 
 
-def test_list_no_instances(console, tmp_storage, monkeypatch):
-    load_model, save_model, storage = tmp_storage
-    storage[StorageKey.INSTANCES] = GkInstances(instances=[])
-
-    monkeypatch.setattr(list_cmd, "load_model", load_model)
+def test_list_no_instances(console):
+    save_model(StorageKey.INSTANCES, GkInstances(instances=[]))
 
     args = type("Args", (), {})()
     args.active = False
@@ -18,8 +15,7 @@ def test_list_no_instances(console, tmp_storage, monkeypatch):
     assert "[]" in output
 
 
-def test_list_multiple_instances(console, tmp_storage, monkeypatch):
-    load_model, save_model, storage = tmp_storage
+def test_list_multiple_instances(console):
     instances = [
         GkInstance(
             base_url="http://one.com",
@@ -32,9 +28,7 @@ def test_list_multiple_instances(console, tmp_storage, monkeypatch):
             active=True,
         ),
     ]
-    storage[StorageKey.INSTANCES] = GkInstances(instances=instances)
-
-    monkeypatch.setattr(list_cmd, "load_model", load_model)
+    save_model(StorageKey.INSTANCES, GkInstances(instances=instances))
 
     args = type("Args", (), {})()
     args.active = False
@@ -45,8 +39,7 @@ def test_list_multiple_instances(console, tmp_storage, monkeypatch):
     assert "http://two.com" in output
 
 
-def test_list_active_instance_only(console, tmp_storage, monkeypatch):
-    load_model, save_model, storage = tmp_storage
+def test_list_active_instance_only(console):
     instances = [
         GkInstance(
             base_url="http://one.com",
@@ -59,9 +52,7 @@ def test_list_active_instance_only(console, tmp_storage, monkeypatch):
             active=True,
         ),
     ]
-    storage[StorageKey.INSTANCES] = GkInstances(instances=instances)
-
-    monkeypatch.setattr(list_cmd, "load_model", load_model)
+    save_model(StorageKey.INSTANCES, GkInstances(instances=instances))
 
     args = type("Args", (), {})()
     args.active = True
