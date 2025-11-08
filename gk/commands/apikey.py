@@ -56,6 +56,11 @@ def handle(args, console: Console):
         console.print_json(error)
         sys.exit(1)
 
+    key: GkApiKey = GkApiKey(
+        instance_base_url=instance.base_url,
+        api_key=api_key,
+    )
+    persist_apikey(key)
     console.print_json(api_key.model_dump_json())
 
 
