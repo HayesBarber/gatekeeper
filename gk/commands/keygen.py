@@ -1,8 +1,9 @@
 from rich.console import Console
 from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance
-from gk.models.gk_keypair import GkKeyPair
+from gk.models.gk_keypair import GkKeyPair, GkKeyPairs
 from gk.commands.list_ import get_instance_by_base_url
+from gk.storage import StorageKey, load_model, save_model
 import sys
 
 
@@ -21,6 +22,18 @@ def handle(args, console: Console):
         sys.exit(1)
 
     keypair = generate_keypair_for_instance(instance)
+    instances_model: GkKeyPairs = get_keypairs()
+
+    for i, existing in enumerate(instances_model.keypairs):
+        if existing.instance_base_url == keypair.instance_base_url:
+            instances_model.keypairs[i] = keypair
+            save_model(StorageKey.KEYPAIRS, instances_model)
+            console.print(f"Overwrote keypair for '{keypair.instance_base_url}'")
+            break
+    else:
+        instances_model.keypairs.append(keypair)
+        save_model(StorageKey.KEYPAIRS, instances_model)
+        console.print(f"Added keypair for '{keypair.instance_base_url}")
 
 
 def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:
@@ -34,3 +47,8 @@ def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:
         public_key=public_key,
         private_key=private_key,
     )
+
+
+def get_keypairs() -> GkKeyPairs:
+    instances_model: GkKeyPairs = load_model(StorageKey.KEYPAIRS)
+    return instances_model
