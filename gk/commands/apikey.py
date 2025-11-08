@@ -13,6 +13,7 @@ from gk import storage
 import httpx
 import sys
 from curveauth.signatures import sign_message
+from datetime import datetime, timezone
 
 
 def add_subparser(subparsers):
@@ -52,14 +53,18 @@ def handle(args, console: Console):
     console.print_json(api_key.model_dump_json())
 
 
-def get_apikey_for_instance(instace: GkInstance) -> GkApiKey | None:
+def get_apikey_for_instance(instance: GkInstance) -> GkApiKey | None:
     apikeys: GkApiKeys = storage.load_model(storage.StorageKey.APIKEYS)
 
     for key in apikeys.api_keys:
-        if key.instance_base_url == instace.base_url:
+        if key.instance_base_url == instance.base_url:
             return key
 
     return None
+
+
+def apikey_is_expired(key: GkApiKey) -> bool:
+    return key.api_key.expires_at < datetime.now(timezone.utc)
 
 
 def fetch_api_key(instance: GkInstance) -> tuple[ChallengeVerificationResponse, object]:
