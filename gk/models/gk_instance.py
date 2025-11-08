@@ -8,6 +8,7 @@ class GkInstance(BaseModel):
     client_id_header: str = "x-requestor-id"
     active: bool
     public_key: str = ""
+    other_headers: dict[str, str] = {}
 
 
 class GkInstances(BaseModel):

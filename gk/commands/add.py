@@ -14,8 +14,8 @@ def add_subparser(subparsers):
 
 def handle(args, console: Console):
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-    base_url, client_id, client_id_header, api_key_header, is_active = gather_input(
-        console, instances_model
+    base_url, client_id, client_id_header, api_key_header, is_active, other_headers = (
+        gather_input(console, instances_model)
     )
 
     kwargs = {
@@ -27,6 +27,8 @@ def handle(args, console: Console):
         kwargs["api_key_header"] = api_key_header
     if client_id_header:
         kwargs["client_id_header"] = client_id_header
+    if other_headers:
+        kwargs["other_headers"] = other_headers
 
     instance = GkInstance(**kwargs)
 
@@ -61,11 +63,25 @@ def gather_input(console: Console, instances_model: GkInstances):
     api_key_header = console.input(
         "API key header name (e.g. x-api-key) Enter to skip: "
     )
+    other_headers = {}
+    while True:
+        header_key = console.input("Other header key (press Enter to finish): ")
+        if not header_key:
+            break
+        header_value = console.input(f"Value for header '{header_key}': ")
+        other_headers[header_key] = header_value
     active = None
     while active != "y" and active != "n":
         active = console.input("Set as active? y/n: ")
     is_active = active == "y"
-    return base_url, client_id, client_id_header, api_key_header, is_active
+    return (
+        base_url,
+        client_id,
+        client_id_header,
+        api_key_header,
+        is_active,
+        other_headers,
+    )
 
 
 def instance_exists(
