@@ -55,6 +55,16 @@ def get_instances() -> GkInstances:
     return instances_model
 
 
+def get_instance_by_base_url(base_url: str) -> GkInstance | None:
+    instances = get_instances()
+
+    for instance in instances.instances:
+        if instance.base_url == base_url:
+            return instance
+
+    return None
+
+
 def get_active_instance() -> GkInstance | None:
     instances = get_instances()
 

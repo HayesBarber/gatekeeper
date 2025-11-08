@@ -8,4 +8,4 @@ class GkKeyPair(BaseModel):
 
 
 class GkKeyPairs(BaseModel):
-    keypairs = list[GkKeyPair] = []
+    keypairs: list[GkKeyPair] = []
