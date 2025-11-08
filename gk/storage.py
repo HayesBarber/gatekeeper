@@ -2,9 +2,9 @@ from pathlib import Path
 from enum import Enum
 from typing import Type, Dict
 from pydantic import BaseModel
-from gk.models.gk_instance import GkInstances
-from gk.models.gk_keypair import GkKeyPairs
-from gk.models.gk_apikey import GkApiKeys
+from gk.models.gk_instance import GkInstances, GkInstance
+from gk.models.gk_keypair import GkKeyPairs, GkKeyPair
+from gk.models.gk_apikey import GkApiKeys, GkApiKey
 
 DATA_DIR = Path.home() / ".gk"
 
@@ -78,3 +78,30 @@ def persist_model_item(
     items.append(new_item)
     save_model(storage_key, model)
     return False
+
+
+def persist_gk_instance(instance: GkInstance) -> bool:
+    return persist_model_item(
+        StorageKey.INSTANCES,
+        "instances",
+        instance,
+        "base_url",
+    )
+
+
+def persist_keypair(keypair: GkKeyPair) -> bool:
+    return persist_model_item(
+        StorageKey.KEYPAIRS,
+        "keypairs",
+        keypair,
+        "instance_base_url",
+    )
+
+
+def persist_apikey(key: GkApiKey) -> bool:
+    return persist_model_item(
+        StorageKey.APIKEYS,
+        "api_keys",
+        key,
+        "instance_base_url",
+    )
