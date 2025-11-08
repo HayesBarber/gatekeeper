@@ -3,6 +3,7 @@ from app.models import ChallengeRequest, ChallengeResponse
 from gk.models.gk_instance import GkInstance
 from gk.commands import list_ as list_mod
 import httpx
+import sys
 
 
 def add_subparser(subparsers):
@@ -31,6 +32,10 @@ def handle(args, console: Console):
 
     if not instance:
         console.print("[yellow]No instance found[/yellow]")
+        sys.exit(1)
+
+    res = request_challenge(instance)
+    console.print_json(res.model_dump_json())
 
 
 def request_challenge(instance: GkInstance) -> ChallengeResponse:
