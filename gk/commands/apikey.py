@@ -41,7 +41,7 @@ def handle(args, console: Console):
         instance = list_mod.get_active_instance()
 
     if not instance:
-        console.print("[yellow]No instance found[/yellow]")
+        console.print("[yellow]Instance not found[/yellow]")
         sys.exit(1)
 
     curr_key = get_apikey_for_instance(instance)
