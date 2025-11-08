@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class ChallengeVerificationRequest(BaseModel):
@@ -14,11 +14,12 @@ class ChallengeVerificationRequest(BaseModel):
         description="Base64-encoded signature over the challenge using client's private key",
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "challenge_id": "83fcfcf6e2e84df7b7a84db6c52934f7",
                 "client_id": "client_abc123",
                 "signature": "MEUCIQDLnY...",
             }
         }
+    )

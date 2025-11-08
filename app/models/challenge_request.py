@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class ChallengeRequest(BaseModel):
@@ -6,9 +6,10 @@ class ChallengeRequest(BaseModel):
         ..., min_length=3, max_length=64, description="ID of the requesting client"
     )
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "client_id": "client_abc123",
             }
         }
+    )
