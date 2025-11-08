@@ -30,6 +30,13 @@ def handle(args, console: Console):
 
     instance = GkInstance(**kwargs)
 
+    keypair = keygen.generate_keypair_for_instance(instance)
+    keygen.persist_keypair(keypair)
+
+    instance.public_key = ECCKeyPair.load_private_pem(
+        keypair.private_key
+    ).public_key_raw_base64()
+
     for i, existing in enumerate(instances_model.instances):
         if existing.base_url == instance.base_url:
             instances_model.instances[i] = instance
@@ -39,17 +46,7 @@ def handle(args, console: Console):
         instances_model.instances.append(instance)
         save_model(StorageKey.INSTANCES, instances_model)
 
-    keypair = keygen.generate_keypair_for_instance(instance)
-    keygen.persist_keypair(keypair)
-
-    console.print_json(
-        data={
-            **instance.model_dump(),
-            "public_key": ECCKeyPair.load_private_pem(
-                keypair.private_key
-            ).public_key_raw_base64(),
-        }
-    )
+    console.print_json(instance.model_dump_json())
 
 
 def gather_input(console: Console, instances_model: GkInstances):
