@@ -31,8 +31,15 @@ def test_apikey_command_parsing(parser):
     assert args.instance is None
 
 
-def test_apikey_command_parsing_with_instance(parser):
+def test_apikey_command_parsing_with_instance_short_flag(parser):
     args = parser.parse_args(["apikey", "-i", "test"])
     assert args.command == "apikey"
     assert hasattr(args, "handler")
     assert args.instance == "test"
+
+
+def test_apikey_command_parsing_with_instance_full_flag(parser):
+    args = parser.parse_args(["apikey", "--instance", "test1"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance == "test1"
