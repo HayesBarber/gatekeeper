@@ -38,10 +38,17 @@ def handle(args, console: Console):
         instances_model.instances.append(instance)
         save_model(StorageKey.INSTANCES, instances_model)
 
-    console.print_json(instance.model_dump_json())
+    keypair = keygen.generate_keypair_for_instance(instance)
+    keygen.persist_keypair(keypair)
 
-    args.instance = instance.base_url
-    keygen.handle(args, console)
+    console.print_json(
+        data={
+            **instance.model_dump(),
+            **{
+                "public_key": keypair.public_key,
+            },
+        }
+    )
 
 
 def gather_input(console: Console, instances_model: GkInstances):
