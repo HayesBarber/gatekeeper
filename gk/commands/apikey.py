@@ -60,6 +60,15 @@ def handle(args, console: Console):
     )
 
 
+def build_headers(instance: GkInstance) -> dict:
+    headers = {
+        "Content-Type": "application/json",
+        instance.client_id_header: instance.client_id,
+        **instance.other_headers,
+    }
+    return headers
+
+
 def request_challenge(
     instance: GkInstance,
     console: Console,
@@ -67,14 +76,9 @@ def request_challenge(
     req = ChallengeRequest(
         client_id=instance.client_id,
     )
-    headers = {
-        "Content-Type": "application/json",
-        instance.client_id_header: instance.client_id,
-        **instance.other_headers,
-    }
     response = httpx.post(
         f"{instance.base_url}/challenge/",
-        headers=headers,
+        headers=build_headers(instance),
         json=req.model_dump(),
     )
 
@@ -99,6 +103,16 @@ def sign_challenge(
 
 
 def request_challenge_verification(
+    instance: GkInstance,
     req: ChallengeVerificationRequest,
-) -> tuple[ChallengeVerificationResponse | None, object | None]:
-    pass
+) -> tuple[ChallengeVerificationResponse, object]:
+    response = httpx.post(
+        f"{instance.base_url}/challenge/verify",
+        headers=build_headers(instance),
+        json=req.model_dump(),
+    )
+
+    if response.status_code != 200:
+        return (None, response.json())
+
+    return (ChallengeVerificationResponse.model_validate(response.json()), None)
