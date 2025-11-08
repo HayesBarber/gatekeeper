@@ -1,6 +1,3 @@
-import pytest
-
-
 def test_add_command_parsing(parser):
     args = parser.parse_args(["add"])
     assert args.command == "add"
