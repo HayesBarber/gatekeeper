@@ -3,6 +3,7 @@ from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance
 from gk.models.gk_keypair import GkKeyPair
 from gk.commands.list_ import get_instance_by_base_url
+import sys
 
 
 def add_subparser(subparsers):
@@ -17,6 +18,9 @@ def handle(args, console: Console):
 
     if not instance:
         console.print(f"[yellow]No instance found:[/yellow] {args.instance}")
+        sys.exit(1)
+
+    keypair = generate_keypair_for_instance(instance)
 
 
 def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:
@@ -26,7 +30,7 @@ def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:
     private_key = keypair.private_pem()
 
     return GkKeyPair(
-        instance_base_url,
-        public_key,
-        private_key,
+        instance_base_url=instance_base_url,
+        public_key=public_key,
+        private_key=private_key,
     )
