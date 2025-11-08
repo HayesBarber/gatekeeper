@@ -35,10 +35,11 @@ def test_apikey_invalid_instance(console):
     assert "Instance not found" in output
 
 
-def test_apikey_no_keypair(console, console_input, local_base_url):
+def test_apikey_happy_path(console, console_input, local_base_url, seeded_user):
+    client_id, _ = seeded_user
     inputs = [
         local_base_url,
-        "hello",
+        client_id,
         "x-client-id",
         "x-api-key",
         "User-Agent",
@@ -50,3 +51,8 @@ def test_apikey_no_keypair(console, console_input, local_base_url):
 
     args = type("Args", (), {})()
     add.handle(args, console)
+
+    args = type("Args", (), {})()
+    args.instance = None
+    with pytest.raises(SystemExit):
+        apikey.handle(args, console)
