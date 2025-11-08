@@ -1,5 +1,10 @@
 from rich.console import Console
-from app.models import ChallengeRequest, ChallengeResponse, ChallengeVerificationRequest
+from app.models import (
+    ChallengeRequest,
+    ChallengeResponse,
+    ChallengeVerificationRequest,
+    ChallengeVerificationResponse,
+)
 from gk.models.gk_instance import GkInstance
 from gk.models.gk_keypair import GkKeyPair
 from gk.commands import list_ as list_mod, keygen
@@ -36,7 +41,11 @@ def handle(args, console: Console):
         console.print("[yellow]No instance found[/yellow]")
         sys.exit(1)
 
-    challeng_res = request_challenge(instance, console)
+    challeng_res, error = request_challenge(instance, console)
+
+    if error:
+        console.print_json(error)
+        sys.exit(1)
 
     keypair = keygen.get_keypair_for_instance(instance)
 
@@ -54,7 +63,7 @@ def handle(args, console: Console):
 def request_challenge(
     instance: GkInstance,
     console: Console,
-) -> ChallengeResponse:
+) -> tuple[ChallengeResponse, object]:
     req = ChallengeRequest(
         client_id=instance.client_id,
     )
@@ -70,10 +79,9 @@ def request_challenge(
     )
 
     if response.status_code != 200:
-        console.print_json(response.json())
-        sys.exit(1)
+        return (None, response.json())
 
-    return ChallengeResponse.model_validate(response.json())
+    return (ChallengeResponse.model_validate(response.json()), None)
 
 
 def sign_challenge(
@@ -88,3 +96,9 @@ def sign_challenge(
         client_id=instance.client_id,
         challenge_id=challenge.challenge_id,
     )
+
+
+def request_challenge_verification(
+    req: ChallengeVerificationRequest,
+) -> tuple[ChallengeVerificationResponse | None, object | None]:
+    pass
