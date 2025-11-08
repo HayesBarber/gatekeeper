@@ -45,11 +45,9 @@ def handle(args, console: Console):
     console.print_json(
         data={
             **instance.model_dump(),
-            **{
-                "public_key": ECCKeyPair.load_private_pem(
-                    keypair.private_key
-                ).public_key_raw_base64(),
-            },
+            "public_key": ECCKeyPair.load_private_pem(
+                keypair.private_key
+            ).public_key_raw_base64(),
         }
     )
 
