@@ -2,7 +2,7 @@ from rich.console import Console
 from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance
 from gk.models.gk_keypair import GkKeyPair, GkKeyPairs
-from gk.storage import StorageKey, load_model, save_model
+from gk.storage import StorageKey, load_model
 
 
 def add_subparser(subparsers):
@@ -19,23 +19,6 @@ def handle(args, console: Console):
             "private_key": private_key.decode(),
         }
     )
-
-
-def persist_keypair(keypair: GkKeyPair) -> bool:
-    """
-    returns true if keypair overwrote an existing
-    """
-    instances_model: GkKeyPairs = get_keypairs()
-
-    for i, existing in enumerate(instances_model.keypairs):
-        if existing.instance_base_url == keypair.instance_base_url:
-            instances_model.keypairs[i] = keypair
-            save_model(StorageKey.KEYPAIRS, instances_model)
-            return True
-
-    instances_model.keypairs.append(keypair)
-    save_model(StorageKey.KEYPAIRS, instances_model)
-    return False
 
 
 def generate_keypair_for_instance(instance: GkInstance) -> GkKeyPair:

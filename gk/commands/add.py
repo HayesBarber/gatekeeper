@@ -1,7 +1,7 @@
 from rich.console import Console
 from curveauth.keys import ECCKeyPair
 from gk.models.gk_instance import GkInstance, GkInstances
-from gk.storage import StorageKey, load_model, save_model
+from gk.storage import StorageKey, load_model, persist_gk_instance, persist_keypair
 from gk.commands import keygen
 import sys
 
@@ -33,7 +33,7 @@ def handle(args, console: Console):
     instance = GkInstance(**kwargs)
 
     keypair = keygen.generate_keypair_for_instance(instance)
-    keygen.persist_keypair(keypair)
+    persist_keypair(keypair)
 
     instance.public_key = ECCKeyPair.load_private_pem(
         keypair.private_key
@@ -91,25 +91,4 @@ def instance_exists(
     for existing in instances_model.instances:
         if existing.base_url == base_url:
             return True
-    return False
-
-
-def persist_gk_instance(
-    instance: GkInstance,
-    instances_model: GkInstances | None = None,
-) -> bool:
-    """
-    returns true if keypair overwrote an existing
-    """
-    if not instances_model:
-        instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-
-    for i, existing in enumerate(instances_model.instances):
-        if existing.base_url == instance.base_url:
-            instances_model.instances[i] = instance
-            save_model(StorageKey.INSTANCES, instances_model)
-            return True
-
-    instances_model.instances.append(instance)
-    save_model(StorageKey.INSTANCES, instances_model)
     return False
