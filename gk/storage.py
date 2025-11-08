@@ -4,6 +4,7 @@ from typing import Type, Dict
 from pydantic import BaseModel
 from gk.models.gk_instance import GkInstances
 from gk.models.gk_keypair import GkKeyPairs
+from gk.models.gk_apikey import GkApiKeys
 
 DATA_DIR = Path.home() / ".gk"
 
@@ -11,12 +12,14 @@ DATA_DIR = Path.home() / ".gk"
 class StorageKey(str, Enum):
     INSTANCES = "instances"
     KEYPAIRS = "keypairs"
+    APIKEYS = "apikeys"
 
 
 FILE_NAMES: dict[StorageKey, str] = {
     StorageKey.INSTANCES: "instances.json",
-    # todo this should be stored securely
+    # todo these should be stored securely
     StorageKey.KEYPAIRS: "keypairs.json",
+    StorageKey.APIKEYS: "apikeys.json",
 }
 
 
@@ -31,6 +34,7 @@ def path_for(key: StorageKey) -> Path:
 MODEL_FOR_KEY: Dict[StorageKey, Type[BaseModel]] = {
     StorageKey.INSTANCES: GkInstances,
     StorageKey.KEYPAIRS: GkKeyPairs,
+    StorageKey.APIKEYS: GkApiKeys,
 }
 
 
