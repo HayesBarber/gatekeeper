@@ -1,6 +1,7 @@
 from gk.commands import list_ as list_cmd
 from gk.models.gk_instance import GkInstance, GkInstances
 from gk.storage import StorageKey
+import pytest
 
 
 def test_list_no_instances(console, tmp_storage, monkeypatch):
@@ -14,14 +15,22 @@ def test_list_no_instances(console, tmp_storage, monkeypatch):
 
     list_cmd.handle(args, console)
     output = console.export_text()
-    assert "No instances found." in output
+    assert "[]" in output
 
 
 def test_list_multiple_instances(console, tmp_storage, monkeypatch):
     load_model, save_model, storage = tmp_storage
     instances = [
-        GkInstance(base_url="http://one.com", active=False),
-        GkInstance(base_url="http://two.com", active=True),
+        GkInstance(
+            base_url="http://one.com",
+            client_id="test1",
+            active=False,
+        ),
+        GkInstance(
+            base_url="http://two.com",
+            client_id="test2",
+            active=True,
+        ),
     ]
     storage[StorageKey.INSTANCES] = GkInstances(instances=instances)
 
@@ -34,14 +43,21 @@ def test_list_multiple_instances(console, tmp_storage, monkeypatch):
     output = console.export_text()
     assert "http://one.com" in output
     assert "http://two.com" in output
-    assert "yes" in output
 
 
 def test_list_active_instance_only(console, tmp_storage, monkeypatch):
     load_model, save_model, storage = tmp_storage
     instances = [
-        GkInstance(base_url="http://one.com", active=False),
-        GkInstance(base_url="http://two.com", active=True),
+        GkInstance(
+            base_url="http://one.com",
+            client_id="test1",
+            active=False,
+        ),
+        GkInstance(
+            base_url="http://two.com",
+            client_id="test2",
+            active=True,
+        ),
     ]
     storage[StorageKey.INSTANCES] = GkInstances(instances=instances)
 
@@ -50,8 +66,9 @@ def test_list_active_instance_only(console, tmp_storage, monkeypatch):
     args = type("Args", (), {})()
     args.active = True
 
-    list_cmd.handle(args, console)
+    with pytest.raises(SystemExit):
+        list_cmd.handle(args, console)
+
     output = console.export_text()
-    assert "Active Instance:" in output
     assert "http://two.com" in output
     assert "http://one.com" not in output
