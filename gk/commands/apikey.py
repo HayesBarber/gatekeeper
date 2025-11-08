@@ -27,3 +27,15 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
     req = ChallengeRequest(
         client_id=instance.client_id,
     )
+    headers = {
+        "Content-Type": "application/json",
+        instance.client_id_header: instance.client_id,
+        **instance.other_headers,
+    }
+    response = httpx.post(
+        f"{instance.base_url}/challenge",
+        headers=headers,
+        json=req.model_dump(),
+    )
+    response.raise_for_status()
+    return ChallengeResponse.model_validate(response.json())
