@@ -3,35 +3,10 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from app.utils.redis_client import redis_client, Namespace
-from curveauth.keys import ECCKeyPair
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from multiprocessing import Process
-import json
-import base64
-from pathlib import Path
-
-
-def seed_redis():
-    client_id = "Test_User"
-    keypair = ECCKeyPair.generate()
-    public_key = keypair.public_key_raw_base64()
-
-    redis_client.set(Namespace.USERS, client_id, public_key)
-
-    test_data = {
-        "client_id": client_id,
-        "private_key": base64.b64encode(keypair.private_pem()).decode("utf-8"),
-        "public_key": public_key,
-    }
-
-    data_path = Path(__file__).parent.parent / "generated/seeded_user.json"
-    data_path.parent.mkdir(parents=True, exist_ok=True)
-    data_path.write_text(json.dumps(test_data))
-
-    return client_id, keypair
 
 
 def create_dummy_upstream_app() -> FastAPI:
@@ -92,8 +67,6 @@ def start_app():
 
 
 if __name__ == "__main__":
-    seed_redis()
-
     upstream1 = Process(target=run_dummy_upstream, args=(8080,))
     upstream2 = Process(target=run_dummy_upstream, args=(8081,))
     app_proc = Process(target=start_app)
