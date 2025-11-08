@@ -22,3 +22,17 @@ def test_keygen_command_parsing(parser):
     args = parser.parse_args(["keygen"])
     assert args.command == "keygen"
     assert hasattr(args, "handler")
+
+
+def test_apikey_command_parsing(parser):
+    args = parser.parse_args(["apikey"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance is None
+
+
+def test_apikey_command_parsing_with_instance(parser):
+    args = parser.parse_args(["apikey", "-i", "test"])
+    assert args.command == "apikey"
+    assert hasattr(args, "handler")
+    assert args.instance == "test"
