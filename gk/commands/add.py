@@ -12,21 +12,15 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    base_url = None
-    while not base_url:
-        base_url = console.input("Base URL of the gatekeeper instance: ")
-    client_id = None
-    while not client_id:
-        client_id = console.input("Client ID: ")
-    client_id_header = console.input(
-        "Client ID header name (e.g. x-requestor-id) Enter to skip: "
+    instances_model: GkInstances = load_model(StorageKey.INSTANCES)
+    base_url, client_id, client_id_header, api_key_header, is_active, exists = (
+        gather_input(console, instances_model)
     )
-    api_key_header = console.input(
-        "API key header name (e.g. x-api-key) Enter to skip: "
-    )
-    active = console.input("Set as active? y/n: ")
 
-    is_active = str(active).strip().lower().startswith("y")
+    if exists:
+        should_continue = console.input("Instance exists, overwrite? y/n: ")
+        if not should_continue.strip().lower().startswith("y"):
+            sys.exit(1)
 
     kwargs = {
         "base_url": base_url,
@@ -39,13 +33,6 @@ def handle(args, console: Console):
         kwargs["client_id_header"] = client_id_header
 
     instance = GkInstance(**kwargs)
-    instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-
-    exists = instance_exists(instance, instances_model)
-    if exists:
-        should_continue = console.input("Instance exists, overwrite? y/n: ")
-        if not should_continue.strip().lower().startswith("y"):
-            sys.exit(1)
 
     for i, existing in enumerate(instances_model.instances):
         if existing.base_url == instance.base_url:
@@ -62,11 +49,30 @@ def handle(args, console: Console):
     keygen.handle(args, console)
 
 
+def gather_input(console: Console, instances_model: GkInstances):
+    base_url = None
+    while not base_url:
+        base_url = console.input("Base URL of the gatekeeper instance: ")
+    client_id = None
+    while not client_id:
+        client_id = console.input("Client ID: ")
+    client_id_header = console.input(
+        "Client ID header name (e.g. x-requestor-id) Enter to skip: "
+    )
+    api_key_header = console.input(
+        "API key header name (e.g. x-api-key) Enter to skip: "
+    )
+    active = console.input("Set as active? y/n: ")
+    is_active = str(active).strip().lower().startswith("y")
+    exists = instance_exists(base_url, instances_model)
+    return base_url, client_id, client_id_header, api_key_header, is_active, exists
+
+
 def instance_exists(
-    instance: GkInstance,
+    base_url: str,
     instances_model: GkInstances,
 ) -> bool:
     for existing in instances_model.instances:
-        if existing.base_url == instance.base_url:
+        if existing.base_url == base_url:
             return True
     return False

@@ -28,7 +28,6 @@ def handle(args, console: Console):
             sys.exit(1)
 
     instances_model = get_instances()
-
     console.print_json(instances_model.model_dump_json())
 
 
