@@ -1,9 +1,11 @@
 from rich.console import Console
 from app.models import ChallengeRequest, ChallengeResponse, ChallengeVerificationRequest
 from gk.models.gk_instance import GkInstance
-from gk.commands import list_ as list_mod
+from gk.models.gk_keypair import GkKeyPair
+from gk.commands import list_ as list_mod, keygen
 import httpx
 import sys
+from curveauth.signatures import sign_message
 
 
 def add_subparser(subparsers):
@@ -34,11 +36,14 @@ def handle(args, console: Console):
         console.print("[yellow]No instance found[/yellow]")
         sys.exit(1)
 
-    res = request_challenge(instance)
+    res = request_challenge(instance, console)
     console.print_json(res.model_dump_json())
 
 
-def request_challenge(instance: GkInstance) -> ChallengeResponse:
+def request_challenge(
+    instance: GkInstance,
+    console: Console,
+) -> ChallengeResponse:
     req = ChallengeRequest(
         client_id=instance.client_id,
     )
@@ -54,7 +59,7 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
     )
 
     if response.status_code != 200:
-        print(response.json())
+        console.print_json(response.json())
         sys.exit(1)
 
     return ChallengeResponse.model_validate(response.json())
@@ -63,5 +68,12 @@ def request_challenge(instance: GkInstance) -> ChallengeResponse:
 def sign_challeng(
     instance: GkInstance,
     challenge: ChallengeResponse,
+    keypair: GkKeyPair,
 ) -> ChallengeVerificationRequest:
-    pass
+    signature = sign_message(challenge, keypair.private_key.decode("utf-8"))
+
+    return ChallengeVerificationRequest(
+        signature=signature,
+        client_id=instance.client_id,
+        challenge_id=challenge.challenge_id,
+    )
