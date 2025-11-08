@@ -7,7 +7,9 @@ from app.models import (
 )
 from gk.models.gk_instance import GkInstance
 from gk.models.gk_keypair import GkKeyPair
+from gk.models.gk_apikey import GkApiKey, GkApiKeys
 from gk.commands import list_ as list_mod, keygen
+from gk import storage
 import httpx
 import sys
 from curveauth.signatures import sign_message
@@ -48,6 +50,16 @@ def handle(args, console: Console):
         sys.exit(1)
 
     console.print_json(api_key.model_dump_json())
+
+
+def get_apikey_for_instance(instace: GkInstance) -> GkApiKey | None:
+    apikeys: GkApiKeys = storage.load_model(storage.StorageKey.APIKEYS)
+
+    for key in apikeys.api_keys:
+        if key.instance_base_url == instace.base_url:
+            return key
+
+    return None
 
 
 def fetch_api_key(instance: GkInstance) -> tuple[ChallengeVerificationResponse, object]:
