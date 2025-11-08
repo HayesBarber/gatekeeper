@@ -58,3 +58,23 @@ def save_model(key: StorageKey, model: BaseModel):
     file_path = path_for(key)
     with open(file_path, "w") as f:
         f.write(model.model_dump_json(indent=2))
+
+
+def persist_model_item(
+    storage_key: StorageKey,
+    items_attr: str,
+    new_item,
+    match_attr: str,
+):
+    model = load_model(storage_key)
+    items = getattr(model, items_attr)
+
+    for i, existing in enumerate(items):
+        if getattr(existing, match_attr) == getattr(new_item, match_attr):
+            items[i] = new_item
+            save_model(storage_key, model)
+            return True
+
+    items.append(new_item)
+    save_model(storage_key, model)
+    return False
