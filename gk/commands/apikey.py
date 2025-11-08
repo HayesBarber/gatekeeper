@@ -41,31 +41,30 @@ def handle(args, console: Console):
         console.print("[yellow]No instance found[/yellow]")
         sys.exit(1)
 
-    challeng_res, error = request_challenge(instance, console)
+    api_key, error = fetch_api_key(instance)
 
     if error:
         console.print_json(error)
         sys.exit(1)
+
+    console.print_json(api_key.model_dump_json())
+
+
+def fetch_api_key(instance: GkInstance) -> tuple[ChallengeVerificationResponse, object]:
+    challenge_res, error = request_challenge(instance)
+    if error:
+        return None, error
 
     keypair = keygen.get_keypair_for_instance(instance)
-
     if not keypair:
-        console.print("[yellow]No keypair found[/yellow]")
-        sys.exit(1)
+        return None, {"error": "No keypair found"}
 
-    verification_req = sign_challenge(
-        instance,
-        challeng_res,
-        keypair,
-    )
-
+    verification_req = sign_challenge(instance, challenge_res, keypair)
     verification_res, error = request_challenge_verification(instance, verification_req)
-
     if error:
-        console.print_json(error)
-        sys.exit(1)
+        return None, error
 
-    console.print_json(verification_res.model_dump_json())
+    return verification_res, None
 
 
 def build_headers(instance: GkInstance) -> dict:
@@ -79,7 +78,6 @@ def build_headers(instance: GkInstance) -> dict:
 
 def request_challenge(
     instance: GkInstance,
-    console: Console,
 ) -> tuple[ChallengeResponse, object]:
     req = ChallengeRequest(
         client_id=instance.client_id,
