@@ -53,7 +53,7 @@ def handle(args, console: Console):
     api_key, error = fetch_api_key(instance)
 
     if error:
-        console.print_json(error)
+        console.print_json(data=error)
         sys.exit(1)
 
     key: GkApiKey = GkApiKey(
