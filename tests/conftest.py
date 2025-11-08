@@ -3,7 +3,7 @@ from curveauth.keys import ECCKeyPair
 from app.utils.redis_client import redis_client, Namespace
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def seeded_user():
     client_id = "Test_User"
     keypair = ECCKeyPair.generate()
