@@ -87,7 +87,7 @@ def handle(args, console: Console):
         sys.exit(1)
 
     if response.status_code != 200:
-        console.print_json(data)
+        console.print_json(data=data)
         sys.exit(1)
     else:
-        console.print_json(data)
+        console.print_json(data=data)
