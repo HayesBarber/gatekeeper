@@ -55,7 +55,7 @@ def handle(args, console: Console):
     headers = apikey.build_headers(instance)
     headers[instance.api_key_header] = curr_key.api_key.api_key
 
-    url = f"{instance.base_url.rstrip('/')}/{args.path.lstrip('/')}"
+    url = f"{instance.base_url.rstrip('/')}/{instance.proxy_path.strip('/')}/{args.path.lstrip('/')}"
 
     body = None
     if getattr(args, "body", None):
