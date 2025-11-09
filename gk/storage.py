@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from gk.models.gk_instance import GkInstances, GkInstance
 from gk.models.gk_keypair import GkKeyPairs, GkKeyPair
 from gk.models.gk_apikey import GkApiKeys, GkApiKey
+import os
 
 DATA_DIR = Path.home() / ".gk"
 
@@ -25,6 +26,7 @@ FILE_NAMES: dict[StorageKey, str] = {
 
 def ensure_data_dir():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    os.chmod(DATA_DIR, 0o700)
 
 
 def path_for(key: StorageKey) -> Path:
