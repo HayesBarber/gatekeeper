@@ -49,3 +49,6 @@ def handle(args, console: Console):
             api_key=api_key,
         )
         storage.persist_apikey(curr_key)
+
+    headers = apikey.build_headers(instance)
+    headers[instance.api_key_header] = curr_key.api_key.api_key
