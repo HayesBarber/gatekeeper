@@ -17,17 +17,27 @@ def add_subparser(subparsers: _SubParsersAction) -> ArgumentParser:
 
 def handle(args, console: Console):
     instances: GkInstances = load_model(StorageKey.INSTANCES)
-    instance = next(
-        (i for i in instances.instances if i.base_url == args.base_url), None
-    )
-    if instance is None:
-        console.print("[yellow]Instance not found[/yellow]")
+
+    found = any(instance.base_url == args.base_url for instance in instances.instances)
+
+    if not found:
+        console.print(f"[yellow]Instance not found:[/yellow] {args.base_url}")
         sys.exit(1)
 
-    for i in instances.instances:
-        i.active = False
-    instance.active = True
+    changed = False
 
-    save_model(StorageKey.INSTANCES, instances)
+    for instance in instances.instances:
+        if instance.base_url == args.base_url:
+            if not instance.active:
+                instance.active = True
+                changed = True
+        else:
+            if instance.active:
+                instance.active = False
+                changed = True
 
-    console.print(f"[green]Activated instance:[/green] {args.base_url}")
+    if changed:
+        save_model(StorageKey.INSTANCES, instances)
+        console.print(f"[green]Activated instance:[/green] {args.base_url}")
+    else:
+        console.print(f"[blue]Instance already active:[/blue] {args.base_url}")
