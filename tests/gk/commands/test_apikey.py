@@ -40,6 +40,7 @@ def test_apikey_happy_path(console, console_input, local_base_url, seed_user):
     inputs = [
         local_base_url,
         client_id,
+        "",
         "x-client-id",
         "x-api-key",
         "User-Agent",
