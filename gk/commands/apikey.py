@@ -97,7 +97,6 @@ def fetch_api_key(instance: GkInstance) -> tuple[ChallengeVerificationResponse, 
 
 def build_headers(instance: GkInstance) -> dict:
     headers = {
-        "Content-Type": "application/json",
         instance.client_id_header: instance.client_id,
         **instance.other_headers,
     }
