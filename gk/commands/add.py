@@ -36,7 +36,7 @@ def handle(args, console: Console):
     if other_headers:
         kwargs["other_headers"] = other_headers
     if proxy_path:
-        kwargs["proxy_path"] = other_headers
+        kwargs["proxy_path"] = proxy_path
 
     instance = GkInstance(**kwargs)
 
