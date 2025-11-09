@@ -14,9 +14,15 @@ def add_subparser(subparsers):
 
 def handle(args, console: Console):
     instances_model: GkInstances = load_model(StorageKey.INSTANCES)
-    base_url, client_id, client_id_header, api_key_header, is_active, other_headers = (
-        gather_input(console, instances_model)
-    )
+    (
+        base_url,
+        proxy_path,
+        client_id,
+        client_id_header,
+        api_key_header,
+        is_active,
+        other_headers,
+    ) = gather_input(console, instances_model)
 
     kwargs = {
         "base_url": base_url,
@@ -29,6 +35,8 @@ def handle(args, console: Console):
         kwargs["client_id_header"] = client_id_header
     if other_headers:
         kwargs["other_headers"] = other_headers
+    if proxy_path:
+        kwargs["proxy_path"] = proxy_path
 
     instance = GkInstance(**kwargs)
 
@@ -57,11 +65,12 @@ def gather_input(console: Console, instances_model: GkInstances):
     client_id = None
     while not client_id:
         client_id = console.input("Client ID: ")
+    proxy_path = console.input("Proxy path (default /proxy) Enter to skip: ")
     client_id_header = console.input(
-        "Client ID header name (e.g. x-requestor-id) Enter to skip: "
+        "Client ID header name (default x-requestor-id) Enter to skip: "
     )
     api_key_header = console.input(
-        "API key header name (e.g. x-api-key) Enter to skip: "
+        "API key header name (default x-api-key) Enter to skip: "
     )
     other_headers = {}
     while True:
@@ -76,6 +85,7 @@ def gather_input(console: Console, instances_model: GkInstances):
     is_active = active == "y"
     return (
         base_url,
+        proxy_path,
         client_id,
         client_id_header,
         api_key_header,

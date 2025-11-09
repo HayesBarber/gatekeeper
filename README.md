@@ -114,13 +114,7 @@ The empty-string key ("") in UPSTREAMS acts as the default fallback and will mat
 
 ## Testing
 
-First, run the setup script to seed Redis with a test user, setup a dummy upstream API, and run gatekeeper itself:
-
-```bash
-python tests/scripts/setup.py
-```
-
-Then, in another terminal, run the tests:
+Run the tests using pytest:
 
 ```bash
 pytest

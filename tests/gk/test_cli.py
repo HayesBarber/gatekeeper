@@ -43,3 +43,41 @@ def test_apikey_command_parsing_with_instance_full_flag(parser):
     assert args.command == "apikey"
     assert hasattr(args, "handler")
     assert args.instance == "test1"
+
+
+def test_proxy_command_parsing(parser):
+    args = parser.parse_args(["proxy", "GET", "users"])
+    assert args.command == "proxy"
+    assert hasattr(args, "handler")
+    assert args.method == "GET"
+    assert args.path == "users"
+    assert args.instance is None
+    assert args.body is None
+
+
+def test_proxy_command_parsing_with_instance_short_flag(parser):
+    args = parser.parse_args(["proxy", "POST", "api/items", "-i", "test_instance"])
+    assert args.command == "proxy"
+    assert hasattr(args, "handler")
+    assert args.method == "POST"
+    assert args.path == "api/items"
+    assert args.instance == "test_instance"
+    assert args.body is None
+
+
+def test_proxy_command_parsing_with_instance_full_flag(parser):
+    args = parser.parse_args(["proxy", "DELETE", "v1/resource", "--instance", "prod"])
+    assert args.command == "proxy"
+    assert hasattr(args, "handler")
+    assert args.method == "DELETE"
+    assert args.path == "v1/resource"
+    assert args.instance == "prod"
+
+
+def test_proxy_command_parsing_with_body_short_flag(parser):
+    args = parser.parse_args(["proxy", "POST", "items", "-b", '{"key": "value"}'])
+    assert args.command == "proxy"
+    assert hasattr(args, "handler")
+    assert args.method == "POST"
+    assert args.path == "items"
+    assert args.body == '{"key": "value"}'
