@@ -8,6 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.main import app
+import requests
 
 
 @pytest.fixture()
@@ -99,8 +100,20 @@ def gatekeeper_services():
     upstream2.start()
     app_proc.start()
 
-    # wait for services to start
-    time.sleep(1)
+    ports = [8080, 8081, 8000]
+    for port in ports:
+        url = f"http://127.0.0.1:{port}/"
+        for _ in range(20):
+            try:
+                r = requests.get(url, timeout=0.5)
+                # gatekeeper will return 400 here for missing headers
+                if r.status_code in (200, 400, 404, 405):
+                    break
+            except Exception:
+                pass
+            time.sleep(0.5)
+        else:
+            pytest.fail(f"Service on port {port} did not start in time")
 
     yield
 
