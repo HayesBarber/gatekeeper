@@ -1,4 +1,6 @@
 from rich.console import Console
+from gk.commands import list_ as list_mod
+import sys
 
 
 def add_subparser(subparsers):
@@ -21,4 +23,13 @@ def add_subparser(subparsers):
 
 
 def handle(args, console: Console):
-    pass
+    instance = None
+
+    if args.instance:
+        instance = list_mod.get_instance_by_base_url(args.instance)
+    else:
+        instance = list_mod.get_active_instance()
+
+    if not instance:
+        console.print("[yellow]Instance not found[/yellow]")
+        sys.exit(1)
