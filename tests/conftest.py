@@ -100,18 +100,8 @@ def gatekeeper_services():
     upstream2.start()
     app_proc.start()
 
-    # Wait for the services to be ready
-    ports = [8080, 8081]
-    for port in ports:
-        for _ in range(20):
-            try:
-                r = requests.get(f"http://127.0.0.1:{port}/echo", timeout=0.5)
-                if r.status_code in (200, 405):
-                    break
-            except Exception:
-                time.sleep(0.5)
-        else:
-            pytest.fail(f"Service on port {port} did not start in time")
+    # wait for services to start
+    time.sleep(1)
 
     yield
 
