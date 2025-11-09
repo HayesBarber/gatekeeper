@@ -18,6 +18,9 @@ class StorageKey(str, Enum):
     APIKEYS = "apikeys"
 
 
+SECURE_KEYS = {StorageKey.KEYPAIRS, StorageKey.APIKEYS}
+
+
 FILE_NAMES: dict[StorageKey, str] = {
     StorageKey.INSTANCES: "instances.json",
     StorageKey.KEYPAIRS: "keypairs.json",
@@ -78,7 +81,7 @@ def load_model(key: StorageKey) -> BaseModel:
     model_cls = MODEL_FOR_KEY[key]
     if not file_path.exists():
         return model_cls()
-    if key in (StorageKey.KEYPAIRS, StorageKey.APIKEYS):
+    if key in SECURE_KEYS:
         return secure_read_json(file_path, model_cls)
     return model_cls.model_validate_json(file_path.read_text())
 
@@ -88,7 +91,7 @@ def save_model(key: StorageKey, model: BaseModel):
     Save a Pydantic model to the file corresponding to key.
     """
     file_path = path_for(key)
-    if key in (StorageKey.KEYPAIRS, StorageKey.APIKEYS):
+    if key in SECURE_KEYS:
         secure_write_json(file_path, model)
     else:
         with open(file_path, "w") as f:
