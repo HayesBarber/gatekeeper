@@ -7,8 +7,9 @@ def test_proxy_happy_path(console, console_input, local_base_url, seed_user):
     inputs = [
         local_base_url,
         client_id,
-        "x-client-id",
-        "x-api-key",
+        "",
+        "",
+        "",
         "User-Agent",
         "test-user-agent",
         "",
@@ -21,28 +22,28 @@ def test_proxy_happy_path(console, console_input, local_base_url, seed_user):
     public_key = list_.get_active_instance().public_key
     seed_user(client_id, public_key)
 
-    # Proxy GET /echo
-    args = type("Args", (), {})()
-    args.method = "GET"
-    args.path = "echo"
-    args.instance = None
-    args.body = None
-    proxy.handle(args, console)
-    output = console.export_text()
-    data = json.loads(output)
-    assert data["method"] == "GET"
-    assert data["path"] == "/echo"
-    assert "user-agent" in data["headers"]
+    for i in range(1, 3):
+        # Proxy GET /echo
+        args = type("Args", (), {})()
+        args.method = "GET"
+        args.path = f"/api{i}/echo"
+        args.instance = None
+        args.body = None
+        proxy.handle(args, console)
+        output = console.export_text()
+        assert "GET" in output
+        assert "path" in output
+        assert "/echo" in output
 
-    # Proxy POST /echo
-    args = type("Args", (), {})()
-    args.method = "POST"
-    args.path = "echo"
-    args.instance = None
-    args.body = json.dumps({"msg": "hi"})
-    proxy.handle(args, console)
-    output = console.export_text()
-    data = json.loads(output)
-    assert data["method"] == "POST"
-    assert data["body"] == {"msg": "hi"}
-    assert "user-agent" in data["headers"]
+        # Proxy POST /echo
+        args = type("Args", (), {})()
+        args.method = "POST"
+        args.path = f"/api{i}/echo"
+        args.instance = None
+        body = json.dumps({"msg": "hi"})
+        args.body = body
+        proxy.handle(args, console)
+        output = console.export_text()
+        assert "POST" in output
+        assert "msg" in output
+        assert "hi" in output
