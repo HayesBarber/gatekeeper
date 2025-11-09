@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_add_command_parsing(parser):
     args = parser.parse_args(["add"])
     assert args.command == "add"
@@ -81,3 +84,15 @@ def test_proxy_command_parsing_with_body_short_flag(parser):
     assert args.method == "POST"
     assert args.path == "items"
     assert args.body == '{"key": "value"}'
+
+
+def test_activate_command_parsing(parser):
+    args = parser.parse_args(["activate", "test"])
+    assert args.command == "activate"
+    assert hasattr(args, "handler")
+    assert args.base_url == "test"
+
+
+def test_activate_command_parsing_url_not_provided(parser):
+    with pytest.raises(SystemExit):
+        parser.parse_args(["activate"])
