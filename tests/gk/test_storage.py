@@ -15,11 +15,11 @@ def test_save_and_load_encrypted_model(tmp_path):
     filepath = tmp_path / f".gk/{storage.FILE_NAMES[storage.StorageKey.KEYPAIRS]}"
     assert filepath.exists()
 
-    with open(filepath, "r") as f:
+    with open(filepath, "rb") as f:
         content = f.read()
-    assert "testing" not in content
-    assert "test_public_key" not in content
-    assert "test_private_key" not in content
+    assert b"testing" not in content
+    assert b"test_public_key" not in content
+    assert b"test_private_key" not in content
 
     mode = os.stat(filepath).st_mode
     assert stat.S_IMODE(mode) == 0o600
