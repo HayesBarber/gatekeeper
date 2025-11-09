@@ -1,5 +1,7 @@
 from rich.console import Console
-from gk.commands import list_ as list_mod
+from gk.commands import list_ as list_mod, apikey
+from gk.models.gk_apikey import GkApiKey
+from gk import storage
 import sys
 
 
@@ -33,3 +35,17 @@ def handle(args, console: Console):
     if not instance:
         console.print("[yellow]Instance not found[/yellow]")
         sys.exit(1)
+
+    curr_key = apikey.get_apikey_for_instance(instance)
+
+    if not curr_key or apikey.apikey_is_expired(curr_key):
+        api_key, error = apikey.fetch_api_key(instance)
+        if error:
+            console.print_json(data=error)
+            sys.exit(1)
+
+        curr_key = GkApiKey(
+            instance_base_url=instance.base_url,
+            api_key=api_key,
+        )
+        storage.persist_apikey(curr_key)
