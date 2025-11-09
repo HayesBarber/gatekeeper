@@ -3,7 +3,6 @@ from curveauth.keys import ECCKeyPair
 from app.utils.redis_client import redis_client, Namespace
 import multiprocessing
 import time
-import requests
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
