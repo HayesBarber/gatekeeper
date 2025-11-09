@@ -2,6 +2,8 @@ from rich.console import Console
 from gk.commands import list_ as list_mod, apikey
 from gk.models.gk_apikey import GkApiKey
 from gk import storage
+import httpx
+import json
 import sys
 
 
@@ -52,3 +54,40 @@ def handle(args, console: Console):
 
     headers = apikey.build_headers(instance)
     headers[instance.api_key_header] = curr_key.api_key.api_key
+
+    url = f"{instance.base_url.rstrip('/')}/{args.path.lstrip('/')}"
+
+    body = None
+    if getattr(args, "body", None):
+        if args.body.startswith("@"):
+            filename = args.body[1:]
+            try:
+                with open(filename, "r") as f:
+                    body = json.load(f)
+            except Exception as e:
+                console.print(f"[red]Failed to read body file: {e}[/red]")
+                sys.exit(1)
+        else:
+            try:
+                body = json.loads(args.body)
+            except Exception as e:
+                console.print(f"[red]Failed to parse JSON body: {e}[/red]")
+                sys.exit(1)
+
+    try:
+        response = httpx.request(args.method, url, headers=headers, json=body)
+    except Exception as e:
+        console.print(f"[red]HTTP request failed: {e}[/red]")
+        sys.exit(1)
+
+    try:
+        data = response.json()
+    except Exception as e:
+        console.print(f"[red]Failed to parse response JSON: {e}[/red]")
+        sys.exit(1)
+
+    if response.status_code != 200:
+        console.print_json(data)
+        sys.exit(1)
+    else:
+        console.print_json(data)
