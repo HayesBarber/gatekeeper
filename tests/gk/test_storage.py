@@ -2,6 +2,7 @@ import os
 import stat
 from gk import storage
 from gk.models.gk_keypair import GkKeyPair, GkKeyPairs
+from gk.models.gk_instance import GkInstance, GkInstances
 
 
 def test_save_and_load_encrypted_model(tmp_path):
@@ -31,13 +32,22 @@ def test_save_and_load_encrypted_model(tmp_path):
     assert loaded.keypairs[0].private_key == b"test_private_key"
 
 
-# def test_save_and_load_nonsecure_model(tmp_path):
-#     storage.save_model(INSTANCES, tmp_path)
-#     filepath = tmp_path / f"{INSTANCES}.json"
-#     assert filepath.exists()
+def test_save_and_load_nonsecure_model(tmp_path):
+    instance = GkInstance(
+        base_url="http://two.com",
+        client_id="test2",
+        active=True,
+    )
+    model = GkInstances(instances=[instance])
+    storage.save_model(storage.StorageKey.INSTANCES, model)
+    filepath = tmp_path / f".gk/{storage.FILE_NAMES[storage.StorageKey.INSTANCES]}"
+    assert filepath.exists()
 
-#     mode = os.stat(filepath).st_mode
-#     assert stat.S_IMODE(mode) == 0o600
+    mode = os.stat(filepath).st_mode
+    assert stat.S_IMODE(mode) == 0o600
 
-#     loaded = storage.load_model(INSTANCES, tmp_path)
-#     assert loaded == storage.MODELS[INSTANCES]
+    loaded: GkInstances = storage.load_model(storage.StorageKey.INSTANCES)
+    assert len(loaded.instances) == 1
+    assert loaded.instances[0].base_url == "http://two.com"
+    assert loaded.instances[0].client_id == "test2"
+    assert loaded.instances[0].active
