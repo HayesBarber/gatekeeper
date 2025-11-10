@@ -9,6 +9,7 @@ def _tmp_data_dir(tmp_path, monkeypatch):
     tmp_dir = tmp_path / ".gk"
     tmp_dir.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr(storage, "DATA_DIR", tmp_dir)
+    monkeypatch.setattr(storage, "KEY_FILE", tmp_dir / ".key")
     return tmp_dir
 
 
