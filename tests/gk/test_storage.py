@@ -51,3 +51,11 @@ def test_save_and_load_nonsecure_model(tmp_path):
     assert loaded.instances[0].base_url == "http://two.com"
     assert loaded.instances[0].client_id == "test2"
     assert loaded.instances[0].active
+
+
+def test_ensure_data_dir_permissions(tmp_path):
+    test_dir = tmp_path / ".gk"
+    storage.ensure_data_dir()
+    assert test_dir.exists()
+    mode = os.stat(test_dir).st_mode
+    assert stat.S_IMODE(mode) == 0o700
