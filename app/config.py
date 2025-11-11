@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.utils.logger import LOGGER
+from app.utils.redis_client import Namespace, redis_client
+from app.models.upstream import UpstreamMapping
 
 
 class Settings(BaseSettings):
@@ -15,6 +17,15 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    def load_redis_upstreams(self) -> dict[str, str]:
+        upstreams = redis_client.get_all_models(Namespace.UPSTREAMS, UpstreamMapping)
+        return {m.prefix: m.base_url for m in upstreams.values()}
+
+    def get_combined_upstreams(self) -> dict[str, str]:
+        redis_upstreams = self.load_redis_upstreams()
+        combined = {**self.upstreams, **redis_upstreams}
+        return combined
+
     def get_upstream_for_path(self, path: str) -> tuple[str, str] | None:
         """
         Return (matched_prefix, upstream_base_url) using longest-prefix match.
@@ -24,7 +35,9 @@ class Settings(BaseSettings):
             path = "/"
         if not path.startswith("/"):
             path = "/" + path
-        matches = [(p, u) for p, u in self.upstreams.items() if path.startswith(p)]
+
+        combined_upstreams = self.get_combined_upstreams()
+        matches = [(p, u) for p, u in combined_upstreams.items() if path.startswith(p)]
         if not matches:
             return None
         prefix, url = max(matches, key=lambda x: len(x[0]))
