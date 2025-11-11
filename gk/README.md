@@ -51,6 +51,16 @@ gk add
 
 ---
 
+### List instances
+
+```bash
+gk list
+```
+
+- Displays all gatekeeper instances
+
+---
+
 ### Make a proxied request
 
 ```bash
