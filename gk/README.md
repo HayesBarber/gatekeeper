@@ -15,7 +15,9 @@ You can:
 
 ## Data Storage
 
-All persistent data (API keys, keypairs, configuration) is stored in the `~/.gk` directory.
+All persistent data (API keys, keypairs, configuration) is stored securely in the `~/.gk` directory.
+Sensitive files such as API keys and keypairs are encrypted using Fernet symmetric encryption.
+File and directory permissions are restricted to the current user (`700` for directories, `600` for files) to prevent unauthorized access.
 
 ## Installation
 
