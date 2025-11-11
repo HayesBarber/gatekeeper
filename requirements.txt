@@ -2,5 +2,6 @@ fastapi
 redis
 uvicorn
 httpx
+pydantic
 pydantic-settings
 git+https://github.com/HayesBarber/curveauth-py.git
