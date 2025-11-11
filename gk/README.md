@@ -12,7 +12,7 @@ You can:
 • Activate and switch between gatekeeper instances
 • Make proxied requests to upstream services that are sitting behind gatekeeper
 
-All persistent data (API keys, key pairs, configuration) is stored in the `~/.gk` directory.
+All persistent data (API keys, keypairs, configuration) is stored in the `~/.gk` directory.
 
 ## Installation
 
@@ -35,3 +35,16 @@ pip install -e .
 ```
 
 This exposes the `gk` command globally.
+
+## Usage
+
+### Add an instance
+
+```bash
+gk add
+```
+
+- The CLI will prompt for the needed input
+- The instance will be saved, and a keypair will be generated for it
+
+---
