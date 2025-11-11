@@ -7,7 +7,7 @@ setup(
     packages=find_packages(include=["app*", "gk*"]),
     entry_points={
         "console_scripts": [
-            "gk=gk.cli:main",
+            "gk=gk.main:main",
         ],
     },
 )
