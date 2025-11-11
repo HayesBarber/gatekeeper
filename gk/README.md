@@ -7,10 +7,11 @@ A command-line interface for managing and interacting with Gatekeeper
 `gk` allows you to make requests to a gatekeeper instance, and managing the api keys behind the scenes.
 
 You can:
-• Manage API keys and instances
-• Generate and store cryptographic key pairs
-• Activate and switch between gatekeeper instances
-• Make proxied requests to upstream services that are sitting behind gatekeeper
+
+- Manage API keys and instances
+- Generate and store cryptographic key pairs
+- Activate and switch between gatekeeper instances
+- Make proxied requests to upstream services that are sitting behind gatekeeper
 
 All persistent data (API keys, keypairs, configuration) is stored in the `~/.gk` directory.
 
@@ -46,5 +47,14 @@ gk add
 
 - The CLI will prompt for the needed input
 - The instance will be saved, and a keypair will be generated for it
+- As gatekeeper does not handle user creation, you will need to add the client ID and public key on the server
 
 ---
+
+### Make a proxied request
+
+```bash
+gk proxy GET /your/upstream/endpoint
+```
+
+- An API key will be fetched as needed
