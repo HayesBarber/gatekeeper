@@ -92,4 +92,16 @@ gk apikey
 ```
 
 - Fetches a new API key
-- This will happen automatically in `gk proxy` if the current key is expired
+- This will happen automatically when doing a `gk proxy` if the current key is expired
+
+---
+
+### Generate keypair
+
+```bash
+gk keygen
+```
+
+- Generates an ECC keypair
+- This will happen automatically when doing `gk add`
+- This command by itself does not associate the keypair with a gatekeeper instance
