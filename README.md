@@ -110,7 +110,9 @@ The empty-string key ("") in UPSTREAMS acts as the default fallback and will mat
 
 ## gk CLI
 
-> WIP
+The gatekeeper CLI (`gk`) is a CLI client for interacting with gatekeeper instances.
+
+See the full [gk README](./gk/README.md) for usage, commands, and setup details.
 
 ## Testing
 
