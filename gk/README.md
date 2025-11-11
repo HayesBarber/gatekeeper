@@ -82,3 +82,14 @@ gk proxy GET /your/upstream/endpoint
 ```
 
 - An API key will be fetched as needed
+
+---
+
+### Fetch an API key
+
+```bash
+gk apikey
+```
+
+- Fetches a new API key
+- This will happen automatically in `gk proxy` if the current key is expired
