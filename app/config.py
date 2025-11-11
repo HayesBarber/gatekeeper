@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.utils.logger import LOGGER
 from app.utils.redis_client import Namespace, redis_client
 from app.models.upstream import UpstreamMapping
+import time
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
@@ -18,8 +20,14 @@ class Settings(BaseSettings):
     )
 
     def load_redis_upstreams(self) -> dict[str, str]:
+        now = time.time()
+        if hasattr(self, "_cached_upstreams") and hasattr(self, "_last_upstream_load"):
+            if now - self._last_upstream_load < 30:
+                return self._cached_upstreams
         upstreams = redis_client.get_all_models(Namespace.UPSTREAMS, UpstreamMapping)
-        return {m.prefix: m.base_url for m in upstreams.values()}
+        self._cached_upstreams = {m.prefix: m.base_url for m in upstreams.values()}
+        self._last_upstream_load = now
+        return self._cached_upstreams
 
     def get_combined_upstreams(self) -> dict[str, str]:
         redis_upstreams = self.load_redis_upstreams()
