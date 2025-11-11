@@ -13,6 +13,8 @@ You can:
 - Activate and switch between gatekeeper instances
 - Make proxied requests to upstream services that are sitting behind gatekeeper
 
+## Data Storage
+
 All persistent data (API keys, keypairs, configuration) is stored in the `~/.gk` directory.
 
 ## Installation
@@ -39,7 +41,7 @@ This exposes the `gk` command globally.
 
 ## Usage
 
-### Add an instance
+### Add an Instance
 
 ```bash
 gk add
@@ -51,7 +53,7 @@ gk add
 
 ---
 
-### List instances
+### List Instances
 
 ```bash
 gk list
@@ -61,7 +63,7 @@ gk list
 
 ---
 
-### Activate an instance
+### Activate an Instance
 
 ```bash
 gk activate base_url
@@ -71,7 +73,7 @@ gk activate base_url
 
 ---
 
-### Make a proxied request
+### Make a Proxied Request
 
 ```bash
 gk proxy GET /your/upstream/endpoint
