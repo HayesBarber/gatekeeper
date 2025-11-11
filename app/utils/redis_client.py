@@ -7,20 +7,26 @@ from app.utils.logger import LOGGER
 
 T = TypeVar("T", bound=BaseModel)
 
+
 class Namespace(str, Enum):
     CHALLENGES = "challenges"
     API_KEYS = "api_keys"
     USERS = "users"
+    UPSTREAMS = "upstreams"
+
 
 class TTL(int, Enum):
     API_KEYS = 5 * 60
     CHALLENGES = 30
 
+
 def _make_key(namespace: Namespace, key: str) -> str:
     return f"{namespace.value}:{key.strip()}"
 
+
 def get_ttl(ns: Namespace) -> Optional[int]:
     return TTL[ns.name].value if ns.name in TTL.__members__ else None
+
 
 class RedisClient:
     def __init__(self, redis_url: Optional[str] = None):
@@ -46,7 +52,9 @@ class RedisClient:
         try:
             return model.model_validate_json(raw)
         except ValidationError:
-            raise RuntimeError(f"Invalid model JSON for key: {_make_key(namespace, key)}")
+            raise RuntimeError(
+                f"Invalid model JSON for key: {_make_key(namespace, key)}"
+            )
 
     def set_model(self, namespace: Namespace, key: str, model_instance: BaseModel):
         self.set(namespace, key, model_instance.model_dump_json())
@@ -63,10 +71,7 @@ class RedisClient:
                 yield orig_key, value
 
     def get_all(self, namespace: Namespace) -> Dict[str, str]:
-        return {
-            key: val.decode("utf-8")
-            for key, val in self._get_all_raw(namespace)
-        }
+        return {key: val.decode("utf-8") for key, val in self._get_all_raw(namespace)}
 
     def get_all_models(self, namespace: Namespace, model: Type[T]) -> Dict[str, T]:
         models = {}
@@ -74,22 +79,32 @@ class RedisClient:
             try:
                 models[key] = model.model_validate_json(val)
             except ValidationError:
-                LOGGER.error(f"[Redis] Skipping invalid model for key: {_make_key(namespace, key)}")
+                LOGGER.error(
+                    f"[Redis] Skipping invalid model for key: {_make_key(namespace, key)}"
+                )
             except Exception as e:
-                LOGGER.error(f"[Redis] Unexpected error on key {_make_key(namespace, key)}: {e}")
+                LOGGER.error(
+                    f"[Redis] Unexpected error on key {_make_key(namespace, key)}: {e}"
+                )
         return models
 
-    def set_all_models(self, namespace: Namespace, model_list: List[T], key_field: str) -> int:
+    def set_all_models(
+        self, namespace: Namespace, model_list: List[T], key_field: str
+    ) -> int:
         if not model_list:
             return 0
 
         try:
             data = {
-                _make_key(namespace, str(getattr(model, key_field))): model.model_dump_json()
+                _make_key(
+                    namespace, str(getattr(model, key_field))
+                ): model.model_dump_json()
                 for model in model_list
             }
         except AttributeError as e:
-            raise AttributeError(f"[Redis] key_field '{key_field}' not found on model.") from e
+            raise AttributeError(
+                f"[Redis] key_field '{key_field}' not found on model."
+            ) from e
 
         pipe = self._redis.pipeline()
         ttl = get_ttl(namespace)
@@ -100,5 +115,6 @@ class RedisClient:
         pipe.execute()
 
         return len(data)
+
 
 redis_client = RedisClient()
