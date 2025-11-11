@@ -104,4 +104,4 @@ gk keygen
 
 - Generates an ECC keypair
 - This will happen automatically when doing `gk add`
-- This command by itself does not associate the keypair with a gatekeeper instance
+- This command by itself does not associate the keypair with any gatekeeper instance
