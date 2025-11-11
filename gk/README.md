@@ -61,6 +61,16 @@ gk list
 
 ---
 
+### Activate an instance
+
+```bash
+gk activate base_url
+```
+
+- Sets the instance with `base_url` as active
+
+---
+
 ### Make a proxied request
 
 ```bash
