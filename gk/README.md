@@ -11,7 +11,7 @@ You can:
 - Manage API keys and instances
 - Generate and store cryptographic key pairs
 - Activate and switch between gatekeeper instances
-- Make proxied requests to upstream services that are sitting behind gatekeeper
+- Make proxied requests to upstream services that are sitting behind a gatekeeper instance
 
 ## Data Storage
 
