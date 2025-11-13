@@ -1,5 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from app.utils.logger import LOGGER
+from app.utils.redis_client import Namespace, redis_client
+from app.models.upstream import UpstreamMapping
+import time
 
 
 class Settings(BaseSettings):
@@ -7,13 +10,28 @@ class Settings(BaseSettings):
     proxy_path: str = "/proxy"
     api_key_header: str = "x-api-key"
     client_id_header: str = "x-requestor-id"
-    upstreams: dict[str, str] = {"": "http://localhost:8080"}
+    upstreams: dict[str, str] = {}
     blacklisted_paths: dict[str, list[str]] = {}
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    def load_redis_upstreams(self) -> dict[str, str]:
+        now = time.time()
+        if hasattr(self, "_cached_upstreams") and hasattr(self, "_last_upstream_load"):
+            if now - self._last_upstream_load < 30:
+                return self._cached_upstreams
+        upstreams = redis_client.get_all_models(Namespace.UPSTREAMS, UpstreamMapping)
+        self._cached_upstreams = {m.prefix: m.base_url for m in upstreams.values()}
+        self._last_upstream_load = now
+        return self._cached_upstreams
+
+    def get_combined_upstreams(self) -> dict[str, str]:
+        redis_upstreams = self.load_redis_upstreams()
+        combined = {**self.upstreams, **redis_upstreams}
+        return combined
 
     def get_upstream_for_path(self, path: str) -> tuple[str, str] | None:
         """
@@ -24,7 +42,9 @@ class Settings(BaseSettings):
             path = "/"
         if not path.startswith("/"):
             path = "/" + path
-        matches = [(p, u) for p, u in self.upstreams.items() if path.startswith(p)]
+
+        combined_upstreams = self.get_combined_upstreams()
+        matches = [(p, u) for p, u in combined_upstreams.items() if path.startswith(p)]
         if not matches:
             return None
         prefix, url = max(matches, key=lambda x: len(x[0]))

@@ -11,6 +11,16 @@ from app.main import app
 import requests
 
 
+@pytest.fixture(autouse=True, scope="session")
+def clean_redis():
+    """Purge Gatekeeper Redis namespaces before tests."""
+    for ns in Namespace:
+        pattern = f"{ns.value}:*"
+        keys = redis_client._redis.keys(pattern)
+        if keys:
+            redis_client._redis.delete(*keys)
+
+
 @pytest.fixture()
 def seeded_user():
     client_id = "Test_User"

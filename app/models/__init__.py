@@ -3,6 +3,7 @@ from .challenge_response import ChallengeResponse
 from .challenge_verification_request import ChallengeVerificationRequest
 from .challenge_verification_response import ChallengeVerificationResponse
 from .exceptions import ChallengeNotVerified, ClientNotFound
+from .upstream import UpstreamMapping
 
 __all__ = [
     "ChallengeRequest",
@@ -11,4 +12,5 @@ __all__ = [
     "ChallengeVerificationResponse",
     "ChallengeNotVerified",
     "ClientNotFound",
+    "UpstreamMapping",
 ]
