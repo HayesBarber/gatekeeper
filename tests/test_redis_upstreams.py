@@ -15,9 +15,13 @@ def clean_redis():
 
 def test_load_redis_upstreams_returns_empty_when_no_data():
     settings = Settings()
-    upstreams = settings.load_redis_upstreams()
-    assert isinstance(upstreams, dict)
+    redis_upstreams = settings.load_redis_upstreams()
+    assert isinstance(redis_upstreams, dict)
+    assert len(redis_upstreams) == 0
+    upstreams = settings.upstreams
     assert len(upstreams) == 0
+    combined = settings.get_combined_upstreams()
+    assert len(combined) == 0
 
 
 def test_redis_upstream_overrides_static():

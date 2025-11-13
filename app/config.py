@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     proxy_path: str = "/proxy"
     api_key_header: str = "x-api-key"
     client_id_header: str = "x-requestor-id"
-    upstreams: dict[str, str] = {"": "http://localhost:8080"}
+    upstreams: dict[str, str] = {}
     blacklisted_paths: dict[str, list[str]] = {}
     model_config = SettingsConfigDict(
         env_file=".env",
