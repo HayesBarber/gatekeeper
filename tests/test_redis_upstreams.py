@@ -47,3 +47,53 @@ def test_redis_upstream_overrides_static():
     combined = settings.get_combined_upstreams()
     assert len(combined) == 1
     assert combined.get(static_path) == redis_upstream
+
+
+def test_load_redis_upstreams_caches_for_30_seconds(monkeypatch):
+    settings = Settings()
+    path = "/cache-path"
+    upstream1 = "http://upstream1"
+    mapping1 = UpstreamMapping(prefix=path, base_url=upstream1)
+    redis_client.set_model(Namespace.UPSTREAMS, path, mapping1)
+
+    original_time = __import__("time").time()
+    monkeypatch.setattr("time.time", lambda: original_time)
+
+    # Load and cache
+    redis_upstreams = settings.load_redis_upstreams()
+    assert redis_upstreams.get(path) == upstream1
+
+    # Change Redis value
+    upstream2 = "http://upstream2"
+    mapping2 = UpstreamMapping(prefix=path, base_url=upstream2)
+    redis_client.set_model(Namespace.UPSTREAMS, path, mapping2)
+
+    # time within 30 seconds: cache should still return old value
+    monkeypatch.setattr("time.time", lambda: original_time + 10)
+    cached_upstreams = settings.load_redis_upstreams()
+    assert cached_upstreams.get(path) == upstream1
+
+
+def test_cache_expires_after_30_seconds(monkeypatch):
+    settings = Settings()
+    path = "/cache-expire-path"
+    upstream1 = "http://upstream1"
+    mapping1 = UpstreamMapping(prefix=path, base_url=upstream1)
+    redis_client.set_model(Namespace.UPSTREAMS, path, mapping1)
+
+    original_time = __import__("time").time()
+    monkeypatch.setattr("time.time", lambda: original_time)
+
+    # Load and cache
+    redis_upstreams = settings.load_redis_upstreams()
+    assert redis_upstreams.get(path) == upstream1
+
+    # Change Redis value
+    upstream2 = "http://upstream2"
+    mapping2 = UpstreamMapping(prefix=path, base_url=upstream2)
+    redis_client.set_model(Namespace.UPSTREAMS, path, mapping2)
+
+    # time after 31 seconds: cache expired, should load new value
+    monkeypatch.setattr("time.time", lambda: original_time + 31)
+    updated_upstreams = settings.load_redis_upstreams()
+    assert updated_upstreams.get(path) == upstream2
