@@ -3,7 +3,6 @@ from app.utils.logger import LOGGER
 from app.utils.redis_client import Namespace, redis_client
 from app.models.upstream import UpstreamMapping
 import time
-from functools import lru_cache
 
 
 class Settings(BaseSettings):
