@@ -74,6 +74,7 @@ Configuration is handled in `app/config.py`, which loads values from a `.env` fi
 - API_KEY_HEADER: Name of the header containing the API key used to authenticate proxied requests
 - PROXY_PATH: URL prefix that marks requests to be forwarded to an upstream
 - UPSTREAMS: JSON mapping of prefix -> base URL (e.g. {"": "http://localhost:8080", "/api/v1": "http://localhost:8081"})
+  - gatekeeper will also load upstream mappings dynamically from Redis under the `upstreams` namespace. These take precedence over values defined in `UPSTREAMS` in the `.env` file and are refreshed periodically
   - PROXY_PATH is stripped from the incoming request before resolving an upstream. The remaining path is matched using longest-prefix match against UPSTREAMS, and the matched prefix is removed before constructing the final upstream URL. See example below
 - REQUIRED_HEADERS: JSON mapping of header -> expected value (null to only require presence)
 - BLACKLISTED_PATHS: JSON mapping of path -> list of allowed methods ["GET", "POST", etc...] (empty list disables all methods to that path)
