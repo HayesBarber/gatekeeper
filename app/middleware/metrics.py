@@ -23,10 +23,9 @@ async def metrics_middleware(request: Request, call_next):
     else:
         outcome = "success"
 
-    # Record metrics
     otel.requests_total.add(
         1,
-        labels={
+        attributes={
             "method": method,
             "path": path,
             "status_code": str(status_code),
@@ -35,7 +34,12 @@ async def metrics_middleware(request: Request, call_next):
     )
 
     otel.request_duration.record(
-        duration_ms, labels={"method": method, "path": path, "outcome": outcome}
+        duration_ms,
+        attributes={
+            "method": method,
+            "path": path,
+            "outcome": outcome,
+        },
     )
 
     return response
