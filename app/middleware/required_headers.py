@@ -3,8 +3,11 @@ from starlette.responses import JSONResponse
 from app.config import settings
 from app.utils.logger import LOGGER
 
+
 async def required_headers_middleware(request: Request, call_next):
-    LOGGER.info(f"[RequiredHeaders] Checking headers for {request.method} {request.url.path}")
+    LOGGER.info(
+        f"[RequiredHeaders] Checking headers for {request.method} {request.url.path}"
+    )
 
     missing = []
     for header, expected in settings.required_headers.items():
@@ -14,6 +17,8 @@ async def required_headers_middleware(request: Request, call_next):
 
     if missing:
         LOGGER.warn(f"Request missing or mismatched required headers: {missing}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "required_headers"
         return JSONResponse(
             status_code=400,
             content={"detail": "Missing required headers"},
