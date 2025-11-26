@@ -8,8 +8,8 @@ from app.middleware import (
 )
 
 app = FastAPI(title="Gate Keeper")
-app.middleware("http")(metrics_middleware)
 app.middleware("http")(proxy_middleware)
 app.middleware("http")(required_headers_middleware)
 app.middleware("http")(blacklist_middleware)
+app.middleware("http")(metrics_middleware)
 app.include_router(api_router)

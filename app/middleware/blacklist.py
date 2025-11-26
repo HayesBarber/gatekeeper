@@ -14,6 +14,9 @@ async def blacklist_middleware(request: Request, call_next):
             LOGGER.warn(
                 f"Blocking {request.method} request to blacklisted path: {request_path}"
             )
+
+            request.state.gateway_reject = True
+
             return JSONResponse(
                 status_code=403, content={"detail": "Access to this path is forbidden."}
             )
