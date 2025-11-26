@@ -4,10 +4,6 @@ from app.utils.otel import otel
 
 
 async def metrics_middleware(request: Request, call_next):
-    """
-    Function-based FastAPI middleware for recording OTEL metrics.
-    Tracks request duration, status code, and outcome.
-    """
     start_time = time.time()
 
     response: Response = await call_next(request)
@@ -17,7 +13,6 @@ async def metrics_middleware(request: Request, call_next):
     path = request.url.path
     status_code = response.status_code
 
-    # Determine outcome
     if getattr(request.state, "gateway_reject", False):
         outcome = "gateway_reject"
     elif (
