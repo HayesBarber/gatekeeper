@@ -16,6 +16,7 @@ async def blacklist_middleware(request: Request, call_next):
             )
 
             request.state.gateway_reject = True
+            request.state.reject_reason = "blacklist"
 
             return JSONResponse(
                 status_code=403, content={"detail": "Access to this path is forbidden."}
