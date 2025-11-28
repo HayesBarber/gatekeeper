@@ -8,7 +8,17 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.main import app
+import app.utils.otel as otel_module
+from tests.mocks.mock_otel import MockOtel
 import requests
+
+
+@pytest.fixture(autouse=True)
+def mock_otel(monkeypatch):
+    mock = MockOtel()
+    monkeypatch.setattr(otel_module, "otel", mock)
+
+    return mock
 
 
 @pytest.fixture(autouse=True, scope="session")
