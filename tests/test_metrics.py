@@ -38,6 +38,7 @@ async def test_metrics_success(mock_otel):
     assert amount == 1
     assert attrs["outcome"] == "success"
     assert attrs["status_code"] == "200"
+    assert len(mock_otel.requests_total.calls) == 1
 
     await metrics_middleware(request, call_next)
     assert len(mock_otel.requests_total.calls) == 2
