@@ -24,23 +24,20 @@ async def metrics_middleware(request: Request, call_next):
     ):
         outcome = f"upstream_error:{request.state.upstream_status}"
 
+    attributes = {
+        "method": method,
+        "path": path,
+        "status_code": str(status_code),
+        "outcome": outcome,
+    }
     otel.requests_total.add(
         1,
-        attributes={
-            "method": method,
-            "path": path,
-            "status_code": str(status_code),
-            "outcome": outcome,
-        },
+        attributes=attributes,
     )
 
     otel.request_duration.record(
         duration_ms,
-        attributes={
-            "method": method,
-            "path": path,
-            "outcome": outcome,
-        },
+        attributes=attributes,
     )
 
     return response
