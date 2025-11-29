@@ -39,6 +39,9 @@ async def test_metrics_success(mock_otel):
     assert attrs["outcome"] == "success"
     assert attrs["status_code"] == "200"
 
+    await metrics_middleware(request, call_next)
+    assert len(mock_otel.requests_total.calls) == 2
+
 
 @pytest.mark.anyio
 async def test_metrics_gateway_reject(mock_otel):
