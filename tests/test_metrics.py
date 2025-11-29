@@ -37,3 +37,20 @@ async def test_metrics_success(mock_otel):
     assert opname == "add"
     assert amount == 1
     assert attrs["outcome"] == "success"
+    assert attrs["status_code"] == "200"
+
+
+@pytest.mark.anyio
+async def test_metrics_gateway_reject(mock_otel):
+    request = make_request()
+    request.state.gateway_reject = True
+    request.state.reject_reason = "bad_key"
+
+    call_next = AsyncMock(return_value=Response(status_code=403))
+    await metrics_middleware(request, call_next)
+
+    opname, amount, attrs = mock_otel.requests_total.calls[0]
+    assert opname == "add"
+    assert amount == 1
+    assert attrs["outcome"] == "gateway_reject:bad_key"
+    assert attrs["status_code"] == "403"
