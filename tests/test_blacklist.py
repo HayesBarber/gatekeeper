@@ -42,11 +42,9 @@ async def test_blacklist_allows_request(make_request):
 
     request = make_request("/not-blocked", "GET")
     call_next = AsyncMock(return_value=Response(status_code=200))
-
     response = await blacklist_middleware(request, call_next)
 
     assert response.status_code == 200
     call_next.assert_called_once()
-
     assert not hasattr(request.state, "gateway_reject")
     assert not hasattr(request.state, "reject_reason")
