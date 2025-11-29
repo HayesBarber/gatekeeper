@@ -1,5 +1,4 @@
 import pytest
-from fastapi import Request
 from unittest.mock import AsyncMock
 from fastapi import Response
 from app.middleware.metrics import metrics_middleware
@@ -13,21 +12,8 @@ def mock_otel(monkeypatch):
     return otel
 
 
-def make_request(path="/x", method="GET"):
-    scope = {
-        "type": "http",
-        "method": method,
-        "path": path,
-        "headers": [],
-        "query_string": b"",
-        "server": ("testserver", 80),
-        "client": ("testclient", 50000),
-    }
-    return Request(scope)
-
-
 @pytest.mark.anyio
-async def test_metrics_success(mock_otel):
+async def test_metrics_success(mock_otel, make_request):
     request = make_request()
     call_next = AsyncMock(return_value=Response(status_code=200))
 
@@ -45,7 +31,7 @@ async def test_metrics_success(mock_otel):
 
 
 @pytest.mark.anyio
-async def test_metrics_gateway_reject(mock_otel):
+async def test_metrics_gateway_reject(mock_otel, make_request):
     request = make_request()
     request.state.gateway_reject = True
     request.state.reject_reason = "bad_key"
@@ -61,7 +47,7 @@ async def test_metrics_gateway_reject(mock_otel):
 
 
 @pytest.mark.anyio
-async def test_metrics_upstream_error(mock_otel):
+async def test_metrics_upstream_error(mock_otel, make_request):
     request = make_request()
     request.state.upstream_status = 502
 

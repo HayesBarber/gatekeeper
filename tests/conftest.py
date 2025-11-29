@@ -11,6 +11,24 @@ from app.main import app
 import requests
 
 
+@pytest.fixture()
+def make_request():
+
+    def _make(path="/x", method="GET"):
+        scope = {
+            "type": "http",
+            "method": method,
+            "path": path,
+            "headers": [],
+            "query_string": b"",
+            "server": ("testserver", 80),
+            "client": ("testclient", 50000),
+        }
+        return Request(scope)
+
+    return _make
+
+
 @pytest.fixture(autouse=True, scope="session")
 def clean_redis():
     """Purge Gatekeeper Redis namespaces before tests."""
