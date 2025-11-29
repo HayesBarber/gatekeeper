@@ -22,12 +22,8 @@ def test_blacklist_blocked():
 
 
 @pytest.mark.anyio
-async def test_blacklist_sets_state(monkeypatch, make_request):
-    monkeypatch.setattr(
-        settings,
-        "blacklisted_paths",
-        {"/blocked": ["GET"]},
-    )
+async def test_blacklist_sets_state(make_request):
+    settings.blacklisted_paths = {"/blocked": ["GET"]}
 
     request = make_request("/blocked", "GET")
     call_next = AsyncMock(return_value=Response(status_code=200))
@@ -41,12 +37,8 @@ async def test_blacklist_sets_state(monkeypatch, make_request):
 
 
 @pytest.mark.anyio
-async def test_blacklist_allows_request(monkeypatch, make_request):
-    monkeypatch.setattr(
-        settings,
-        "blacklisted_paths",
-        {},
-    )
+async def test_blacklist_allows_request(make_request):
+    settings.blacklisted_paths = {}
 
     request = make_request("/not-blocked", "GET")
     call_next = AsyncMock(return_value=Response(status_code=200))
