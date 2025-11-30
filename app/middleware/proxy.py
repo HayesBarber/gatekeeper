@@ -23,6 +23,8 @@ async def proxy_middleware(request: Request, call_next):
         LOGGER.warn(
             f"[Proxy] Missing client ID for {request.method} {request.url.path}"
         )
+        request.state.gateway_reject = True
+        request.state.reject_reason = "missing_client_id"
         return JSONResponse(
             status_code=403, content={"detail": "Missing required headers"}
         )
@@ -30,6 +32,8 @@ async def proxy_middleware(request: Request, call_next):
     api_key = request.headers.get(settings.api_key_header)
     if not api_key:
         LOGGER.warn(f"[Proxy] Missing API key for {request.method} {request.url.path}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "missing_api_key"
         return JSONResponse(
             status_code=403, content={"detail": "Missing required headers"}
         )
@@ -39,29 +43,35 @@ async def proxy_middleware(request: Request, call_next):
     )
     if not stored:
         LOGGER.warn(f"[Proxy] No API key found for client {client_id}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "no_api_key_for_client"
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     if stored.api_key != api_key:
         LOGGER.warn(f"[Proxy] Invalid API key for client {client_id}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "invalid_api_key"
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     if stored.expires_at < datetime.now(timezone.utc):
         LOGGER.warn(f"[Proxy] API key expired for client {client_id}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "api_key_expired"
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     LOGGER.info(f"[Proxy] Authorized request for client {client_id}, forwarding")
 
     rel_path = request.url.path.removeprefix(settings.proxy_path)
-
     resolved = settings.resolve_upstream(rel_path)
     if not resolved:
         LOGGER.info(f"[Proxy] No resolved upstream path for {rel_path}")
+        request.state.gateway_reject = True
+        request.state.reject_reason = "no_upstream"
         return JSONResponse(
             status_code=502, content={"detail": "No upstream configured"}
         )
 
     base, trimmed_path = resolved
-
     forward_url = f"{base}{trimmed_path}"
     LOGGER.info(f"[Proxy] Forward URL: {forward_url}")
 
@@ -76,6 +86,10 @@ async def proxy_middleware(request: Request, call_next):
                 content=await request.body(),
                 follow_redirects=True,
             )
+
+            if 400 <= proxy_response.status_code < 600:
+                request.state.upstream_status = proxy_response.status_code
+
             return Response(
                 status_code=proxy_response.status_code,
                 content=proxy_response.content,
@@ -84,4 +98,5 @@ async def proxy_middleware(request: Request, call_next):
             )
         except httpx.RequestError as e:
             LOGGER.error(f"[Proxy] Error forwarding request: {e}")
+            request.state.upstream_status = 502
             return JSONResponse(status_code=502, content={"detail": "Bad gateway"})
