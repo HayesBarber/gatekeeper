@@ -9,8 +9,6 @@ from datetime import datetime, timezone, timedelta
 
 @pytest.mark.anyio
 async def test_proxy_missing_client_id(make_request):
-    settings.proxy_path = "/proxy"
-
     request = make_request(
         "/proxy/test",
         headers={
@@ -33,7 +31,6 @@ async def test_proxy_missing_client_id(make_request):
 
 @pytest.mark.anyio
 async def test_proxy_unknown_client(monkeypatch, make_request):
-    settings.proxy_path = "/proxy"
     monkeypatch.setattr(redis_client, "get_model", lambda *a, **k: None)
 
     request = make_request(
@@ -65,7 +62,6 @@ class FakeStored:
 
 @pytest.mark.anyio
 async def test_proxy_invalid_api_key(monkeypatch, make_request):
-    settings.proxy_path = "/proxy"
     monkeypatch.setattr(redis_client, "get_model", lambda *a, **k: FakeStored())
 
     request = make_request(
@@ -84,11 +80,9 @@ async def test_proxy_invalid_api_key(monkeypatch, make_request):
 
 @pytest.mark.anyio
 async def test_proxy_no_upstream(monkeypatch, make_request):
-    settings.proxy_path = "/proxy"
     monkeypatch.setattr(
         redis_client, "get_model", lambda *a, **k: FakeStored(value="a")
     )
-    monkeypatch.setattr(settings, "resolve_upstream", lambda rel: None)
 
     request = make_request(
         "/proxy/x",
