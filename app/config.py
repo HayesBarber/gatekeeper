@@ -17,6 +17,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    otel_enabled: bool = False
 
     def load_redis_upstreams(self) -> dict[str, str]:
         now = time.time()

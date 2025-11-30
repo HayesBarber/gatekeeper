@@ -3,6 +3,7 @@ from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry import metrics
+from app.config import settings
 
 
 class Otel:
@@ -13,11 +14,13 @@ class Otel:
 
         exporter = OTLPMetricExporter()
 
-        reader = PeriodicExportingMetricReader(exporter)
+        metric_readers = []
+        if settings.otel_enabled:
+            metric_readers.append(PeriodicExportingMetricReader(exporter))
 
         provider = MeterProvider(
             resource=resource,
-            metric_readers=[reader],
+            metric_readers=metric_readers,
         )
 
         metrics.set_meter_provider(provider)
