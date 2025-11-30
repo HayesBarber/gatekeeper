@@ -44,7 +44,7 @@ async def proxy_middleware(request: Request, call_next):
     if not stored:
         LOGGER.warn(f"[Proxy] No API key found for client {client_id}")
         request.state.gateway_reject = True
-        request.state.reject_reason = "unknown_client"
+        request.state.reject_reason = "no_api_key_for_client"
         return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
     if stored.api_key != api_key:

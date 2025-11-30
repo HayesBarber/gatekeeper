@@ -48,7 +48,7 @@ async def test_proxy_unknown_client(monkeypatch, make_request):
 
     assert resp.status_code == 403
     assert request.state.gateway_reject
-    assert request.state.reject_reason == "unknown_client"
+    assert request.state.reject_reason == "no_api_key_for_client"
 
 
 class FakeStored:
