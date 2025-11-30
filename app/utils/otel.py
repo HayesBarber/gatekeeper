@@ -35,5 +35,29 @@ class Otel:
             unit="ms",
         )
 
+        self.challenges_created = self.meter.create_counter(
+            name="gateway.challenges_created",
+            description="Challenges issued",
+            unit="1",
+        )
+
+        self.challenge_verification_attempts = self.meter.create_counter(
+            name="gateway.challenge_verification_attempts",
+            description="Verification attempts",
+            unit="1",
+        )
+
+        self.challenge_verification_failures = self.meter.create_counter(
+            name="gateway.challenge_verification_failures",
+            description="Verification failures",
+            unit="1",
+        )
+
+        self.api_keys_issued = self.meter.create_counter(
+            name="gateway.api_keys_issued",
+            description="API keys successfully issued",
+            unit="1",
+        )
+
 
 otel = Otel()
