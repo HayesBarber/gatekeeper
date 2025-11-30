@@ -15,7 +15,7 @@ def test_missing_required_headers():
 
 
 @pytest.mark.anyio
-async def test_blacklist_sets_state(make_request):
+async def test_required_headers_sets_state(make_request):
     settings.required_headers = {"test_header": "test_value"}
 
     request = make_request()
