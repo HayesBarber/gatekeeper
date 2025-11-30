@@ -4,6 +4,7 @@ from app.middleware.proxy import proxy_middleware
 from starlette.responses import JSONResponse
 from app.config import settings
 from app.utils.redis_client import redis_client
+from datetime import datetime, timezone, timedelta
 
 
 @pytest.mark.anyio
@@ -50,3 +51,28 @@ async def test_proxy_unknown_client(monkeypatch, make_request):
     assert resp.status_code == 403
     assert request.state.gateway_reject
     assert request.state.reject_reason == "unknown_client"
+
+
+class FakeStored:
+    def __init__(self):
+        self.api_key = "expected-key"
+        self.expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+
+
+@pytest.mark.anyio
+async def test_proxy_invalid_api_key(monkeypatch, make_request):
+    settings.proxy_path = "/proxy"
+    monkeypatch.setattr(redis_client, "get_model", lambda *a, **k: FakeStored())
+
+    request = make_request(
+        "/proxy/x",
+        headers={
+            settings.client_id_header: "abc",
+            settings.api_key_header: "wrong-key",
+        },
+    )
+
+    resp = await proxy_middleware(request, AsyncMock())
+
+    assert resp.status_code == 403
+    assert request.state.reject_reason == "invalid_api_key"
