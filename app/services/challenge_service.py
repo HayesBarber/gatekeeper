@@ -5,27 +5,28 @@ from curveauth.signatures import verify_signature
 import secrets
 from datetime import datetime, timedelta, timezone
 from app.utils.redis_client import redis_client, Namespace, get_ttl
+from app.utils.otel import otel
 
 def generate_challenge_response(req: ChallengeRequest) -> ChallengeResponse:
-   if not redis_client.get(Namespace.USERS, req.client_id):
-      raise ClientNotFound(req.client_id)
+    if not redis_client.get(Namespace.USERS, req.client_id):
+        otel.challenge_verification_failures.add(1, {"reason": "client_not_found"})
+        raise ClientNotFound(req.client_id)
 
-   challenge_id = secrets.token_hex(16)
-   challenge = generate_challenge()
-   ttl_seconds = get_ttl(Namespace.CHALLENGES)
-   if not ttl_seconds:
-      ttl_seconds = 1
-   expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
+    challenge_id = secrets.token_hex(16)
+    challenge = generate_challenge()
+    ttl_seconds = get_ttl(Namespace.CHALLENGES) or 1
 
-   response = ChallengeResponse(
-      challenge_id=challenge_id,
-      challenge=challenge,
-      expires_at=expires
-   )
+    expires = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
-   redis_client.set_model(Namespace.CHALLENGES, req.client_id, response)
+    response = ChallengeResponse(
+        challenge_id=challenge_id,
+        challenge=challenge,
+        expires_at=expires,
+    )
 
-   return response
+    redis_client.set_model(Namespace.CHALLENGES, req.client_id, response)
+    otel.challenges_created.add(1, {"client_id": req.client_id})
+    return response
 
 def verify_challenge(req: ChallengeVerificationRequest) -> ChallengeVerificationResponse:
    stored = redis_client.get_model(Namespace.CHALLENGES, req.client_id, ChallengeResponse)
