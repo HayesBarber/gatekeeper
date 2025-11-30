@@ -5,6 +5,7 @@ from starlette.responses import JSONResponse
 from app.config import settings
 from app.utils.redis_client import redis_client
 from datetime import datetime, timezone, timedelta
+import httpx
 
 
 @pytest.mark.anyio
@@ -96,3 +97,36 @@ async def test_proxy_no_upstream(monkeypatch, make_request):
 
     assert resp.status_code == 502
     assert request.state.reject_reason == "no_upstream"
+
+
+class FakeResponse:
+    def __init__(self, status_code=500, body=b"err"):
+        self.status_code = status_code
+        self.content = body
+        self.headers = {"content-type": "text/plain"}
+
+
+@pytest.mark.anyio
+async def test_proxy_upstream_error(monkeypatch, make_request):
+    monkeypatch.setattr(
+        redis_client, "get_model", lambda *a, **k: FakeStored(value="a")
+    )
+    monkeypatch.setattr(settings, "resolve_upstream", lambda rel: ("http://x", "/y"))
+
+    async def fake_request(*args, **kwargs):
+        return FakeResponse(500, b"upstream error")
+
+    monkeypatch.setattr(httpx.AsyncClient, "request", fake_request)
+
+    request = make_request(
+        "/proxy/z",
+        headers={
+            settings.client_id_header: "abc",
+            settings.api_key_header: "a",
+        },
+    )
+
+    resp = await proxy_middleware(request, AsyncMock())
+
+    assert resp.status_code == 500
+    assert request.state.upstream_status == 500
