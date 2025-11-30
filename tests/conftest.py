@@ -14,12 +14,14 @@ import requests
 @pytest.fixture()
 def make_request():
 
-    def _make(path="/x", method="GET"):
+    def _make(path="/x", method="GET", headers=None):
         scope = {
             "type": "http",
             "method": method,
             "path": path,
-            "headers": [],
+            "headers": [
+                (k.lower().encode(), v.encode()) for k, v in (headers or {}).items()
+            ],
             "query_string": b"",
             "server": ("testserver", 80),
             "client": ("testclient", 50000),
