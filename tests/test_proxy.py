@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import AsyncMock
 from app.middleware.proxy import proxy_middleware
 from starlette.responses import JSONResponse
-from app.config import settings
+from app.config import Settings, settings
 from app.utils.redis_client import redis_client
 from datetime import datetime, timezone, timedelta
 import httpx
@@ -111,7 +111,9 @@ async def test_proxy_upstream_error(monkeypatch, make_request):
     monkeypatch.setattr(
         redis_client, "get_model", lambda *a, **k: FakeStored(value="a")
     )
-    monkeypatch.setattr(settings, "resolve_upstream", lambda rel: ("http://x", "/y"))
+    monkeypatch.setattr(
+        Settings, "resolve_upstream", lambda *a, **k: ("http://x", "/y")
+    )
 
     async def fake_request(*args, **kwargs):
         return FakeResponse(500, b"upstream error")

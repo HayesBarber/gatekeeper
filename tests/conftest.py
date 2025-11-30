@@ -14,7 +14,7 @@ import requests
 @pytest.fixture()
 def make_request():
 
-    def _make(path="/x", method="GET", headers=None):
+    def _make(path="/x", method="GET", headers=None, body=b""):
         scope = {
             "type": "http",
             "method": method,
@@ -26,7 +26,15 @@ def make_request():
             "server": ("testserver", 80),
             "client": ("testclient", 50000),
         }
-        return Request(scope)
+
+        async def receive():
+            return {
+                "type": "http.request",
+                "body": body,
+                "more_body": False,
+            }
+
+        return Request(scope, receive=receive)
 
     return _make
 
