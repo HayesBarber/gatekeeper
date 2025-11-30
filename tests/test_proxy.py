@@ -54,9 +54,13 @@ async def test_proxy_unknown_client(monkeypatch, make_request):
 
 
 class FakeStored:
-    def __init__(self):
-        self.api_key = "expected-key"
-        self.expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    def __init__(
+        self,
+        value="expected-key",
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+    ):
+        self.api_key = value
+        self.expires_at = expires_at
 
 
 @pytest.mark.anyio
@@ -76,3 +80,25 @@ async def test_proxy_invalid_api_key(monkeypatch, make_request):
 
     assert resp.status_code == 403
     assert request.state.reject_reason == "invalid_api_key"
+
+
+@pytest.mark.anyio
+async def test_proxy_no_upstream(monkeypatch, make_request):
+    settings.proxy_path = "/proxy"
+    monkeypatch.setattr(
+        redis_client, "get_model", lambda *a, **k: FakeStored(value="a")
+    )
+    monkeypatch.setattr(settings, "resolve_upstream", lambda rel: None)
+
+    request = make_request(
+        "/proxy/x",
+        headers={
+            settings.client_id_header: "abc",
+            settings.api_key_header: "a",
+        },
+    )
+
+    resp = await proxy_middleware(request, AsyncMock())
+
+    assert resp.status_code == 502
+    assert request.state.reject_reason == "no_upstream"
