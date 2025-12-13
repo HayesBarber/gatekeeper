@@ -94,13 +94,14 @@ Configuration loading is defined in `app/config.py`.
   - The matched prefix is removed before constructing the final upstream URL
 
 - `required_headers`  
-  Mapping of header → expected value  
+  Mapping of header → expected value
+
   Use `null` to require presence only
 
 - `blacklisted_paths`  
   Mapping of path → list of allowed HTTP methods (`GET`, `POST`, etc.)
 
-  - Empty list (`[]`) disables all methods for that path
+  Empty list (`[]`) disables all methods for that path
 
 - `otel_enabled`  
   Enables OpenTelemetry instrumentation (default: `false`)
