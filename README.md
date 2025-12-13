@@ -29,7 +29,7 @@ To build and run with Docker:
 docker build -t gatekeeper .
 
 # run it
-docker run -d --network host --env-file .gatekeeper.env --name gatekeeper gatekeeper
+docker run -d --network host --name gatekeeper -v $(pwd)/gatekeeper.yaml:/gatekeeper.yaml gatekeeper
 ```
 
 > **Note:** The service expects a running Redis instance. You can run Redis however you prefer — for example, with Homebrew:
@@ -68,32 +68,63 @@ A typical request flow involves:
 
 ## Configuration
 
-Configuration is handled in `app/config.py`, which loads values from a `.env` file.
+Gatekeeper is configured via a **YAML file (`gatekeeper.yaml`)**.
 
-- CLIENT_ID_HEADER: Name of the header used to identify the client for challenge requests and API-keyed proxy calls
-- API_KEY_HEADER: Name of the header containing the API key used to authenticate proxied requests
-- PROXY_PATH: URL prefix that marks requests to be forwarded to an upstream
-- UPSTREAMS: JSON mapping of prefix -> base URL (e.g. {"": "http://localhost:8080", "/api/v1": "http://localhost:8081"})
-  - gatekeeper will also load upstream mappings dynamically from Redis under the `upstreams` namespace. These take precedence over values defined in `UPSTREAMS` in the `.env` file and are refreshed periodically
-  - PROXY_PATH is stripped from the incoming request before resolving an upstream. The remaining path is matched using longest-prefix match against UPSTREAMS, and the matched prefix is removed before constructing the final upstream URL. See example below
-- REQUIRED_HEADERS: JSON mapping of header -> expected value (null to only require presence)
-- BLACKLISTED_PATHS: JSON mapping of path -> list of allowed methods ["GET", "POST", etc...] (empty list disables all methods to that path)
-- OTEL_ENABLED: Enables OpenTelemetry instrumentation (defaults to false). When enabled, the app exposes counters and histograms for challenge flow, proxy behavior, and error cases. You can point these at any OTLP-compatible collector if you want to aggregate or ship the metrics elsewhere.
+Configuration loading is defined in `app/config.py`.
 
-Example `.env`:
+### Configuration Fields
 
+- `client_id_header`  
+  Name of the header used to identify the client for challenge requests and API-keyed proxy calls
+
+- `api_key_header`  
+  Name of the header containing the API key used to authenticate proxied requests
+
+- `proxy_path`  
+  URL prefix that marks requests to be forwarded to an upstream
+
+- `upstreams`  
+  Mapping of request path prefix → upstream base URL
+
+  - Gatekeeper also loads upstream mappings dynamically from Redis under the `upstreams` namespace
+  - Redis-defined upstreams take precedence over values defined in YAML
+  - `proxy_path` is stripped from the incoming request before resolving an upstream
+  - The remaining path is matched using longest-prefix match against `upstreams`
+  - The matched prefix is removed before constructing the final upstream URL
+
+- `required_headers`  
+  Mapping of header → expected value. Use `null` to require presence only
+
+- `blacklisted_paths`  
+  Mapping of path → list of allowed HTTP methods (`GET`, `POST`, etc). Empty list (`[]`) disables all methods for that path
+
+- `otel_enabled`  
+  Enables OpenTelemetry instrumentation (default: `false`). When enabled, Gatekeeper exposes counters and histograms for challenge flow, proxy behavior, and error cases. Metrics can be exported to any OTLP-compatible collector.
+
+### Example `gatekeeper.yaml`
+
+```yaml
+proxy_path: /proxy
+client_id_header: x-client-id
+api_key_header: x-api-key
+otel_enabled: true
+
+upstreams:
+  "": http://localhost:8080
+  /home-api: http://localhost:8081
+  /api/v2: http://localhost:8082
+
+required_headers:
+  x-custom-header: expected-value
+
+blacklisted_paths:
+  /admin: []
+  /internal:
+    - GET
+  /debug:
+    - GET
+    - POST
 ```
-# .env
-CLIENT_ID_HEADER=x-client-id
-API_KEY_HEADER=x-api-key
-PROXY_PATH=/proxy
-UPSTREAMS={"": "http://localhost:8080", "/home-api": "http://localhost:8081", "/api/v2": "http://localhost:8082"}
-REQUIRED_HEADERS={"x-custom-header": "expected-value"}
-BLACKLISTED_PATHS={"/admin": ["GET", "POST"]}
-OTEL_ENABLED=true
-```
-
-> **Note:** All configuration keys have defaults defined in `app/config.py`.
 
 ## Example: how a proxied request resolves
 

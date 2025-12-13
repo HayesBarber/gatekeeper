@@ -1,0 +1,22 @@
+proxy_path: /proxy
+api_key_header: x-api-key
+client_id_header: x-requestor-id
+otel_enabled: false
+
+required_headers:
+  User-Agent: custom-value
+  x-client-version: null
+
+upstreams:
+  /home-api: http://localhost:8081
+  /auth-api: http://localhost:8082
+  /metrics: http://localhost:9090
+
+blacklisted_paths:
+  /admin: []
+  /internal:
+    - GET
+  /debug:
+    - GET
+    - POST
+

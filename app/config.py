@@ -1,4 +1,9 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    YamlConfigSettingsSource,
+)
 from app.utils.logger import LOGGER
 from app.utils.redis_client import Namespace, redis_client
 from app.models.upstream import UpstreamMapping
@@ -12,12 +17,31 @@ class Settings(BaseSettings):
     client_id_header: str = "x-requestor-id"
     upstreams: dict[str, str] = {}
     blacklisted_paths: dict[str, list[str]] = {}
+    otel_enabled: bool = False
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        yaml_file="gatekeeper.yaml",
+        yaml_file_encoding="utf-8",
         extra="ignore",
     )
-    otel_enabled: bool = False
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            YamlConfigSettingsSource(settings_cls),
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
     def load_redis_upstreams(self) -> dict[str, str]:
         now = time.time()

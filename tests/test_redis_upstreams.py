@@ -14,14 +14,20 @@ def clean_redis():
 
 
 def test_load_redis_upstreams_returns_empty_when_no_data():
-    settings = Settings()
+    upstreams = {
+        "/home-api": "http://localhost:8081",
+        "/auth-api": "http://localhost:8082",
+        "/metrics": "http://localhost:9090",
+    }
+    settings = Settings(upstreams=upstreams)
     redis_upstreams = settings.load_redis_upstreams()
     assert isinstance(redis_upstreams, dict)
     assert len(redis_upstreams) == 0
     upstreams = settings.upstreams
-    assert len(upstreams) == 0
+    assert len(upstreams) == 3
     combined = settings.get_combined_upstreams()
-    assert len(combined) == 0
+    assert len(combined) == 3
+    assert combined == upstreams
 
 
 def test_redis_upstream_overrides_static():
@@ -30,9 +36,12 @@ def test_redis_upstream_overrides_static():
     settings = Settings(
         upstreams={
             static_path: static_upstream,
+            "/home-api": "http://localhost:8081",
+            "/auth-api": "http://localhost:8082",
+            "/metrics": "http://localhost:9090",
         }
     )
-    assert len(settings.upstreams) == 1
+    assert len(settings.upstreams) == 4
     assert settings.upstreams.get(static_path) == static_upstream
 
     redis_upstream = "http://redis-upstream"
@@ -45,7 +54,7 @@ def test_redis_upstream_overrides_static():
     redis_upstreams = settings.load_redis_upstreams()
     assert redis_upstreams.get(static_path) == redis_upstream
     combined = settings.get_combined_upstreams()
-    assert len(combined) == 1
+    assert len(combined) == 4
     assert combined.get(static_path) == redis_upstream
 
 
