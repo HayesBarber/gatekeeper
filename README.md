@@ -95,17 +95,14 @@ Configuration loading is defined in `app/config.py`.
 
 - `required_headers`  
   Mapping of header → expected value
-
   Use `null` to require presence only
 
 - `blacklisted_paths`  
   Mapping of path → list of allowed HTTP methods (`GET`, `POST`, etc.)
-
   Empty list (`[]`) disables all methods for that path
 
 - `otel_enabled`  
   Enables OpenTelemetry instrumentation (default: `false`)
-
   When enabled, Gatekeeper exposes counters and histograms for challenge flow, proxy behavior, and error cases. Metrics can be exported to any OTLP-compatible collector.
 
 ### Example `gatekeeper.yaml`
