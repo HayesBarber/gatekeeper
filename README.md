@@ -118,7 +118,10 @@ required_headers:
   x-custom-header: expected-value
 
 blacklisted_paths:
-  /admin:
+  /admin: []
+  /internal:
+    - GET
+  /debug:
     - GET
     - POST
 ```
