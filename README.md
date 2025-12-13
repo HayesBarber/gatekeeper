@@ -84,8 +84,7 @@ Configuration loading is defined in `app/config.py`.
   URL prefix that marks requests to be forwarded to an upstream
 
 - `upstreams`  
-  Mapping of request path prefix → upstream base URL  
-  Example: `"/api/v1": "http://localhost:8081"`
+  Mapping of request path prefix → upstream base URL
 
   - Gatekeeper also loads upstream mappings dynamically from Redis under the `upstreams` namespace
   - Redis-defined upstreams take precedence over values defined in YAML
@@ -94,16 +93,13 @@ Configuration loading is defined in `app/config.py`.
   - The matched prefix is removed before constructing the final upstream URL
 
 - `required_headers`  
-  Mapping of header → expected value
-  Use `null` to require presence only
+  Mapping of header → expected value. Use `null` to require presence only
 
 - `blacklisted_paths`  
-  Mapping of path → list of allowed HTTP methods (`GET`, `POST`, etc.)
-  Empty list (`[]`) disables all methods for that path
+  Mapping of path → list of allowed HTTP methods (`GET`, `POST`, etc). Empty list (`[]`) disables all methods for that path
 
 - `otel_enabled`  
-  Enables OpenTelemetry instrumentation (default: `false`)
-  When enabled, Gatekeeper exposes counters and histograms for challenge flow, proxy behavior, and error cases. Metrics can be exported to any OTLP-compatible collector.
+  Enables OpenTelemetry instrumentation (default: `false`). When enabled, Gatekeeper exposes counters and histograms for challenge flow, proxy behavior, and error cases. Metrics can be exported to any OTLP-compatible collector.
 
 ### Example `gatekeeper.yaml`
 
