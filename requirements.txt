@@ -4,8 +4,8 @@ uvicorn
 httpx
 pydantic
 pydantic-settings
+pydantic-settings-yaml
 git+https://github.com/HayesBarber/curveauth-py.git
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-exporter-otlp
-
