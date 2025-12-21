@@ -31,6 +31,22 @@ async def test_metrics_success(mock_otel, make_request):
 
 
 @pytest.mark.anyio
+async def test_metrics_success_github_webhook(mock_otel, make_request):
+    request = make_request()
+    request.state.github_webhook_success = True
+    call_next = AsyncMock(return_value=Response(status_code=204))
+
+    await metrics_middleware(request, call_next)
+
+    opname, amount, attrs = mock_otel.requests_total.calls[0]
+    assert opname == "add"
+    assert amount == 1
+    assert attrs["outcome"] == "success:github_webhook"
+    assert attrs["status_code"] == "204"
+    assert len(mock_otel.requests_total.calls) == 1
+
+
+@pytest.mark.anyio
 async def test_metrics_gateway_reject(mock_otel, make_request):
     request = make_request()
     request.state.gateway_reject = True

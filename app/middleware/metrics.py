@@ -23,7 +23,7 @@ async def metrics_middleware(request: Request, call_next):
         and 400 <= request.state.upstream_status < 600
     ):
         outcome = f"upstream_error:{request.state.upstream_status}"
-    elif getattr(request.state, "github_webhook_success ", False):
+    elif getattr(request.state, "github_webhook_success", False):
         outcome = "success:github_webhook"
 
     attributes = {
