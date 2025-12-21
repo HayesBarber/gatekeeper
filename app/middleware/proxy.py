@@ -128,6 +128,14 @@ async def proxy_middleware(request: Request, call_next):
     if not request.url.path.startswith(settings.proxy_path):
         return await call_next(request)
 
+    if settings.github.enabled and request.url.path.endswith(settings.github.path):
+        if not verify_github_signature(
+            request.body(),
+            settings.github.secret,
+            request.headers.get("x-hub-signature-256"),
+        ):
+            return reject(request, "invalid_github_signature", 403, "Forbidden")
+
     headers_result = validate_headers(request)
     if isinstance(headers_result, JSONResponse):
         return headers_result
