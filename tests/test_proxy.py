@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock
-from app.middleware.proxy import proxy_middleware
+from app.middleware.proxy import proxy_middleware, verify_github_signature
 from starlette.responses import JSONResponse
 from app.config import Settings, settings
 from app.utils.redis_client import redis_client
@@ -132,3 +132,22 @@ async def test_proxy_upstream_error(monkeypatch, make_request):
 
     assert resp.status_code == 500
     assert request.state.upstream_status == 500
+
+
+def test_github_signature_example():
+    secret = "It's a Secret to Everybody"
+    payload = b"Hello, World!"
+    signature_header = (
+        "sha256=757107ea0eb2509fc211221cce984b8a37570b6d7586c22c46f4379c8b043e17"
+    )
+
+    assert verify_github_signature(payload, secret, signature_header) is True
+
+    bad_payload = b"Hello, Mars!"
+    assert verify_github_signature(bad_payload, secret, signature_header) is False
+
+    wrong_secret = "Wrong Secret"
+    assert verify_github_signature(payload, wrong_secret, signature_header) is False
+
+    bad_header = None
+    assert verify_github_signature(payload, secret, bad_header) is False
