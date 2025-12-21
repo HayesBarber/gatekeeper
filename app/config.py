@@ -4,10 +4,27 @@ from pydantic_settings import (
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
+from pydantic import BaseModel, HttpUrl
 from app.utils.logger import LOGGER
 from app.utils.redis_client import Namespace, redis_client
 from app.models.upstream import UpstreamMapping
 import time
+
+
+class GitHubConsumer(BaseModel):
+    name: str
+    url: HttpUrl
+
+    model_config = {"extra": "forbid"}
+
+
+class GitHubWebhook(BaseModel):
+    enabled: bool = False
+    path: str = "/github/webhook"
+    secret: str = ""
+    consumers: list[GitHubConsumer] = []
+
+    model_config = {"extra": "forbid"}
 
 
 class Settings(BaseSettings):
@@ -18,6 +35,8 @@ class Settings(BaseSettings):
     upstreams: dict[str, str] = {}
     blacklisted_paths: dict[str, list[str]] = {}
     otel_enabled: bool = False
+    github: GitHubWebhook = GitHubWebhook()
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
