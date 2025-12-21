@@ -19,7 +19,12 @@ def test_resolve_upstream_trims_prefix_and_returns_base_and_path():
             "/api": "http://a",
         }
     )
-    base, trimmed = s.resolve_upstream("/api/resource/1")
+    result = s.resolve_upstream("/api/resource/1")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
+
     assert base == "http://a"
     assert trimmed == "/resource/1"
 
@@ -31,7 +36,11 @@ def test_resolve_upstream_exact_prefix_returns_root_path():
             "/api2": "http://b",
         }
     )
-    base, trimmed = s.resolve_upstream("/api")
+    result = s.resolve_upstream("/api")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
     assert base == "http://a"
     assert trimmed == "/"
 
@@ -42,7 +51,11 @@ def test_resolve_upstream_handles_no_leading_slash_input():
             "/api": "http://a",
         }
     )
-    base, trimmed = s.resolve_upstream("api/resource")
+    result = s.resolve_upstream("api/resource")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
     assert base == "http://a"
     assert trimmed == "/resource"
 
@@ -54,7 +67,11 @@ def test_resolve_upstream_empty_prefix_matches_as_default():
             "/test": "http://b",
         }
     )
-    base, trimmed = s.resolve_upstream("/some/path")
+    result = s.resolve_upstream("/some/path")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
     assert base == "http://default"
     assert trimmed == "/some/path"
 
@@ -66,7 +83,11 @@ def test_resolve_upstream_prefers_longer_prefix_over_empty_default():
             "/x": "http://x",
         }
     )
-    base, trimmed = s.resolve_upstream("/x/hello")
+    result = s.resolve_upstream("/x/hello")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
     assert base == "http://x"
     assert trimmed == "/hello"
 
@@ -86,6 +107,10 @@ def test_resolve_upstream_root_prefix_slash():
             "/": "http://root",
         }
     )
-    base, trimmed = s.resolve_upstream("/")
+    result = s.resolve_upstream("/")
+    if result is None:
+        base, trimmed = None, None
+    else:
+        base, trimmed = result
     assert base == "http://root"
     assert trimmed == "/"
