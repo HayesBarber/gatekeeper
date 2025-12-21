@@ -1,3 +1,4 @@
+from pydantic import HttpUrl
 import pytest
 from curveauth.keys import ECCKeyPair
 from app.utils.redis_client import redis_client, Namespace
@@ -6,7 +7,7 @@ import time
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from app.config import settings
+from app.config import GitHubConsumer, GitHubWebhook, settings
 from app.main import app
 import requests
 
@@ -121,6 +122,17 @@ def start_app():
         "/api2": "http://127.0.0.1:8081",
     }
     settings.proxy_path = "/proxy"
+    settings.github = GitHubWebhook(
+        enabled=True,
+        path="/github/webhook",
+        secret="test_secret",
+        consumers=[
+            GitHubConsumer(
+                name="test service",
+                url=HttpUrl(url="http://127.0.0.1:8080"),
+            )
+        ],
+    )
 
     config = uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info")
     server = uvicorn.Server(config)
