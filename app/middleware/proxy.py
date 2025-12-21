@@ -149,7 +149,7 @@ async def proxy_middleware(request: Request, call_next):
 
         urls = [str(c.url) for c in settings.github.consumers]
         asyncio.create_task(forward_to_consumers(request, urls))
-        return Response(status_code=200)
+        return Response(status_code=204)
 
     headers_result = validate_headers(request)
     if isinstance(headers_result, JSONResponse):
