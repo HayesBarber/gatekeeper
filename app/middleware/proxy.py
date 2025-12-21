@@ -6,6 +6,8 @@ from app.utils.redis_client import redis_client, Namespace
 from app.models import ChallengeVerificationResponse
 import httpx
 from datetime import datetime, timezone
+import hashlib
+import hmac
 
 
 def reject(request: Request, reason: str, status: int, detail: str):
@@ -64,6 +66,28 @@ def resolve_forward_url(request: Request):
 
     base, trimmed_path = resolved
     return f"{base}{trimmed_path}"
+
+
+def verify_github_signature(payload_body, secret_token, signature_header) -> bool:
+    """Verify that the payload was sent from GitHub by validating SHA256.
+
+    Returns False if not authorized.
+
+    Args:
+        payload_body: original request body to verify (request.body())
+        secret_token: GitHub app webhook token (WEBHOOK_SECRET)
+        signature_header: header received from GitHub (x-hub-signature-256)
+    """
+    if not signature_header:
+        return False
+    hash_object = hmac.new(
+        secret_token.encode("utf-8"), msg=payload_body, digestmod=hashlib.sha256
+    )
+    expected_signature = "sha256=" + hash_object.hexdigest()
+    if not hmac.compare_digest(expected_signature, signature_header):
+        return False
+
+    return True
 
 
 async def forward_request(request: Request, url: str):
