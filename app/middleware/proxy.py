@@ -91,9 +91,13 @@ def verify_github_signature(payload_body, secret_token, signature_header) -> boo
     return True
 
 
-async def forward_request(request: Request, url: str):
+async def forward_request(request: Request, url: str, body=None):
     headers = dict(request.headers)
     headers.pop("host", None)
+    content = body
+
+    if not content:
+        content = await request.body()
 
     async with httpx.AsyncClient() as client:
         try:
@@ -101,7 +105,7 @@ async def forward_request(request: Request, url: str):
                 method=request.method,
                 url=url,
                 headers=headers,
-                content=await request.body(),
+                content=content,
                 follow_redirects=True,
             )
 
@@ -122,7 +126,8 @@ async def forward_request(request: Request, url: str):
 
 
 async def forward_to_consumers(request: Request, urls: list[str]):
-    tasks = [forward_request(request, url) for url in urls]
+    content = await request.body()
+    tasks = [forward_request(request, url, content) for url in urls]
     await asyncio.gather(*tasks)
 
 
