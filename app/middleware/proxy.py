@@ -8,6 +8,7 @@ import httpx
 from datetime import datetime, timezone
 import hashlib
 import hmac
+import asyncio
 
 
 def reject(request: Request, reason: str, status: int, detail: str):
@@ -120,6 +121,11 @@ async def forward_request(request: Request, url: str):
             return JSONResponse(status_code=502, content={"detail": "Bad gateway"})
 
 
+async def forward_to_consumers(request: Request, urls: list[str]):
+    tasks = [forward_request(request, url) for url in urls]
+    await asyncio.gather(*tasks)
+
+
 async def proxy_middleware(request: Request, call_next):
     LOGGER.info(
         f"[Proxy] Checking for proxy eligibility for {request.method} {request.url.path}"
@@ -130,11 +136,15 @@ async def proxy_middleware(request: Request, call_next):
 
     if settings.github.enabled and request.url.path.endswith(settings.github.path):
         if not verify_github_signature(
-            request.body(),
+            await request.body(),
             settings.github.secret,
             request.headers.get("x-hub-signature-256"),
         ):
             return reject(request, "invalid_github_signature", 403, "Forbidden")
+
+        urls = [str(c.url) for c in settings.github.consumers]
+        asyncio.create_task(forward_to_consumers(request, urls))
+        return Response(status_code=200)
 
     headers_result = validate_headers(request)
     if isinstance(headers_result, JSONResponse):
