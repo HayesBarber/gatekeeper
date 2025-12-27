@@ -11,7 +11,7 @@ class ShorebirdRedisClient implements RedisClientBase {
   RedisClient? _client;
   bool _connected = false;
 
-  RedisClient get client {
+  RedisClient _getClient() {
     if (_client == null || !_connected) {
       throw StateError('RedisService not connected. Call connect() first.');
     }
@@ -39,10 +39,10 @@ class ShorebirdRedisClient implements RedisClientBase {
   }
 
   @override
-  Future<void> delete({required String key}) => client.delete(key: key);
+  Future<void> delete({required String key}) => _getClient().delete(key: key);
 
   @override
-  Future<String?> get({required String key}) => client.get(key: key);
+  Future<String?> get({required String key}) => _getClient().get(key: key);
 
   @override
   Future<void> set({
@@ -50,7 +50,7 @@ class ShorebirdRedisClient implements RedisClientBase {
     required String value,
     Duration? ttl,
   }) =>
-      client.set(
+      _getClient().set(
         key: key,
         value: value,
         ttl: ttl,
