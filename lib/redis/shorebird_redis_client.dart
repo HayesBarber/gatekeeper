@@ -13,7 +13,9 @@ class ShorebirdRedisClient implements RedisClientBase {
 
   RedisClient _getClient() {
     if (_client == null || !_connected) {
-      throw StateError('RedisService not connected. Call connect() first.');
+      throw StateError(
+        'ShorebirdRedisClient not connected. Call connect() first.',
+      );
     }
     return _client!;
   }
