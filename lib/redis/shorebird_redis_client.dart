@@ -1,10 +1,12 @@
+import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:shorebird_redis_client/shorebird_redis_client.dart';
 
-class Redis {
-  factory Redis() => _instance;
+class ShorebirdRedisClient implements RedisClientBase {
+  factory ShorebirdRedisClient() => _instance;
 
-  Redis._internal();
-  static final Redis _instance = Redis._internal();
+  ShorebirdRedisClient._internal();
+  static final ShorebirdRedisClient _instance =
+      ShorebirdRedisClient._internal();
 
   RedisClient? _client;
   bool _connected = false;
@@ -16,6 +18,7 @@ class Redis {
     return _client!;
   }
 
+  @override
   Future<void> close() async {
     if (!_connected || _client == null) return;
 
@@ -24,6 +27,7 @@ class Redis {
     _connected = false;
   }
 
+  @override
   Future<void> connect() async {
     if (_connected) return;
 
@@ -34,14 +38,21 @@ class Redis {
     _connected = true;
   }
 
-  Future<void> Function({required String key}) delete(String key) =>
-      client.delete;
+  @override
+  Future<void> delete({required String key}) => client.delete(key: key);
 
-  Future<String?> Function({required String key}) get(String key) => client.get;
+  @override
+  Future<String?> get({required String key}) => client.get(key: key);
 
-  Future<void> Function({
+  @override
+  Future<void> set({
     required String key,
     required String value,
     Duration? ttl,
-  }) set(String key, String value) => client.set;
+  }) =>
+      client.set(
+        key: key,
+        value: value,
+        ttl: ttl,
+      );
 }
