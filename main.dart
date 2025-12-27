@@ -8,5 +8,5 @@ Future<void> init(InternetAddress ip, int port) async {
 }
 
 Future<HttpServer> run(Handler handler, InternetAddress ip, int port) {
-  return serve(handler, ip, port);
+  return serve(handler, ip, port, poweredByHeader: null);
 }
