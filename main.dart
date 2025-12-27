@@ -1,10 +1,14 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 
 Future<void> init(InternetAddress ip, int port) async {
-  await ShorebirdRedisClient().connect();
+  final configService = await YamlConfigService.load(path: '');
+  await ShorebirdRedisClient().connect(
+    host: configService.config.redisUrl,
+  );
 }
 
 Future<HttpServer> run(Handler handler, InternetAddress ip, int port) {

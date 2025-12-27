@@ -1,5 +1,5 @@
 abstract interface class RedisClientBase {
-  Future<void> connect();
+  Future<void> connect({String host = '127.0.0.1'});
   Future<void> close();
 
   Future<String?> get({required String key});

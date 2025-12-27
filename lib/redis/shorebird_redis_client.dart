@@ -30,10 +30,11 @@ class ShorebirdRedisClient implements RedisClientBase {
   }
 
   @override
-  Future<void> connect() async {
+  Future<void> connect({String host = '127.0.0.1'}) async {
     if (_connected) return;
 
-    final client = RedisClient();
+    final options = RedisSocketOptions(host: host);
+    final client = RedisClient(socket: options);
     await client.connect();
 
     _client = client;
