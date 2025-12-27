@@ -40,8 +40,12 @@ class YamlConfigService implements ConfigService {
         ? redis['host'] as String? ?? '127.0.0.1'
         : '127.0.0.1';
 
+    final clientIdHeader =
+        doc?['client_id_header'] as String? ?? 'x-requestor-id';
+
     final config = AppConfig(
       redisHost: redisHost,
+      clientIdHeader: clientIdHeader,
     );
 
     _instance = YamlConfigService._(config);

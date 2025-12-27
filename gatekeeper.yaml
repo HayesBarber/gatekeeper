@@ -1,3 +1,4 @@
 redis:
   host: 127.0.0.1
+client_id_header: x-requestor-id
 
