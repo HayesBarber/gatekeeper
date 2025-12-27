@@ -2,50 +2,41 @@ import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:shorebird_redis_client/shorebird_redis_client.dart';
 
 class ShorebirdRedisClient implements RedisClientBase {
-  factory ShorebirdRedisClient() => _instance;
+  ShorebirdRedisClient._(this._client);
 
-  ShorebirdRedisClient._internal();
-  static final ShorebirdRedisClient _instance =
-      ShorebirdRedisClient._internal();
+  static ShorebirdRedisClient? _instance;
 
-  RedisClient? _client;
-  bool _connected = false;
+  final RedisClient _client;
 
-  RedisClient _getClient() {
-    if (_client == null || !_connected) {
+  static ShorebirdRedisClient instance() {
+    if (_instance == null) {
       throw StateError(
         'ShorebirdRedisClient not connected. Call connect() first.',
       );
     }
-    return _client!;
+    return _instance!;
   }
 
-  @override
   Future<void> close() async {
-    if (!_connected || _client == null) return;
-
-    await _client!.close();
-    _client = null;
-    _connected = false;
+    await _client.close();
   }
 
-  @override
-  Future<void> connect({String host = '127.0.0.1'}) async {
-    if (_connected) return;
-
+  static Future<ShorebirdRedisClient> connect({
+    String host = '127.0.0.1',
+  }) async {
     final options = RedisSocketOptions(host: host);
     final client = RedisClient(socket: options);
     await client.connect();
 
-    _client = client;
-    _connected = true;
+    _instance = ShorebirdRedisClient._(client);
+    return _instance!;
   }
 
   @override
-  Future<void> delete({required String key}) => _getClient().delete(key: key);
+  Future<void> delete({required String key}) => _client.delete(key: key);
 
   @override
-  Future<String?> get({required String key}) => _getClient().get(key: key);
+  Future<String?> get({required String key}) => _client.get(key: key);
 
   @override
   Future<void> set({
@@ -53,7 +44,7 @@ class ShorebirdRedisClient implements RedisClientBase {
     required String value,
     Duration? ttl,
   }) =>
-      _getClient().set(
+      _client.set(
         key: key,
         value: value,
         ttl: ttl,

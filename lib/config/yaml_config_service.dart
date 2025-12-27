@@ -7,14 +7,20 @@ class YamlConfigService implements ConfigService {
   YamlConfigService._(this._config);
 
   static YamlConfigService? _instance;
-  static bool _initialized = false;
 
   final AppConfig _config;
+
+  static YamlConfigService instance() {
+    if (_instance == null) {
+      throw StateError('YamlConfigService not initialized. Call load() first.');
+    }
+    return _instance!;
+  }
 
   static Future<YamlConfigService> load({
     required String path,
   }) async {
-    if (_initialized) {
+    if (_instance != null) {
       return _instance!;
     }
 
@@ -30,15 +36,6 @@ class YamlConfigService implements ConfigService {
     );
 
     _instance = YamlConfigService._(config);
-    _initialized = true;
-
-    return _instance!;
-  }
-
-  static YamlConfigService instance() {
-    if (!_initialized || _instance == null) {
-      throw StateError('YamlConfigService not initialized. Call load() first.');
-    }
     return _instance!;
   }
 

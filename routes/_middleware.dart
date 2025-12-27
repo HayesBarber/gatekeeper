@@ -4,7 +4,7 @@ import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 
-final _redis = ShorebirdRedisClient();
+final _redis = ShorebirdRedisClient.instance();
 final _config = YamlConfigService.instance();
 
 Handler middleware(Handler handler) {
