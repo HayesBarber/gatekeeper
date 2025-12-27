@@ -1,9 +1,31 @@
-abstract interface class RedisClientBase {
-  Future<String?> get({required String key});
-  Future<void> delete({required String key});
+enum Namespace {
+  users(key: 'users'),
+  challenges(key: 'challenges', ttl: Duration(seconds: 30)),
+  apiKeys(key: 'api_keys', ttl: Duration(minutes: 5));
+
+  const Namespace({required this.key, this.ttl});
+
+  final String key;
+  final Duration? ttl;
+}
+
+abstract class RedisClientBase {
+  Future<String?> get({
+    required Namespace ns,
+    required String key,
+  });
+  Future<void> delete({
+    required Namespace ns,
+    required String key,
+  });
   Future<void> set({
+    required Namespace ns,
     required String key,
     required String value,
     Duration? ttl,
   });
+
+  String redisKey(Namespace ns, String key) {
+    return '${ns.key}:$key';
+  }
 }

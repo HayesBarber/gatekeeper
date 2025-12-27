@@ -1,7 +1,7 @@
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:shorebird_redis_client/shorebird_redis_client.dart';
 
-class ShorebirdRedisClient implements RedisClientBase {
+class ShorebirdRedisClient extends RedisClientBase {
   ShorebirdRedisClient._(this._client);
 
   static ShorebirdRedisClient? _instance;
@@ -33,20 +33,33 @@ class ShorebirdRedisClient implements RedisClientBase {
   }
 
   @override
-  Future<void> delete({required String key}) => _client.delete(key: key);
+  Future<void> delete({
+    required Namespace ns,
+    required String key,
+  }) =>
+      _client.delete(
+        key: super.redisKey(ns, key),
+      );
 
   @override
-  Future<String?> get({required String key}) => _client.get(key: key);
+  Future<String?> get({
+    required Namespace ns,
+    required String key,
+  }) =>
+      _client.get(
+        key: super.redisKey(ns, key),
+      );
 
   @override
   Future<void> set({
+    required Namespace ns,
     required String key,
     required String value,
     Duration? ttl,
   }) =>
       _client.set(
-        key: key,
+        key: super.redisKey(ns, key),
         value: value,
-        ttl: ttl,
+        ttl: ttl ?? ns.ttl,
       );
 }
