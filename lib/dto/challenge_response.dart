@@ -53,4 +53,6 @@ class ChallengeResponse {
       'expires_at': expiresAt.toUtc().toIso8601String(),
     };
   }
+
+  String encode() => jsonEncode(toJson());
 }
