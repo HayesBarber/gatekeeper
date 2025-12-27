@@ -24,6 +24,14 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   final redis = context.read<RedisClientBase>();
+  final client = await redis.get(ns: Namespace.users, key: clientId);
+
+  if (client == null) {
+    return Response(
+      statusCode: 401,
+      body: 'Unauthorized',
+    );
+  }
 
   return Response.json(
     body: {},
