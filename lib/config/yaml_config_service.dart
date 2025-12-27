@@ -29,10 +29,14 @@ class YamlConfigService implements ConfigService {
       throw StateError('Config file not found: $path');
     }
 
-    final doc = loadYaml(await file.readAsString()) as YamlMap;
+    final doc = loadYaml(await file.readAsString());
+
+    final redis = doc['redis'];
+
+    final redisHost = redis['host'] as String? ?? '127.0.0.1';
 
     final config = AppConfig(
-      redisUrl: doc['redis']['url'] as String,
+      redisHost: redisHost,
     );
 
     _instance = YamlConfigService._(config);

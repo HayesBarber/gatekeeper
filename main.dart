@@ -5,9 +5,9 @@ import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 
 Future<void> init(InternetAddress ip, int port) async {
-  final configService = await YamlConfigService.load(path: 'todo');
+  final configService = await YamlConfigService.load(path: 'gatekeeper.yaml');
   await ShorebirdRedisClient.connect(
-    host: configService.config.redisUrl,
+    host: configService.config.redisHost,
   );
 }
 

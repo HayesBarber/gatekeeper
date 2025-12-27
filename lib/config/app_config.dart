@@ -1,7 +1,7 @@
 class AppConfig {
   AppConfig({
-    required this.redisUrl,
+    required this.redisHost,
   });
 
-  final String redisUrl;
+  final String redisHost;
 }
