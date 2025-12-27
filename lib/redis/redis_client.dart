@@ -1,4 +1,4 @@
-abstract class RedisClientBase {
+abstract interface class RedisClientBase {
   Future<void> connect();
   Future<void> close();
 
