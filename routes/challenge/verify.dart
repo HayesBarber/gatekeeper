@@ -81,15 +81,14 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   final apiKey = ChallengeVerificationResponse.random();
-  final response = apiKey.encode();
 
   await redis.set(
     ns: Namespace.apiKeys,
     key: clientId,
-    value: response,
+    value: apiKey.encode(),
   );
 
   return Response.json(
-    body: response,
+    body: apiKey,
   );
 }
