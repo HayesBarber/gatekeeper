@@ -12,9 +12,19 @@ void main() {
         TestEnv.apiUri('/challenge/verify'),
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
+      expect(res.body, equals('Unauthorized'));
     });
 
-    test('returns 401 if challenge not found for client', () async {});
+    test('returns 401 if challenge not found for client', () async {
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+      );
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
+      expect(res.body, equals('Unauthorized'));
+    });
 
     test('returns 400 if challenge ID does not match provided', () async {});
 
@@ -24,6 +34,6 @@ void main() {
 
     test('returns 403 for invalid signature', () async {});
 
-    test('returns 200 and api key for valid signature', () async {});
+    test('returns 200 and api key for valid handshake', () async {});
   });
 }
