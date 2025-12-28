@@ -1,0 +1,4 @@
+client_id_header: "x-client-id"
+redis:
+  host: "192.168.1.10"
+
