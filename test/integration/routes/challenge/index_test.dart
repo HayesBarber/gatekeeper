@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -22,6 +23,21 @@ void main() {
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
+    });
+
+    test('returns 200 and challenge if user exists', () async {
+      final res = await http.post(
+        TestEnv.apiUri('/challenge'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      expect(res.body, isNotEmpty);
+      final challenge = ChallengeResponse.decode(res.body);
+      expect(challenge.challengeId, isNotEmpty);
+      expect(challenge.challenge, isNotEmpty);
+      expect(challenge.expiresAt, isNotNull);
     });
   });
 
