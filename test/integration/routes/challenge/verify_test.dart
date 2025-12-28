@@ -100,15 +100,31 @@ void main() {
     });
 
     test('returns 400 if challenge is expired', () async {
-      // final res = await http.post(
-      //   TestEnv.apiUri('/challenge/verify'),
-      //   headers: {
-      //     'x-requestor-id': TestEnv.clientId,
-      //   },
-      //   body: 'todo',
-      // );
-      // expect(res.statusCode, equals(HttpStatus.badRequest));
-      // expect(res.body, equals('Challenge expired'));
+      final challenge = await getChallenge();
+      final copy = ChallengeResponse(
+        challengeId: challenge.challengeId,
+        challenge: challenge.challenge,
+        expiresAt: DateTime.now().subtract(
+          const Duration(seconds: 30),
+        ),
+      );
+      await redis.set(
+        ns: Namespace.challenges,
+        key: TestEnv.clientId,
+        value: copy.encode(),
+      );
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+        body: ChallengeVerificationRequest(
+          challengeId: challenge.challengeId,
+          signature: 'invalid',
+        ).encode(),
+      );
+      expect(res.statusCode, equals(HttpStatus.badRequest));
+      expect(res.body, equals('Challenge expired'));
     });
 
     test('returns 403 for invalid signature', () async {
