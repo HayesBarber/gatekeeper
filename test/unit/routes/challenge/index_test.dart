@@ -45,6 +45,7 @@ void main() {
         AppConfig(
           clientIdHeader: clientIdHeader,
           redisHost: redisHost,
+          subdomainUpstreams: {},
         ),
       );
     });

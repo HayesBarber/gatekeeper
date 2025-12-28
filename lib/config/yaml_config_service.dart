@@ -46,6 +46,7 @@ class YamlConfigService implements ConfigService {
     return AppConfig(
       redisHost: _getRedisHost(doc),
       clientIdHeader: _getClientIdHeader(doc),
+      subdomainUpstreams: {},
     );
   }
 

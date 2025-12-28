@@ -56,6 +56,7 @@ void main() {
         AppConfig(
           clientIdHeader: clientIdHeader,
           redisHost: 'localhost',
+          subdomainUpstreams: {},
         ),
       );
     });
