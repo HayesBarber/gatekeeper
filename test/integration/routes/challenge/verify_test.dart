@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
+import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -103,6 +105,25 @@ void main() {
       expect(res.body, equals('Invalid signature'));
     });
 
-    test('returns 200 and api key for valid handshake', () async {});
+    test('returns 200 and api key for valid handshake', () async {
+      final challenge = await getChallenge();
+      final keyPair = ECCKeyPair.fromJson({});
+      final signature = await keyPair.createSignature(challenge.challenge);
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+        body: ChallengeVerificationRequest(
+          challengeId: challenge.challengeId,
+          signature: signature,
+        ).encode(),
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      expect(res.body, isNotEmpty);
+      final apiKeyResponse = ChallengeVerificationResponse.decode(res.body);
+      expect(apiKeyResponse.apiKey, isNotEmpty);
+      expect(apiKeyResponse.expiresAt, isNotNull);
+    });
   });
 }
