@@ -25,9 +25,9 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   final redis = context.read<RedisClientBase>();
-  final client = await redis.get(ns: Namespace.users, key: clientId);
+  final publicKey = await redis.get(ns: Namespace.users, key: clientId);
 
-  if (client == null) {
+  if (publicKey == null) {
     return Response(
       statusCode: HttpStatus.unauthorized,
       body: 'Unauthorized',
@@ -38,7 +38,7 @@ Future<Response> _onPost(RequestContext context) async {
 
   await redis.set(
     ns: Namespace.challenges,
-    key: client,
+    key: clientId,
     value: challenge.encode(),
   );
 
