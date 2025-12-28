@@ -9,7 +9,10 @@ cleanup() {
 
 setup() {
   echo "setting up"
-  redis-cli ping | grep -q PONG
+  if [[ "$(redis-cli ping 2>/dev/null)" != "PONG" ]]; then
+    echo "No response from redis"
+    exit 1
+  fi
   trap cleanup EXIT
 }
 
