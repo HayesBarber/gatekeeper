@@ -46,7 +46,7 @@ class YamlConfigService implements ConfigService {
     return AppConfig(
       redisHost: _getRedisHost(doc),
       clientIdHeader: _getClientIdHeader(doc),
-      subdomainUpstreams: {},
+      subdomainUpstreams: _getSubdomainUpstreams(doc),
     );
   }
 
@@ -60,5 +60,17 @@ class YamlConfigService implements ConfigService {
 
   static String _getClientIdHeader(YamlMap? doc) {
     return doc?['client_id_header'] as String? ?? 'x-requestor-id';
+  }
+
+  static Map<String, String> _getSubdomainUpstreams(YamlMap? doc) {
+    final subdomains = doc?['subdomains'];
+    if (subdomains is YamlMap) {
+      return Map<String, String>.fromEntries(
+        subdomains.entries.map(
+          (e) => MapEntry(e.key.toString(), e.value.toString()),
+        ),
+      );
+    }
+    return {};
   }
 }
