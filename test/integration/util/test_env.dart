@@ -16,6 +16,8 @@ final class TestEnv {
 
   static final String clientId = _require('CLIENT_ID');
 
+  static final String clientIdHeader = _require('CLIENT_ID_HEADER');
+
   static final String keyPairJson = _require('KEY_PAIR_JSON');
 
   static final String redisHost = _require('REDIS_HOST');
@@ -23,4 +25,8 @@ final class TestEnv {
   static Uri apiUri(String path) {
     return Uri.parse('$apiBaseUrl$path');
   }
+
+  static Map<String, String> headers = {
+    TestEnv.clientIdHeader: TestEnv.clientId,
+  };
 }

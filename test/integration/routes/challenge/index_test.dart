@@ -20,7 +20,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
         headers: {
-          'x-requestor-id': '7a860417-3b7d-4777-840b-62f0a57d4353',
+          TestEnv.clientIdHeader: '7a860417-3b7d-4777-840b-62f0a57d4353',
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -30,9 +30,7 @@ void main() {
     test('returns 200 and challenge if user exists', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);

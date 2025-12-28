@@ -20,6 +20,8 @@ setup() {
 
   CLIENT_ID="it-$(openssl rand -hex 6)"
   export CLIENT_ID
+  CLIENT_ID_HEADER="x-requestor-id"
+  export CLIENT_ID_HEADER
 
   KEY_PAIR_JSON=$(dart run tool/keygen.dart)
   export KEY_PAIR_JSON

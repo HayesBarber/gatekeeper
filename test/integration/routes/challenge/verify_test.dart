@@ -17,9 +17,7 @@ void main() {
     Future<ChallengeResponse> getChallenge() async {
       final challengeRes = await http.post(
         TestEnv.apiUri('/challenge'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
       );
       expect(challengeRes.statusCode, equals(HttpStatus.ok));
       expect(challengeRes.body, isNotEmpty);
@@ -61,7 +59,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          'x-requestor-id': 'eb893043-d510-460b-ace7-c9b9057d16d9',
+          TestEnv.clientIdHeader: 'eb893043-d510-460b-ace7-c9b9057d16d9',
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -71,9 +69,7 @@ void main() {
     test('returns 404 if challenge not found for client', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
           signature: 'invalid',
@@ -87,9 +83,7 @@ void main() {
       final challenge = await getChallenge();
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
         body: ChallengeVerificationRequest(
           challengeId: '${challenge.challengeId}-invalid',
           signature: 'invalid',
@@ -115,9 +109,7 @@ void main() {
       );
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
@@ -131,9 +123,7 @@ void main() {
       final challenge = await getChallenge();
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
@@ -153,9 +143,7 @@ void main() {
       final signature = await keyPair.createSignature(challenge.challenge);
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          'x-requestor-id': TestEnv.clientId,
-        },
+        headers: TestEnv.headers,
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: signature,
