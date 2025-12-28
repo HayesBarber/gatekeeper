@@ -1,10 +1,24 @@
 import 'dart:convert';
 
+import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/random_bytes.dart';
+
 class ChallengeVerificationResponse {
   ChallengeVerificationResponse({
     required this.apiKey,
     required this.expiresAt,
   });
+
+  factory ChallengeVerificationResponse.random() {
+    final apiKey = RandomBytes.generate();
+    final ttlSeconds = Namespace.apiKeys.ttlSeconds();
+    final expiresAt = DateTime.now().toUtc().add(Duration(seconds: ttlSeconds));
+
+    return ChallengeVerificationResponse(
+      apiKey: apiKey,
+      expiresAt: expiresAt,
+    );
+  }
 
   factory ChallengeVerificationResponse.fromJson(Map<String, dynamic> json) {
     return ChallengeVerificationResponse(

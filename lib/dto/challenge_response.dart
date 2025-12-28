@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/random_bytes.dart';
 
 class ChallengeResponse {
   ChallengeResponse({
@@ -11,15 +11,9 @@ class ChallengeResponse {
   });
 
   factory ChallengeResponse.random() {
-    String randomBytes() {
-      final random = Random.secure();
-      final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-      return base64Encode(bytes);
-    }
-
-    final challengeId = randomBytes();
-    final challenge = randomBytes();
-    final ttlSeconds = Namespace.challenges.ttl?.inSeconds ?? 1;
+    final challengeId = RandomBytes.generate();
+    final challenge = RandomBytes.generate();
+    final ttlSeconds = Namespace.challenges.ttlSeconds();
     final expiresAt = DateTime.now().toUtc().add(Duration(seconds: ttlSeconds));
 
     return ChallengeResponse(

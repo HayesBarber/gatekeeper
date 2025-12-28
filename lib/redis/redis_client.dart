@@ -7,6 +7,8 @@ enum Namespace {
 
   final String key;
   final Duration? ttl;
+
+  int ttlSeconds() => ttl != null ? ttl!.inSeconds : 1;
 }
 
 abstract class RedisClientBase {
