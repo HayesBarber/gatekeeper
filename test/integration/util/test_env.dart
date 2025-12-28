@@ -18,6 +18,8 @@ final class TestEnv {
 
   static final String keyPairJson = _require('KEY_PAIR_JSON');
 
+  static final String redisHost = _require('REDIS_HOST');
+
   static Uri apiUri(String path) {
     return Uri.parse('$apiBaseUrl$path');
   }

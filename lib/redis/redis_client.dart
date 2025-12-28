@@ -26,6 +26,7 @@ abstract class RedisClientBase {
     required String value,
     Duration? ttl,
   });
+  Future<void> close();
 
   String redisKey(Namespace ns, String key) {
     return '${ns.key}:$key';

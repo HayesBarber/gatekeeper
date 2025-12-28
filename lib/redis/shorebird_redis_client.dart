@@ -17,10 +17,6 @@ class ShorebirdRedisClient extends RedisClientBase {
     return _instance!;
   }
 
-  Future<void> close() async {
-    await _client.close();
-  }
-
   static Future<ShorebirdRedisClient> connect({
     String host = '127.0.0.1',
   }) async {
@@ -30,6 +26,11 @@ class ShorebirdRedisClient extends RedisClientBase {
 
     _instance = ShorebirdRedisClient._(client);
     return _instance!;
+  }
+
+  @override
+  Future<void> close() async {
+    await _client.close();
   }
 
   @override

@@ -5,6 +5,8 @@ import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
+import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -27,6 +29,25 @@ void main() {
       expect(challenge.expiresAt, isNotNull);
       return challenge;
     }
+
+    late RedisClientBase redis;
+
+    setUpAll(() async {
+      redis = await ShorebirdRedisClient.connect(
+        host: TestEnv.redisHost,
+      );
+    });
+
+    tearDown(() async {
+      await redis.delete(
+        ns: Namespace.challenges,
+        key: TestEnv.clientId,
+      );
+    });
+
+    tearDownAll(() async {
+      await redis.close();
+    });
 
     test('returns 401 if client ID header is missing', () async {
       final res = await http.post(

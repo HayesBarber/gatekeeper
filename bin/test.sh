@@ -40,6 +40,9 @@ setup() {
   API_BASE_URL="http://127.0.0.1:8080"
   export API_BASE_URL
 
+  REDIS_HOST="127.0.0.1"
+  export REDIS_HOST
+
   echo "waiting for server"
   until curl -sf http://127.0.0.1:8080/health >/dev/null; do
     sleep 0.2
