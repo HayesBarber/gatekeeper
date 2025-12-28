@@ -37,6 +37,9 @@ class ChallengeResponse {
     );
   }
 
+  factory ChallengeResponse.decode(String json) =>
+      ChallengeResponse.fromJson(jsonDecode(json) as Map<String, dynamic>);
+
   /// Unique identifier for the challenge
   final String challengeId;
 

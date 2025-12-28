@@ -19,7 +19,7 @@ Future<Response> _onPost(RequestContext context) async {
 
   if (clientId == null) {
     return Response(
-      statusCode: 401,
+      statusCode: HttpStatus.unauthorized,
       body: 'Unauthorized',
     );
   }
@@ -29,7 +29,7 @@ Future<Response> _onPost(RequestContext context) async {
 
   if (client == null) {
     return Response(
-      statusCode: 401,
+      statusCode: HttpStatus.unauthorized,
       body: 'Unauthorized',
     );
   }
