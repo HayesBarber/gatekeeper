@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:gatekeeper/dto/challenge_response.dart';
+import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -32,18 +34,38 @@ void main() {
         headers: {
           'x-requestor-id': TestEnv.clientId,
         },
+        body: ChallengeVerificationRequest(
+          challengeId: 'invalid',
+          signature: 'invalid',
+        ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.notFound));
       expect(res.body, equals('No challenge found'));
     });
 
     test('returns 400 if challenge ID does not match provided', () async {
+      final challengeRes = await http.post(
+        TestEnv.apiUri('/challenge'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+      );
+      expect(challengeRes.statusCode, equals(HttpStatus.ok));
+      expect(challengeRes.body, isNotEmpty);
+      final challenge = ChallengeResponse.decode(challengeRes.body);
+      expect(challenge.challengeId, isNotEmpty);
+      expect(challenge.challenge, isNotEmpty);
+      expect(challenge.expiresAt, isNotNull);
+
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
           'x-requestor-id': TestEnv.clientId,
         },
-        body: 'todo',
+        body: ChallengeVerificationRequest(
+          challengeId: '${challenge.challengeId}-invalid',
+          signature: 'invalid',
+        ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
       expect(res.body, equals('Invalid challenge'));
