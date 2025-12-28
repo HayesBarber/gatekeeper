@@ -16,10 +16,20 @@ class YamlConfigService implements ConfigService {
     return _instance!;
   }
 
-  static Future<YamlConfigService> load({required String path}) async {
-    if (_instance != null) return _instance!;
-
+  static Future<YamlConfigService> load({
+    required String path,
+  }) async {
     final doc = await _loadYamlFile(path);
+    final config = _parseAppConfig(doc);
+
+    _instance = YamlConfigService._(config);
+    return _instance!;
+  }
+
+  static Future<YamlConfigService> loadFromString({
+    required String contents,
+  }) async {
+    final doc = await _loadYamlString(contents);
     final config = _parseAppConfig(doc);
 
     _instance = YamlConfigService._(config);
@@ -34,6 +44,10 @@ class YamlConfigService implements ConfigService {
     if (!file.existsSync()) return null;
 
     final contents = await file.readAsString();
+    return _loadYamlString(contents);
+  }
+
+  static Future<YamlMap?> _loadYamlString(String contents) async {
     final parsed = loadYaml(contents);
     return parsed is YamlMap ? parsed : null;
   }
