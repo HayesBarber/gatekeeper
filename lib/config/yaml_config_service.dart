@@ -7,7 +7,6 @@ class YamlConfigService implements ConfigService {
   YamlConfigService._(this._config);
 
   static YamlConfigService? _instance;
-
   final AppConfig _config;
 
   static YamlConfigService instance() {
@@ -17,36 +16,11 @@ class YamlConfigService implements ConfigService {
     return _instance!;
   }
 
-  static Future<YamlConfigService> load({
-    required String path,
-  }) async {
-    if (_instance != null) {
-      return _instance!;
-    }
+  static Future<YamlConfigService> load({required String path}) async {
+    if (_instance != null) return _instance!;
 
-    YamlMap? doc;
-
-    final file = File(path);
-    if (file.existsSync()) {
-      final contents = await file.readAsString();
-      final parsed = loadYaml(contents);
-      if (parsed is YamlMap) {
-        doc = parsed;
-      }
-    }
-
-    final redis = doc?['redis'];
-    final redisHost = redis is YamlMap
-        ? redis['host'] as String? ?? '127.0.0.1'
-        : '127.0.0.1';
-
-    final clientIdHeader =
-        doc?['client_id_header'] as String? ?? 'x-requestor-id';
-
-    final config = AppConfig(
-      redisHost: redisHost,
-      clientIdHeader: clientIdHeader,
-    );
+    final doc = await _loadYamlFile(path);
+    final config = _parseAppConfig(doc);
 
     _instance = YamlConfigService._(config);
     return _instance!;
@@ -54,4 +28,32 @@ class YamlConfigService implements ConfigService {
 
   @override
   AppConfig get config => _config;
+
+  static Future<YamlMap?> _loadYamlFile(String path) async {
+    final file = File(path);
+    if (!file.existsSync()) return null;
+
+    final contents = await file.readAsString();
+    final parsed = loadYaml(contents);
+    return parsed is YamlMap ? parsed : null;
+  }
+
+  static AppConfig _parseAppConfig(YamlMap? doc) {
+    return AppConfig(
+      redisHost: _getRedisHost(doc),
+      clientIdHeader: _getClientIdHeader(doc),
+    );
+  }
+
+  static String _getRedisHost(YamlMap? doc) {
+    final redis = doc?['redis'];
+    if (redis is YamlMap) {
+      return redis['host'] as String? ?? '127.0.0.1';
+    }
+    return '127.0.0.1';
+  }
+
+  static String _getClientIdHeader(YamlMap? doc) {
+    return doc?['client_id_header'] as String? ?? 'x-requestor-id';
+  }
 }
