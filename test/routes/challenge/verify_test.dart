@@ -9,9 +9,15 @@ import '../../../routes/challenge/verify.dart' as route;
 class _MockRequestContext extends Mock implements RequestContext {}
 
 void main() {
-  group('GET /', () {
+  group('POST /challenge/verify', () {
     test('responds with a 200 and greeting.', () async {
       final context = _MockRequestContext();
+      when(() => context.request).thenReturn(
+        Request(
+          HttpMethod.post.value,
+          Uri.parse('http://localhost/challenge/verify'),
+        ),
+      );
 
       final response = route.onRequest(context);
 
