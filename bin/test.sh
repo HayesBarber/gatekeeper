@@ -20,8 +20,14 @@ setup() {
 
   CLIENT_ID="it-$(openssl rand -hex 6)"
   export CLIENT_ID
+
+  KEY_PAIR_JSON=$(dart run tool/gen_keys.dart)
+  export KEY_PAIR_JSON
+
+  PUBLIC_KEY=$(echo "$KEY_PAIR_JSON" | jq -r '.publicKey')
+
   echo "creating redis key users:${CLIENT_ID}"
-  redis-cli SET "users:${CLIENT_ID}" "todo"
+  redis-cli SET "users:${CLIENT_ID}" "${PUBLIC_KEY}"
 
   echo "creating build"
   dart_frog build
