@@ -37,11 +37,41 @@ void main() {
       expect(res.body, equals('No challenge found'));
     });
 
-    test('returns 400 if challenge ID does not match provided', () async {});
+    test('returns 400 if challenge ID does not match provided', () async {
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+        body: 'todo',
+      );
+      expect(res.statusCode, equals(HttpStatus.badRequest));
+      expect(res.body, equals('Invalid challenge'));
+    });
 
-    test('returns 400 if challenge is expired', () async {});
+    test('returns 400 if challenge is expired', () async {
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+        body: 'todo',
+      );
+      expect(res.statusCode, equals(HttpStatus.badRequest));
+      expect(res.body, equals('Challenge expired'));
+    });
 
-    test('returns 403 for invalid signature', () async {});
+    test('returns 403 for invalid signature', () async {
+      final res = await http.post(
+        TestEnv.apiUri('/challenge/verify'),
+        headers: {
+          'x-requestor-id': TestEnv.clientId,
+        },
+        body: 'todo',
+      );
+      expect(res.statusCode, equals(HttpStatus.forbidden));
+      expect(res.body, equals('Invalid signature'));
+    });
 
     test('returns 200 and api key for valid handshake', () async {});
   });
