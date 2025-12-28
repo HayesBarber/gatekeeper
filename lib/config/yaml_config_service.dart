@@ -26,16 +26,6 @@ class YamlConfigService implements ConfigService {
     return _instance!;
   }
 
-  static Future<YamlConfigService> loadFromString({
-    required String contents,
-  }) async {
-    final doc = await _loadYamlString(contents);
-    final config = _parseAppConfig(doc);
-
-    _instance = YamlConfigService._(config);
-    return _instance!;
-  }
-
   @override
   AppConfig get config => _config;
 
