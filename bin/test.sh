@@ -11,14 +11,29 @@ cleanup() {
 
 setup() {
   echo "setting up"
+
   if [[ "$(redis-cli ping 2>/dev/null)" != "PONG" ]]; then
     echo "No response from redis"
     exit 1
   fi
+
   CLIENT_ID="it-$(openssl rand -hex 6)"
   export CLIENT_ID
   echo "creating redis key users:${CLIENT_ID}"
   redis-cli SET "users:${CLIENT_ID}" "todo"
+
+  echo "creating build"
+  dart_frog build
+
+  echo "starting server"
+  dart build/bin/server.dart &
+  SERVER_PID=$!
+
+  echo "waiting for server"
+  until curl -sf http://127.0.0.1:8080/health >/dev/null; do
+    sleep 0.2
+  done
+
   trap cleanup EXIT
 }
 
