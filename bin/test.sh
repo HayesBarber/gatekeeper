@@ -5,6 +5,8 @@ MODE=${1:-all}
 
 cleanup() {
   echo "cleaning up"
+  echo "deleting redis key users:${CLIENT_ID}"
+  redis-cli DEL "users:${CLIENT_ID}"
 }
 
 setup() {
@@ -13,6 +15,10 @@ setup() {
     echo "No response from redis"
     exit 1
   fi
+  CLIENT_ID="it-$(openssl rand -hex 6)"
+  export CLIENT_ID
+  echo "creating redis key users:${CLIENT_ID}"
+  redis-cli SET "users:${CLIENT_ID}" "todo"
   trap cleanup EXIT
 }
 
