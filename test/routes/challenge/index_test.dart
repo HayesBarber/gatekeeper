@@ -100,4 +100,36 @@ void main() {
       expect(challenge.expiresAt, isNotNull);
     });
   });
+
+  group('non-POST methods', () {
+    late Request request;
+    late RequestContext context;
+
+    setUp(() {
+      request = _MockRequest();
+      context = _MockRequestContext();
+
+      when(() => context.request).thenReturn(request);
+    });
+
+    final methods = <HttpMethod>[
+      HttpMethod.get,
+      HttpMethod.put,
+      HttpMethod.patch,
+      HttpMethod.delete,
+      HttpMethod.head,
+      HttpMethod.options,
+    ];
+
+    for (final method in methods) {
+      test('${method.name.toUpperCase()} returns 405', () async {
+        when(() => request.method).thenReturn(method);
+        when(() => request.headers).thenReturn({});
+
+        final response = await route.onRequest(context);
+
+        expect(response.statusCode, equals(HttpStatus.methodNotAllowed));
+      });
+    }
+  });
 }
