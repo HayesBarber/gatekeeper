@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
@@ -107,7 +108,9 @@ void main() {
 
     test('returns 200 and api key for valid handshake', () async {
       final challenge = await getChallenge();
-      final keyPair = ECCKeyPair.fromJson({});
+      final keyPair = ECCKeyPair.fromJson(
+        jsonDecode(TestEnv.keyPairJson) as Map<String, String>,
+      );
       final signature = await keyPair.createSignature(challenge.challenge);
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),

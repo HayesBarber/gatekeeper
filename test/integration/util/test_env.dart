@@ -16,6 +16,8 @@ final class TestEnv {
 
   static final String clientId = _require('CLIENT_ID');
 
+  static final String keyPairJson = _require('KEY_PAIR_JSON');
+
   static Uri apiUri(String path) {
     return Uri.parse('$apiBaseUrl$path');
   }
