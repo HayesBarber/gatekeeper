@@ -7,6 +7,7 @@ cleanup() {
   echo "cleaning up"
   echo "deleting redis key users:${CLIENT_ID}"
   redis-cli DEL "users:${CLIENT_ID}"
+  kill "$SERVER_PID"
 }
 
 setup() {
@@ -28,6 +29,7 @@ setup() {
   echo "starting server"
   dart build/bin/server.dart &
   SERVER_PID=$!
+  echo "server PID: $SERVER_PID"
 
   echo "waiting for server"
   until curl -sf http://127.0.0.1:8080/health >/dev/null; do
