@@ -24,4 +24,22 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
   });
+
+  group('non-POST methods', () {
+    final methods = [
+      (http.get, 'GET'),
+      (http.put, 'PUT'),
+      (http.patch, 'PATCH'),
+      (http.delete, 'DELETE'),
+    ];
+
+    for (final record in methods) {
+      test('${record.$2} returns 405', () async {
+        final res = await record.$1(
+          TestEnv.apiUri('/challenge'),
+        );
+        expect(res.statusCode, equals(HttpStatus.methodNotAllowed));
+      });
+    }
+  });
 }
