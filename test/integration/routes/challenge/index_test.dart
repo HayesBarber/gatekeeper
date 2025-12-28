@@ -13,6 +13,7 @@ void main() {
         TestEnv.apiUri('/challenge'),
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
+      expect(res.body, equals('Unauthorized'));
     });
 
     test('returns 401 if user not found in Redis', () async {
@@ -23,6 +24,7 @@ void main() {
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
+      expect(res.body, equals('Unauthorized'));
     });
 
     test('returns 200 and challenge if user exists', () async {
