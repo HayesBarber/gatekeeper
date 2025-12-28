@@ -8,7 +8,7 @@ import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-import '../../../routes/challenge/index.dart' as route;
+import '../../../../routes/challenge/index.dart' as route;
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
