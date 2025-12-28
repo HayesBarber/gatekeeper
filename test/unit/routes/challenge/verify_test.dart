@@ -5,7 +5,9 @@ import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
+import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/types/signature_verifier.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -19,12 +21,17 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
+class _MockSignatureVerifier extends Mock {
+  bool call(String m, String s, String k);
+}
+
 void main() {
   group('POST /challenge/verify', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockConfigService configService;
     late _MockRedisClient redisClient;
+    late _MockSignatureVerifier verifier;
 
     const clientIdHeader = 'X-Client-ID';
     const clientId = 'client-123';
@@ -37,11 +44,13 @@ void main() {
       request = _MockRequest();
       configService = _MockConfigService();
       redisClient = _MockRedisClient();
+      verifier = _MockSignatureVerifier();
 
       when(() => context.request).thenReturn(request);
       when(() => request.method).thenReturn(HttpMethod.post);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
+      when(() => context.read<SignatureVerifier>()).thenReturn(verifier.call);
 
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -171,11 +180,67 @@ void main() {
       when(
         () => redisClient.get(ns: Namespace.challenges, key: clientId),
       ).thenAnswer((_) async => challenge.encode());
+      when(
+        () => verifier(
+          challengeValue,
+          'bad-sig',
+          publicKey,
+        ),
+      ).thenReturn(false);
 
       final response = await route.onRequest(context);
 
       expect(response.statusCode, equals(HttpStatus.forbidden));
       expect(await response.body(), equals('Invalid signature'));
+    });
+
+    test('returns 200 and api key for valid challenge verification', () async {
+      final challenge = ChallengeResponse(
+        challengeId: challengeId,
+        challenge: challengeValue,
+        expiresAt: DateTime.now().add(const Duration(seconds: 30)),
+      );
+
+      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.body()).thenAnswer(
+        (_) async => ChallengeVerificationRequest(
+          challengeId: challengeId,
+          signature: 'valid-signature',
+        ).encode(),
+      );
+
+      when(
+        () => redisClient.get(ns: Namespace.users, key: clientId),
+      ).thenAnswer((_) async => publicKey);
+
+      when(
+        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+      ).thenAnswer((_) async => challenge.encode());
+
+      when(
+        () => verifier(
+          challengeValue,
+          'valid-signature',
+          publicKey,
+        ),
+      ).thenReturn(true);
+
+      when(
+        () => redisClient.set(
+          ns: Namespace.apiKeys,
+          key: clientId,
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
+
+      final response = await route.onRequest(context);
+
+      expect(response.statusCode, equals(HttpStatus.ok));
+
+      final body = await response.body();
+      final apiKeyResponse = ChallengeVerificationResponse.decode(body);
+      expect(apiKeyResponse.apiKey, isNotEmpty);
+      expect(apiKeyResponse.expiresAt, isNotNull);
     });
   });
 

@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/types/signature_verifier.dart';
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -67,7 +67,9 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final isValid = VerifySignature.verifySignature(
+  final verify = context.read<SignatureVerifier>();
+
+  final isValid = verify(
     challenge.challenge,
     request.signature,
     publicKey,
