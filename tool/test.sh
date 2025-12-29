@@ -59,12 +59,12 @@ run_unit() {
 
 run_integration() {
   setup
-  dart test test/integration
+  dart test test/integration --concurrency=1
 }
 
 run_all() {
   setup
-  dart test
+  dart test --concurrency=1
 }
 
 case "$MODE" in
