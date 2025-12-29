@@ -59,6 +59,8 @@ void main() {
           'api',
         ),
       );
+      expect(res.statusCode, equals(HttpStatus.forbidden));
+      expect(res.body, equals('Missing api key'));
     });
 
     test('returns 403 for invalid api key', () async {});
