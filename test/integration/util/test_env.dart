@@ -30,9 +30,12 @@ final class TestEnv {
     String subdomain,
     String path,
   ) {
-    final uri = apiUri(path);
-    final host = uri.host;
-    return Uri.parse('$subdomain.$host$path');
+    final base = Uri.parse(apiBaseUrl);
+
+    return base.replace(
+      host: '$subdomain.${base.host}',
+      path: path,
+    );
   }
 
   static Map<String, String> headers = {

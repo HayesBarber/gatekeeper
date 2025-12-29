@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
@@ -34,10 +36,17 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/health'),
       );
+      expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, equals('healthy'));
     });
 
-    test('returns 200 healty when client ID header is missing', () async {});
+    test('returns 200 healty when client ID header is missing', () async {
+      final res = await http.get(
+        TestEnv.apiUriWithSubdomain('api', '/health'),
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      expect(res.body, equals('healthy'));
+    });
 
     test('returns 403 for missing api key', () async {});
 
