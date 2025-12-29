@@ -45,14 +45,21 @@ void main() {
         TestEnv.apiUri('/health'),
         headers: TestEnv.headersWithSubdomain(
           'api',
-          includeOtherHeaders: false,
+          includeClientId: false,
         ),
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, equals('healthy'));
     });
 
-    test('returns 403 for missing api key', () async {});
+    test('returns 403 for missing api key', () async {
+      final res = await http.get(
+        TestEnv.apiUri('/health'),
+        headers: TestEnv.headersWithSubdomain(
+          'api',
+        ),
+      );
+    });
 
     test('returns 403 for invalid api key', () async {});
 

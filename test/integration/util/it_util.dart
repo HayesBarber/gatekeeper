@@ -10,7 +10,9 @@ class ItUtil {
   static Future<ChallengeResponse> getChallenge() async {
     final challengeRes = await http.post(
       TestEnv.apiUri('/challenge'),
-      headers: TestEnv.headers,
+      headers: {
+        TestEnv.clientIdHeader: TestEnv.clientId,
+      },
     );
     expect(challengeRes.statusCode, equals(HttpStatus.ok));
     expect(challengeRes.body, isNotEmpty);

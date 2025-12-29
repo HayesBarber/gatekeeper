@@ -30,7 +30,9 @@ void main() {
     test('returns 200 and challenge if user exists', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);

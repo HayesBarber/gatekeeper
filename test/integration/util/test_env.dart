@@ -25,19 +25,15 @@ final class TestEnv {
 
   static Map<String, String> headersWithSubdomain(
     String subdomain, {
-    bool includeOtherHeaders = true,
+    bool includeClientId = true,
   }) {
     final host = _baseUri.hasPort
         ? '$subdomain.${_baseUri.host}:${_baseUri.port}'
         : '$subdomain.${_baseUri.host}';
 
     return {
-      if (includeOtherHeaders) ...headers,
+      if (includeClientId) clientIdHeader: clientId,
       'host': host,
     };
   }
-
-  static Map<String, String> headers = {
-    clientIdHeader: clientId,
-  };
 }

@@ -56,7 +56,9 @@ void main() {
     test('returns 404 if challenge not found for client', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
           signature: 'invalid',
@@ -70,7 +72,9 @@ void main() {
       final challenge = await ItUtil.getChallenge();
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
         body: ChallengeVerificationRequest(
           challengeId: '${challenge.challengeId}-invalid',
           signature: 'invalid',
@@ -96,7 +100,9 @@ void main() {
       );
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
@@ -110,7 +116,9 @@ void main() {
       final challenge = await ItUtil.getChallenge();
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
@@ -130,7 +138,9 @@ void main() {
       final signature = await keyPair.createSignature(challenge.challenge);
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: TestEnv.headers,
+        headers: {
+          TestEnv.clientIdHeader: TestEnv.clientId,
+        },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: signature,
