@@ -42,7 +42,11 @@ void main() {
 
     test('returns 200 healty when client ID header is missing', () async {
       final res = await http.get(
-        TestEnv.apiUriWithSubdomain('api', '/health'),
+        TestEnv.apiUri('/health'),
+        headers: TestEnv.headersWithSubdomain(
+          'api',
+          includeOtherHeaders: false,
+        ),
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, equals('healthy'));

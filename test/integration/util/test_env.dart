@@ -12,33 +12,32 @@ final class TestEnv {
     return value;
   }
 
-  static final String apiBaseUrl = _require('API_BASE_URL');
+  static final Uri _baseUri = Uri.parse(_require('API_BASE_URL'));
 
   static final String clientId = _require('CLIENT_ID');
-
   static final String clientIdHeader = _require('CLIENT_ID_HEADER');
-
   static final String keyPairJson = _require('KEY_PAIR_JSON');
-
   static final String redisHost = _require('REDIS_HOST');
 
   static Uri apiUri(String path) {
-    return Uri.parse('$apiBaseUrl$path');
+    return _baseUri.replace(path: path);
   }
 
-  static Uri apiUriWithSubdomain(
-    String subdomain,
-    String path,
-  ) {
-    final base = Uri.parse(apiBaseUrl);
+  static Map<String, String> headersWithSubdomain(
+    String subdomain, {
+    bool includeOtherHeaders = true,
+  }) {
+    final host = _baseUri.hasPort
+        ? '$subdomain.${_baseUri.host}:${_baseUri.port}'
+        : '$subdomain.${_baseUri.host}';
 
-    return base.replace(
-      host: '$subdomain.${base.host}',
-      path: path,
-    );
+    return {
+      if (includeOtherHeaders) ...headers,
+      'host': host,
+    };
   }
 
   static Map<String, String> headers = {
-    TestEnv.clientIdHeader: TestEnv.clientId,
+    clientIdHeader: clientId,
   };
 }
