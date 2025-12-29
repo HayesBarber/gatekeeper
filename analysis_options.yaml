@@ -2,4 +2,5 @@ include: package:dart_frog_lint/recommended.yaml
 analyzer:
   errors:
     public_member_api_docs: ignore
+    avoid_equals_and_hash_code_on_mutable_classes: ignore
 

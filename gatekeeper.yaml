@@ -2,7 +2,10 @@ client_id_header: x-requestor-id
 redis:
   host: 127.0.0.1
 subdomains:
-  api: "http://localhost:3000"
-  webhook: "http://localhost:4000"
-  admin: "http://localhost:5000"
+  api:
+    url: "http://localhost:3000"
+  webhook:
+    url: "http://localhost:4000"
+  admin:
+    url: "http://localhost:5000"
 

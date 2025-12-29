@@ -1,3 +1,4 @@
+import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:test/test.dart';
 
@@ -10,10 +11,10 @@ void main() {
 
       expect(config.redisHost, '192.168.1.10');
       expect(config.clientIdHeader, 'x-client-id');
-      expect(config.subdomainUpstreams, <String, String>{
-        'api': 'http://localhost:3000',
-        'webhook': 'http://localhost:4000',
-        'admin': 'http://localhost:5000',
+      expect(config.subdomains, <String, SubdomainConfig>{
+        'api': const SubdomainConfig(url: 'http://localhost:3000'),
+        'webhook': const SubdomainConfig(url: 'http://localhost:4000'),
+        'admin': const SubdomainConfig(url: 'http://localhost:5000'),
       });
     });
 
@@ -24,7 +25,7 @@ void main() {
 
       expect(config.redisHost, '127.0.0.1');
       expect(config.clientIdHeader, 'x-requestor-id');
-      expect(config.subdomainUpstreams, <String, String>{});
+      expect(config.subdomains, <String, SubdomainConfig>{});
     });
 
     test('loads config partial yaml', () async {
@@ -34,7 +35,7 @@ void main() {
 
       expect(config.redisHost, '127.0.0.1');
       expect(config.clientIdHeader, 'x-custom-id');
-      expect(config.subdomainUpstreams, <String, String>{});
+      expect(config.subdomains, <String, SubdomainConfig>{});
     });
   });
 }

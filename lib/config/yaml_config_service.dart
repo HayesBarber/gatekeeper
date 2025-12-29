@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:yaml/yaml.dart';
 
 class YamlConfigService implements ConfigService {
@@ -46,7 +47,7 @@ class YamlConfigService implements ConfigService {
     return AppConfig(
       redisHost: _getRedisHost(doc),
       clientIdHeader: _getClientIdHeader(doc),
-      subdomainUpstreams: _getSubdomainUpstreams(doc),
+      subdomains: _getSubdomainUpstreams(doc),
     );
   }
 
@@ -62,13 +63,20 @@ class YamlConfigService implements ConfigService {
     return doc?['client_id_header'] as String? ?? 'x-requestor-id';
   }
 
-  static Map<String, String> _getSubdomainUpstreams(YamlMap? doc) {
+  static Map<String, SubdomainConfig> _getSubdomainUpstreams(YamlMap? doc) {
     final subdomains = doc?['subdomains'];
     if (subdomains is YamlMap) {
-      return Map<String, String>.fromEntries(
-        subdomains.entries.map(
-          (e) => MapEntry(e.key.toString(), e.value.toString()),
-        ),
+      return Map.fromEntries(
+        subdomains.entries.map((entry) {
+          final key = entry.key.toString();
+          final value = entry.value as YamlMap;
+          return MapEntry(
+            key,
+            SubdomainConfig(
+              url: value['url'] as String,
+            ),
+          );
+        }),
       );
     }
     return {};
