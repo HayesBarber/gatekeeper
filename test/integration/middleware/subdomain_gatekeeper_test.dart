@@ -1,5 +1,6 @@
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
+import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../util/test_env.dart';
@@ -29,7 +30,12 @@ void main() {
       await redis.close();
     });
 
-    test('returns 200 healty when no subdomain matches', () async {});
+    test('returns 200 healty when no subdomain matches', () async {
+      final res = await http.get(
+        TestEnv.apiUri('/health'),
+      );
+      expect(res.body, equals('healthy'));
+    });
 
     test('returns 200 healty when client ID header is missing', () async {});
 

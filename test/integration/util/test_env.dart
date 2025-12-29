@@ -26,6 +26,15 @@ final class TestEnv {
     return Uri.parse('$apiBaseUrl$path');
   }
 
+  static Uri apiUriWithSubdomain(
+    String subdomain,
+    String path,
+  ) {
+    final uri = apiUri(path);
+    final host = uri.host;
+    return Uri.parse('$subdomain.$host$path');
+  }
+
   static Map<String, String> headers = {
     TestEnv.clientIdHeader: TestEnv.clientId,
   };

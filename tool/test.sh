@@ -39,7 +39,7 @@ setup() {
   SERVER_PID=$!
   echo "server PID: $SERVER_PID"
 
-  API_BASE_URL="http://127.0.0.1:8080"
+  API_BASE_URL="http://localhost:8080"
   export API_BASE_URL
 
   REDIS_HOST="127.0.0.1"
