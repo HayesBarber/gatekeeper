@@ -5,7 +5,7 @@ class Subdomain {
 
   static String? fromHost(String host) {
     final parts = host.split('.');
-    if (parts.length > 2) {
+    if (parts.length > 1) {
       return parts.first;
     }
     return null;
