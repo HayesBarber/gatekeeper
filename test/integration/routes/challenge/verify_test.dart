@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
@@ -46,7 +47,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: 'eb893043-d510-460b-ace7-c9b9057d16d9',
+          headerRequestorId: 'eb893043-d510-460b-ace7-c9b9057d16d9',
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -57,7 +58,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
@@ -73,7 +74,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
         body: ChallengeVerificationRequest(
           challengeId: '${challenge.challengeId}-invalid',
@@ -101,7 +102,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
@@ -117,7 +118,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
@@ -139,7 +140,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,

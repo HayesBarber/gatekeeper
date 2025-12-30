@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -20,7 +21,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
         headers: {
-          TestEnv.clientIdHeader: '7a860417-3b7d-4777-840b-62f0a57d4353',
+          headerRequestorId: '7a860417-3b7d-4777-840b-62f0a57d4353',
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -31,7 +32,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
         headers: {
-          TestEnv.clientIdHeader: TestEnv.clientId,
+          headerRequestorId: TestEnv.clientId,
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));

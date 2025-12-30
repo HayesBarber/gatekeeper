@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
@@ -33,7 +34,6 @@ void main() {
     late _MockRedisClient redisClient;
     late _MockSignatureVerifier verifier;
 
-    const clientIdHeader = 'X-Client-ID';
     const clientId = 'client-123';
     const publicKey = 'public-key';
     const challengeId = 'challenge-id';
@@ -54,7 +54,6 @@ void main() {
 
       when(() => configService.config).thenReturn(
         AppConfig(
-          clientIdHeader: clientIdHeader,
           redisHost: 'localhost',
           subdomains: {},
         ),
@@ -71,7 +70,7 @@ void main() {
     });
 
     test('returns 401 if public key not found', () async {
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(ns: Namespace.users, key: clientId),
       ).thenAnswer((_) async => null);
@@ -83,7 +82,7 @@ void main() {
     });
 
     test('returns 404 if challenge not found', () async {
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -111,7 +110,7 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: 'wrong-id',
@@ -139,7 +138,7 @@ void main() {
         expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
       );
 
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -167,7 +166,7 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -202,7 +201,7 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,

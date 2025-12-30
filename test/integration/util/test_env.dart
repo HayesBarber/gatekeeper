@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:gatekeeper/constants/headers.dart';
+
 final class TestEnv {
   static String _require(String key) {
     final value = Platform.environment[key];
@@ -15,7 +17,6 @@ final class TestEnv {
   static final Uri _baseUri = Uri.parse(_require('API_BASE_URL'));
 
   static final String clientId = _require('CLIENT_ID');
-  static final String clientIdHeader = _require('CLIENT_ID_HEADER');
   static final String keyPairJson = _require('KEY_PAIR_JSON');
   static final String redisHost = _require('REDIS_HOST');
 
@@ -32,7 +33,7 @@ final class TestEnv {
         : '$subdomain.${_baseUri.host}';
 
     return {
-      if (includeClientId) clientIdHeader: clientId,
+      if (includeClientId) headerRequestorId: clientId,
       'host': host,
     };
   }

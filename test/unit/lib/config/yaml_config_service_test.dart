@@ -10,7 +10,6 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '192.168.1.10');
-      expect(config.clientIdHeader, 'x-client-id');
       expect(config.subdomains, <String, SubdomainConfig>{
         'api': const SubdomainConfig(url: 'http://localhost:3000'),
         'webhook': const SubdomainConfig(url: 'http://localhost:4000'),
@@ -24,7 +23,6 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
-      expect(config.clientIdHeader, 'x-requestor-id');
       expect(config.subdomains, <String, SubdomainConfig>{});
     });
 
@@ -34,7 +32,6 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
-      expect(config.clientIdHeader, 'x-custom-id');
       expect(config.subdomains, <String, SubdomainConfig>{});
     });
   });

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:mocktail/mocktail.dart';
@@ -25,7 +26,6 @@ void main() {
     late _MockConfigService configService;
     late _MockRedisClient redisClient;
 
-    const clientIdHeader = 'X-Client-ID';
     const clientId = 'client-123';
     const redisUserKey = 'user-123';
     const redisHost = '127.0.0.1';
@@ -43,7 +43,6 @@ void main() {
 
       when(() => configService.config).thenReturn(
         AppConfig(
-          clientIdHeader: clientIdHeader,
           redisHost: redisHost,
           subdomains: {},
         ),
@@ -59,7 +58,7 @@ void main() {
     });
 
     test('returns 401 if user not found in Redis', () async {
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(
           ns: Namespace.users,
@@ -73,7 +72,7 @@ void main() {
     });
 
     test('returns 200 and challenge if user exists', () async {
-      when(() => request.headers).thenReturn({clientIdHeader: clientId});
+      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(
           ns: Namespace.users,

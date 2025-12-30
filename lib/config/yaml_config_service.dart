@@ -46,7 +46,6 @@ class YamlConfigService implements ConfigService {
   static AppConfig _parseAppConfig(YamlMap? doc) {
     return AppConfig(
       redisHost: _getRedisHost(doc),
-      clientIdHeader: _getClientIdHeader(doc),
       subdomains: _getSubdomainUpstreams(doc),
     );
   }
@@ -57,10 +56,6 @@ class YamlConfigService implements ConfigService {
       return redis['host'] as String? ?? '127.0.0.1';
     }
     return '127.0.0.1';
-  }
-
-  static String _getClientIdHeader(YamlMap? doc) {
-    return doc?['client_id_header'] as String? ?? 'x-requestor-id';
   }
 
   static Map<String, SubdomainConfig> _getSubdomainUpstreams(YamlMap? doc) {

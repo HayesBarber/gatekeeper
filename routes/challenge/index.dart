@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 
@@ -14,8 +14,7 @@ Future<Response> onRequest(RequestContext context) {
 
 Future<Response> _onPost(RequestContext context) async {
   final headers = context.request.headers;
-  final config = context.read<ConfigService>().config;
-  final clientId = headers[config.clientIdHeader];
+  final clientId = headers[headerRequestorId];
 
   if (clientId == null) {
     return Response(
