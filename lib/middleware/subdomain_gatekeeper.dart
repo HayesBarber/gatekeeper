@@ -52,6 +52,12 @@ Middleware subdomainGatekeeper() {
         );
       }
 
+      if (storedApiKey.expiresAt.isBefore(DateTime.now())) {
+        return Response(
+          statusCode: HttpStatus.forbidden,
+        );
+      }
+
       final upstreamUrl = Uri.parse(subdomainConfig.url);
 
       return forwardToUpstream(

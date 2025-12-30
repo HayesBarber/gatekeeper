@@ -121,6 +121,33 @@ void main() {
       },
     );
 
+    test(
+      'returns 403 for invalid api key - key expired',
+      () async {
+        final apiKey = ChallengeVerificationResponse(
+          apiKey: 'expired-key',
+          expiresAt: DateTime.now().subtract(
+            const Duration(seconds: 30),
+          ),
+        );
+        await redis.set(
+          ns: Namespace.apiKeys,
+          key: TestEnv.clientId,
+          value: apiKey.encode(),
+        );
+        final res = await http.get(
+          TestEnv.apiUri('/echo'),
+          headers: {
+            ...TestEnv.headersWithSubdomain(
+              'api',
+            ),
+            headerApiKey: apiKey.apiKey,
+          },
+        );
+        expect(res.statusCode, equals(HttpStatus.forbidden));
+      },
+    );
+
     test('returns 200 from upstream when api key is valid', () async {
       final apiKey = ChallengeVerificationResponse.random();
       await redis.set(
