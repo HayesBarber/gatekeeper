@@ -11,9 +11,21 @@ void main() {
 
       expect(config.redisHost, '192.168.1.10');
       expect(config.subdomains, <String, SubdomainConfig>{
-        'api': const SubdomainConfig(url: 'http://localhost:3000'),
+        'api': const SubdomainConfig(
+          url: 'http://localhost:3000',
+          blacklistedPaths: {
+            'GET': ['/admin/*', '/health'],
+            'POST': ['/users/delete'],
+          },
+        ),
         'webhook': const SubdomainConfig(url: 'http://localhost:4000'),
-        'admin': const SubdomainConfig(url: 'http://localhost:5000'),
+        'admin': const SubdomainConfig(
+          url: 'http://localhost:5000',
+          blacklistedPaths: {
+            'GET': ['/config'],
+            'POST': ['/shutdown'],
+          },
+        ),
       });
     });
 

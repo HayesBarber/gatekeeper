@@ -69,11 +69,28 @@ class YamlConfigService implements ConfigService {
             key,
             SubdomainConfig(
               url: value['url'] as String,
+              blacklistedPaths: _parseBlacklistedPaths(value['blacklist']),
             ),
           );
         }),
       );
     }
     return {};
+  }
+
+  static Map<String, List<String>>? _parseBlacklistedPaths(dynamic blacklist) {
+    if (blacklist == null) return null;
+    if (blacklist is! YamlMap) return null;
+
+    final result = <String, List<String>>{};
+    for (final entry in blacklist.entries) {
+      final method = entry.key.toString();
+      final paths = entry.value;
+
+      if (paths is YamlList) {
+        result[method] = paths.whereType<String>().toList();
+      }
+    }
+    return result.isEmpty ? null : result;
   }
 }

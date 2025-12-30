@@ -5,6 +5,7 @@ import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/path_matcher.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware subdomainGatekeeper() {
@@ -56,6 +57,18 @@ Middleware subdomainGatekeeper() {
         return Response(
           statusCode: HttpStatus.forbidden,
         );
+      }
+
+      final blacklistedPaths = subdomainConfig.getBlacklistedPathsForMethod(
+        context.request.method.value,
+      );
+      if (blacklistedPaths.isNotEmpty) {
+        final requestPath = context.request.uri.path;
+        if (PathMatcher.isPathBlacklisted(blacklistedPaths, requestPath)) {
+          return Response(
+            statusCode: HttpStatus.forbidden,
+          );
+        }
       }
 
       final upstreamUrl = Uri.parse(subdomainConfig.url);
