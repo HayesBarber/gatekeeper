@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:gatekeeper/constants/headers.dart';
+import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
@@ -55,7 +56,7 @@ void main() {
 
     test('returns 403 for missing api key', () async {
       final res = await http.get(
-        TestEnv.apiUri('/health'),
+        TestEnv.apiUri('/echo'),
         headers: TestEnv.headersWithSubdomain(
           'api',
         ),
@@ -68,7 +69,7 @@ void main() {
       'returns 403 for invalid api key - header present but no data',
       () async {
         final res = await http.get(
-          TestEnv.apiUri('/health'),
+          TestEnv.apiUri('/echo'),
           headers: {
             ...TestEnv.headersWithSubdomain(
               'api',
@@ -83,7 +84,25 @@ void main() {
 
     test(
       'returns 403 for invalid api key - value does not match stored',
-      () async {},
+      () async {
+        final apiKey = ChallengeVerificationResponse.random();
+        await redis.set(
+          ns: Namespace.apiKeys,
+          key: TestEnv.clientId,
+          value: apiKey.encode(),
+        );
+        final res = await http.get(
+          TestEnv.apiUri('/echo'),
+          headers: {
+            ...TestEnv.headersWithSubdomain(
+              'api',
+            ),
+            headerApiKey: '${apiKey.apiKey}-inalid',
+          },
+        );
+        expect(res.statusCode, equals(HttpStatus.forbidden));
+        expect(res.body, equals('Invalid api key'));
+      },
     );
 
     test('returns 200 from upstream when api key is valid', () async {});
