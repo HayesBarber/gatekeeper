@@ -64,19 +64,27 @@ void main() {
       expect(res.body, equals('Missing api key'));
     });
 
-    test('returns 403 for invalid api key', () async {
-      final res = await http.get(
-        TestEnv.apiUri('/health'),
-        headers: {
-          ...TestEnv.headersWithSubdomain(
-            'api',
-          ),
-          headerApiKey: 'dummy-key',
-        },
-      );
-      expect(res.statusCode, equals(HttpStatus.forbidden));
-      expect(res.body, equals('Invalid api key'));
-    });
+    test(
+      'returns 403 for invalid api key - header present but no data',
+      () async {
+        final res = await http.get(
+          TestEnv.apiUri('/health'),
+          headers: {
+            ...TestEnv.headersWithSubdomain(
+              'api',
+            ),
+            headerApiKey: 'dummy-key',
+          },
+        );
+        expect(res.statusCode, equals(HttpStatus.forbidden));
+        expect(res.body, equals('Invalid api key'));
+      },
+    );
+
+    test(
+      'returns 403 for invalid api key - value does not match stored',
+      () async {},
+    );
 
     test('returns 200 from upstream when api key is valid', () async {});
   });
