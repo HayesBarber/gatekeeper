@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:gatekeeper/constants/headers.dart';
@@ -137,7 +138,9 @@ void main() {
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
-      expect(res.body, equals('echo'));
+      final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody['method'], equals('GET'));
+      expect(jsonBody['path'], equals('/echo'));
     });
   });
 }
