@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
@@ -63,7 +64,19 @@ void main() {
       expect(res.body, equals('Missing api key'));
     });
 
-    test('returns 403 for invalid api key', () async {});
+    test('returns 403 for invalid api key', () async {
+      final res = await http.get(
+        TestEnv.apiUri('/health'),
+        headers: {
+          ...TestEnv.headersWithSubdomain(
+            'api',
+          ),
+          headerApiKey: 'dummy-key',
+        },
+      );
+      expect(res.statusCode, equals(HttpStatus.forbidden));
+      expect(res.body, equals('Invalid api key'));
+    });
 
     test('returns 200 from upstream when api key is valid', () async {});
   });
