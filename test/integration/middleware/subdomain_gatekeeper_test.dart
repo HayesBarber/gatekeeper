@@ -51,7 +51,7 @@ void main() {
           includeClientId: false,
         ),
       );
-      expect(res.statusCode, equals(HttpStatus.forbidden));
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
     test('returns 403 for missing api key', () async {
@@ -61,7 +61,7 @@ void main() {
           'api',
         ),
       );
-      expect(res.statusCode, equals(HttpStatus.forbidden));
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
     test(

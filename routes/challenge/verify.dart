@@ -22,7 +22,6 @@ Future<Response> _onPost(RequestContext context) async {
   if (clientId == null) {
     return Response(
       statusCode: HttpStatus.unauthorized,
-      body: 'Unauthorized',
     );
   }
 
@@ -32,7 +31,6 @@ Future<Response> _onPost(RequestContext context) async {
   if (publicKey == null) {
     return Response(
       statusCode: HttpStatus.unauthorized,
-      body: 'Unauthorized',
     );
   }
 
@@ -46,7 +44,6 @@ Future<Response> _onPost(RequestContext context) async {
   if (challengeData == null) {
     return Response(
       statusCode: HttpStatus.notFound,
-      body: 'No challenge found',
     );
   }
 
@@ -55,14 +52,12 @@ Future<Response> _onPost(RequestContext context) async {
   if (challenge.challengeId != request.challengeId) {
     return Response(
       statusCode: HttpStatus.badRequest,
-      body: 'Invalid challenge',
     );
   }
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
     return Response(
       statusCode: HttpStatus.badRequest,
-      body: 'Challenge expired',
     );
   }
 
@@ -77,7 +72,6 @@ Future<Response> _onPost(RequestContext context) async {
   if (!isValid) {
     return Response(
       statusCode: HttpStatus.forbidden,
-      body: 'Invalid signature',
     );
   }
 

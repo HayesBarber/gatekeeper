@@ -20,14 +20,14 @@ Middleware subdomainGatekeeper() {
       final clientId = context.request.headers[headerRequestorId];
       if (clientId == null) {
         return Response(
-          statusCode: HttpStatus.forbidden,
+          statusCode: HttpStatus.unauthorized,
         );
       }
 
       final apiKey = context.request.headers[headerApiKey];
       if (apiKey == null) {
         return Response(
-          statusCode: HttpStatus.forbidden,
+          statusCode: HttpStatus.unauthorized,
         );
       }
 

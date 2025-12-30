@@ -40,7 +40,6 @@ void main() {
         TestEnv.apiUri('/challenge/verify'),
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
-      expect(res.body, equals('Unauthorized'));
     });
 
     test('returns 401 if no public key found for client', () async {
@@ -51,7 +50,6 @@ void main() {
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
-      expect(res.body, equals('Unauthorized'));
     });
 
     test('returns 404 if challenge not found for client', () async {
@@ -66,7 +64,6 @@ void main() {
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.notFound));
-      expect(res.body, equals('No challenge found'));
     });
 
     test('returns 400 if challenge ID does not match provided', () async {
@@ -82,7 +79,6 @@ void main() {
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
-      expect(res.body, equals('Invalid challenge'));
     });
 
     test('returns 400 if challenge is expired', () async {
@@ -110,7 +106,6 @@ void main() {
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
-      expect(res.body, equals('Challenge expired'));
     });
 
     test('returns 403 for invalid signature', () async {
@@ -126,7 +121,6 @@ void main() {
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
-      expect(res.body, equals('Invalid signature'));
     });
 
     test('returns 200 and api key for valid handshake', () async {
