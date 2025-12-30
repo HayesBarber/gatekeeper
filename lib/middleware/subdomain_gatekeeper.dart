@@ -12,7 +12,8 @@ Middleware subdomainGatekeeper() {
     return (context) async {
       final config = context.read<ConfigService>().config;
       final subdomain = Subdomain.fromUri(context.request.uri);
-      if (!config.subdomains.containsKey(subdomain)) {
+      final subdomainConfig = config.subdomains[subdomain];
+      if (subdomain == null || subdomainConfig == null) {
         return handler(context);
       }
 
@@ -51,7 +52,74 @@ Middleware subdomainGatekeeper() {
         );
       }
 
-      return handler(context);
+      final upstreamUrl = Uri.parse(subdomainConfig.url);
+
+      return forwardToUpstream(
+        context.request,
+        upstreamUrl,
+      );
     };
   };
 }
+
+Future<Response> forwardToUpstream(
+  Request request,
+  Uri upstreamBase,
+) async {
+  final client = HttpClient();
+
+  final upstreamUri = upstreamBase.replace(
+    path: request.uri.path,
+    query: request.uri.query,
+  );
+
+  final upstreamReq = await client.openUrl(
+    request.method.value,
+    upstreamUri,
+  );
+
+  request.headers.forEach((key, value) {
+    final lower = key.toLowerCase();
+    if (_hopByHopHeaders.contains(lower)) return;
+    if (lower == HttpHeaders.contentLengthHeader) return;
+
+    upstreamReq.headers.set(key, value);
+  });
+
+  final body = await request.body();
+  if (body.isNotEmpty) {
+    upstreamReq.write(body);
+  }
+
+  final upstreamRes = await upstreamReq.close();
+
+  final responseBytes = await upstreamRes.fold<List<int>>(
+    <int>[],
+    (acc, chunk) => acc..addAll(chunk),
+  );
+
+  final responseHeaders = <String, String>{};
+  upstreamRes.headers.forEach((key, values) {
+    final lower = key.toLowerCase();
+    if (_hopByHopHeaders.contains(lower)) return;
+
+    responseHeaders[key] = values.join(',');
+  });
+
+  return Response.bytes(
+    body: responseBytes,
+    statusCode: upstreamRes.statusCode,
+    headers: responseHeaders,
+  );
+}
+
+const _hopByHopHeaders = {
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+};
