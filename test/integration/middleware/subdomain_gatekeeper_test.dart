@@ -105,6 +105,24 @@ void main() {
       },
     );
 
-    test('returns 200 from upstream when api key is valid', () async {});
+    test('returns 200 from upstream when api key is valid', () async {
+      final apiKey = ChallengeVerificationResponse.random();
+      await redis.set(
+        ns: Namespace.apiKeys,
+        key: TestEnv.clientId,
+        value: apiKey.encode(),
+      );
+      final res = await http.get(
+        TestEnv.apiUri('/echo'),
+        headers: {
+          ...TestEnv.headersWithSubdomain(
+            'api',
+          ),
+          headerApiKey: apiKey.apiKey,
+        },
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      expect(res.body, equals('echo'));
+    });
   });
 }
