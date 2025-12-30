@@ -8,6 +8,7 @@ cleanup() {
   echo "deleting redis key users:${CLIENT_ID}"
   redis-cli DEL "users:${CLIENT_ID}"
   kill "$SERVER_PID"
+  kill "$ECHO_PID"
 }
 
 setup() {
@@ -37,6 +38,11 @@ setup() {
   SERVER_PID=$!
   echo "server PID: $SERVER_PID"
 
+  echo "starting FastAPI echo server"
+  uvicorn tool.echo_server:app --host 127.0.0.1 --port 3000 --log-level critical &
+  ECHO_PID=$!
+  echo "echo server PID: $ECHO_PID"
+
   API_BASE_URL="http://localhost:8080"
   export API_BASE_URL
 
@@ -45,6 +51,11 @@ setup() {
 
   echo "waiting for server"
   until curl -sf http://127.0.0.1:8080/health >/dev/null; do
+    sleep 0.2
+  done
+
+  echo "waiting for echo server"
+  until curl -sf http://127.0.0.1:3000/ >/dev/null; do
     sleep 0.2
   done
 
