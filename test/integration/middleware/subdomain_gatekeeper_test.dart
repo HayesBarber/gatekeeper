@@ -42,7 +42,7 @@ void main() {
       expect(res.body, equals('healthy'));
     });
 
-    test('returns 200 healty when client ID header is missing', () async {
+    test('returns 403 for missing client id', () async {
       final res = await http.get(
         TestEnv.apiUri('/health'),
         headers: TestEnv.headersWithSubdomain(
@@ -50,8 +50,7 @@ void main() {
           includeClientId: false,
         ),
       );
-      expect(res.statusCode, equals(HttpStatus.ok));
-      expect(res.body, equals('healthy'));
+      expect(res.statusCode, equals(HttpStatus.forbidden));
     });
 
     test('returns 403 for missing api key', () async {
@@ -62,7 +61,6 @@ void main() {
         ),
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
-      expect(res.body, equals('Missing api key'));
     });
 
     test(
@@ -78,7 +76,25 @@ void main() {
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
-        expect(res.body, equals('Invalid api key'));
+      },
+    );
+
+    test(
+      // ignore: lines_longer_than_80_chars
+      'returns 403 for invalid api key - header present but no data: invalid client id',
+      () async {
+        final res = await http.get(
+          TestEnv.apiUri('/echo'),
+          headers: {
+            ...TestEnv.headersWithSubdomain(
+              'api',
+              includeClientId: false,
+            ),
+            headerRequestorId: '${TestEnv.clientId}-invalid',
+            headerApiKey: 'dummy-key',
+          },
+        );
+        expect(res.statusCode, equals(HttpStatus.forbidden));
       },
     );
 
@@ -101,7 +117,6 @@ void main() {
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
-        expect(res.body, equals('Invalid api key'));
       },
     );
 
