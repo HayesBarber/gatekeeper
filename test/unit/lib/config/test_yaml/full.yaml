@@ -1,12 +1,12 @@
+client_id_header: "x-client-id"
 redis:
-  host: 127.0.0.1
+  host: "192.168.1.10"
 subdomains:
   api:
     url: "http://localhost:3000"
     blacklist:
-      GET: ["/admin/*", "/health", "/debug"]
-      POST: ["/users/delete", "/admin/reset"]
-      DELETE: ["/users/*"]
+      GET: ["/admin/*", "/health"]
+      POST: ["/users/delete"]
   webhook:
     url: "http://localhost:4000"
   admin:

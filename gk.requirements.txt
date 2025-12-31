@@ -1,5 +1,0 @@
-rich
-pydantic
-httpx
-git+https://github.com/HayesBarber/curveauth-py.git
-
