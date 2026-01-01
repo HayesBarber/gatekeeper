@@ -13,7 +13,7 @@ final _config = YamlConfigService.instance();
 Handler middleware(Handler handler) {
   return handler
       .use(subdomainGatekeeper())
-      .use(provider<SignatureVerifier>((_) => VerifySignature.verifySignature))
+      .use(provider<SignatureVerifier>((_) => ECCKeyPair.verifySignatureStatic))
       .use(provider<ConfigService>((_) => _config))
       .use(provider<RedisClientBase>((_) => _redis));
 }
