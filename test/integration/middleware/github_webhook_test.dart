@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -41,7 +43,28 @@ void main() {
 
     test(
       'returns 200 from upstream for valid GitHub webhook signature',
-      () async {},
+      () async {
+        const payload = 'hello world';
+        const secret = 'todo';
+        final signature = WebhookVerifier.generateGitHubWebhookSignature(
+          payload: payload,
+          secret: secret,
+        );
+        final res = await http.post(
+          TestEnv.apiUri('/notify'),
+          headers: {
+            ...TestEnv.headersWithSubdomain(
+              'github',
+            ),
+            hubSignature: signature,
+          },
+          body: payload,
+        );
+        expect(res.statusCode, equals(HttpStatus.ok));
+        final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+        expect(jsonBody['method'], equals('POST'));
+        expect(jsonBody['path'], equals('/notify'));
+      },
     );
 
     test('handles empty body with valid signature', () async {});
