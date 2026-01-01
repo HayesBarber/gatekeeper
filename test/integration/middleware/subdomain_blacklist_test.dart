@@ -47,7 +47,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(blacklistedGetRes.statusCode, equals(HttpStatus.forbidden));
@@ -56,7 +56,7 @@ void main() {
         TestEnv.apiUri('/users/delete'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(blacklistedPostRes.statusCode, equals(HttpStatus.forbidden));
@@ -74,7 +74,7 @@ void main() {
         TestEnv.apiUri('/api/data'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(allowedGetRes.statusCode, equals(HttpStatus.ok));
@@ -86,7 +86,7 @@ void main() {
         TestEnv.apiUri('/users/create'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(allowedPostRes.statusCode, equals(HttpStatus.ok));
@@ -107,7 +107,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(getRes.statusCode, equals(HttpStatus.forbidden));
@@ -116,7 +116,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(putRes.statusCode, equals(HttpStatus.ok));

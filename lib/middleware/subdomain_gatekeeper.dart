@@ -25,7 +25,8 @@ Middleware subdomainGatekeeper() {
         );
       }
 
-      final apiKey = context.request.headers[headerApiKey];
+      final apiKey =
+          _extractBearerToken(context.request.headers[headerAuthorization]);
       if (apiKey == null) {
         return Response(
           statusCode: HttpStatus.unauthorized,
@@ -130,6 +131,16 @@ Future<Response> forwardToUpstream(
     statusCode: upstreamRes.statusCode,
     headers: responseHeaders,
   );
+}
+
+String? _extractBearerToken(String? authHeader) {
+  if (authHeader == null) return null;
+
+  final parts = authHeader.trim().split(RegExp(r'\s+'));
+  if (parts.length < 2 || parts[0].toLowerCase() != 'bearer') return null;
+
+  final token = parts.sublist(1).join(' ').trim();
+  return token.isEmpty ? null : token;
 }
 
 const _hopByHopHeaders = {
