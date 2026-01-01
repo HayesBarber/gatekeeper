@@ -45,7 +45,7 @@ void main() {
       'returns 200 from upstream for valid GitHub webhook signature',
       () async {
         const payload = 'hello world';
-        const secret = 'todo';
+        final secret = TestEnv.githubWebhookSecret;
         final signature = WebhookVerifier.generateGitHubWebhookSignature(
           payload: payload,
           secret: secret,

@@ -7,6 +7,12 @@ cleanup() {
   echo "cleaning up"
   echo "deleting redis key users:${CLIENT_ID}"
   redis-cli DEL "users:${CLIENT_ID}"
+  
+  echo "restoring original gatekeeper.yaml"
+  if [ -f gatekeeper.yaml.bak ]; then
+    mv gatekeeper.yaml.bak gatekeeper.yaml
+  fi
+  
   kill "$SERVER_PID"
   kill "$ECHO_PID"
   kill "$GITHUB_WEBHOOK_PID"
@@ -23,6 +29,9 @@ setup() {
   CLIENT_ID="it-$(openssl rand -hex 6)"
   export CLIENT_ID
 
+  GITHUB_WEBHOOK_SECRET="$(openssl rand -hex 16)"
+  export GITHUB_WEBHOOK_SECRET
+
   KEY_PAIR_JSON=$(dart run tool/keygen.dart)
   export KEY_PAIR_JSON
 
@@ -30,6 +39,9 @@ setup() {
 
   echo "creating redis key users:${CLIENT_ID}"
   redis-cli SET "users:${CLIENT_ID}" "$PUBLIC_KEY"
+
+  echo "substituting GitHub webhook secret in config"
+  sed -i.bak "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" gatekeeper.yaml
 
   echo "creating build"
   dart_frog build
