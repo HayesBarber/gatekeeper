@@ -31,9 +31,9 @@ Middleware githubWebhook() {
 
       final body = await context.request.body();
       final verified = WebhookVerifier.verifyGitHubWebhook(
-        body,
-        signature,
-        subdomainConfig.secret!,
+        payload: body,
+        signature: signature,
+        secret: subdomainConfig.secret!,
       );
       if (!verified) {
         return Response(
