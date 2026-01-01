@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/constants/subdomains.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
@@ -10,12 +14,31 @@ Middleware githubWebhook() {
       if (subdomain != github) {
         return handler(context);
       }
+
       final config = context.read<ConfigService>().config;
       final subdomainConfig = config.subdomains[subdomain];
       if (subdomainConfig == null || subdomainConfig.secret == null) {
         return handler(context);
       }
-      return handler(context);
+
+      final signature = context.request.headers[hubSignature];
+      if (signature == null) {
+        return Response(
+          statusCode: HttpStatus.unauthorized,
+        );
+      }
+
+      final body = await context.request.body();
+      final verified = WebhookVerifier.verifyGitHubWebhook(
+        body,
+        signature,
+        subdomainConfig.secret!,
+      );
+      if (!verified) {
+        return Response(
+          statusCode: HttpStatus.unauthorized,
+        );
+      }
     };
   };
 }
