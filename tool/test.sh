@@ -9,6 +9,7 @@ cleanup() {
   redis-cli DEL "users:${CLIENT_ID}"
   kill "$SERVER_PID"
   kill "$ECHO_PID"
+  kill "$GITHUB_WEBHOOK_PID"
 }
 
 setup() {
@@ -43,6 +44,11 @@ setup() {
   ECHO_PID=$!
   echo "echo server PID: $ECHO_PID"
 
+  echo "starting FastAPI github webhook server"
+  uvicorn tool.echo_server:app --host 127.0.0.1 --port 6000 --log-level critical &
+  GITHUB_WEBHOOK_PID=$!
+  echo "github webhook server PID: $GITHUB_WEBHOOK_PID"
+
   API_BASE_URL="http://localhost:8080"
   export API_BASE_URL
 
@@ -56,6 +62,11 @@ setup() {
 
   echo "waiting for echo server"
   until curl -sf http://127.0.0.1:3000/ >/dev/null; do
+    sleep 0.2
+  done
+
+  echo "waiting for github webhook server"
+  until curl -sf http://127.0.0.1:6000/ >/dev/null; do
     sleep 0.2
   done
 
