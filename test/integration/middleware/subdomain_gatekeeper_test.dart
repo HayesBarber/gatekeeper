@@ -73,7 +73,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerApiKey: 'dummy-key',
+            headerAuthorization: 'Bearer dummy-key',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -92,7 +92,7 @@ void main() {
               includeClientId: false,
             ),
             headerRequestorId: '${TestEnv.clientId}-invalid',
-            headerApiKey: 'dummy-key',
+            headerAuthorization: 'Bearer dummy-key',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -114,7 +114,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerApiKey: '${apiKey.apiKey}-inalid',
+            headerAuthorization: 'Bearer ${apiKey.apiKey}-inalid',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -141,7 +141,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerApiKey: apiKey.apiKey,
+            headerAuthorization: 'Bearer ${apiKey.apiKey}',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -161,7 +161,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          headerApiKey: apiKey.apiKey,
+          headerAuthorization: 'Bearer ${apiKey.apiKey}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
