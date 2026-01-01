@@ -2,10 +2,12 @@ class SubdomainConfig {
   const SubdomainConfig({
     required this.url,
     this.blacklistedPaths,
+    this.secret,
   });
 
   final String url;
   final Map<String, List<String>>? blacklistedPaths;
+  final String? secret;
 
   List<String> getBlacklistedPathsForMethod(String method) {
     return blacklistedPaths?[method] ?? [];
@@ -16,11 +18,12 @@ class SubdomainConfig {
     if (identical(this, other)) return true;
     return other is SubdomainConfig &&
         other.url == url &&
+        other.secret == secret &&
         _mapEquals(other.blacklistedPaths, blacklistedPaths);
   }
 
   @override
-  int get hashCode => Object.hash(url, _mapHash(blacklistedPaths));
+  int get hashCode => Object.hash(url, secret, _mapHash(blacklistedPaths));
 
   bool _mapEquals(Map<String, List<String>>? a, Map<String, List<String>>? b) {
     if (a == null && b == null) return true;
