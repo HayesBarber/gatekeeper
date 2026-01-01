@@ -14,4 +14,7 @@ subdomains:
     blacklist:
       GET: ["/config"]
       POST: ["/shutdown"]
+  github:
+    url: "http://localhost:6000"
+    secret: "{{GITHUB_WEBHOOK_SECRET}}"
 
