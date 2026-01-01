@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/constants/subdomains.dart';
+import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware githubWebhook() {
@@ -39,6 +40,14 @@ Middleware githubWebhook() {
           statusCode: HttpStatus.unauthorized,
         );
       }
+
+      final upstreamUrl = Uri.parse(subdomainConfig.url);
+
+      return forwardToUpstream(
+        context.request,
+        upstreamUrl,
+        body: body,
+      );
     };
   };
 }

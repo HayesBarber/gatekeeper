@@ -4,8 +4,9 @@ import 'package:dart_frog/dart_frog.dart';
 
 Future<Response> forwardToUpstream(
   Request request,
-  Uri upstreamBase,
-) async {
+  Uri upstreamBase, {
+  String? body,
+}) async {
   final client = HttpClient();
 
   final upstreamUri = upstreamBase.replace(
@@ -26,9 +27,9 @@ Future<Response> forwardToUpstream(
     upstreamReq.headers.set(key, value);
   });
 
-  final body = await request.body();
-  if (body.isNotEmpty) {
-    upstreamReq.write(body);
+  final requestBody = body ?? await request.body();
+  if (requestBody.isNotEmpty) {
+    upstreamReq.write(requestBody);
   }
 
   final upstreamRes = await upstreamReq.close();
