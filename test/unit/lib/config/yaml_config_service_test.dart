@@ -26,6 +26,10 @@ void main() {
             'POST': ['/shutdown'],
           },
         ),
+        'github': const SubdomainConfig(
+          url: 'http://localhost:6000',
+          secret: 'test_secret',
+        ),
       });
     });
 

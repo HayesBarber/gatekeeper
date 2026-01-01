@@ -70,6 +70,7 @@ class YamlConfigService implements ConfigService {
             SubdomainConfig(
               url: value['url'] as String,
               blacklistedPaths: _parseBlacklistedPaths(value['blacklist']),
+              secret: value['secret'] as String?,
             ),
           );
         }),
