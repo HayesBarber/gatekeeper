@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:mocktail/mocktail.dart';
@@ -105,7 +106,28 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
-    test('Unauthorized when invalid signature header', () async {});
+    test('Unauthorized when invalid signature header', () async {
+      when(() => request.uri).thenReturn(
+        Uri.parse('http://github.example.com/'),
+      );
+      when(() => configService.config).thenReturn(
+        AppConfig(
+          redisHost: '',
+          subdomains: {
+            'github': const SubdomainConfig(
+              url: 'testing',
+              secret: 'invalid',
+            ),
+          },
+        ),
+      );
+      when(() => request.headers).thenReturn({hubSignature: 'invalid'});
+      when(() => request.body()).thenAnswer(
+        (_) async => 'invalid',
+      );
+      final res = await githubWebhook()(handler)(context);
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
+    });
 
     test('Forwards to upstream', () async {});
   });
