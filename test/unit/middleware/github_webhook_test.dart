@@ -1,5 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,10 +22,10 @@ void main() {
     late _MockConfigService configService;
     late _MockForward forward;
 
-    const responseBody = 'hello world';
+    const fallthroughResponseBody = 'hello world';
 
     Response handler(context) {
-      return Response(body: responseBody);
+      return Response(body: fallthroughResponseBody);
     }
 
     setUp(() {
@@ -33,21 +35,53 @@ void main() {
       forward = _MockForward();
 
       when(() => context.request).thenReturn(request);
-      when(() => request.uri).thenReturn(Uri.parse('http://localhost/'));
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<Forward>()).thenReturn(forward);
     });
 
     test('Falls through when no match', () async {
+      when(() => request.uri).thenReturn(Uri.parse('http://example.com/'));
       final res = await githubWebhook()(handler)(context);
 
       final body = await res.body();
-      expect(body, 'hello world');
+      expect(body, fallthroughResponseBody);
     });
 
-    test('Falls through when no subdomain config', () async {});
+    test('Falls through when no subdomain config', () async {
+      when(() => request.uri).thenReturn(
+        Uri.parse('http://github.example.com/'),
+      );
+      when(() => configService.config).thenReturn(
+        AppConfig(
+          redisHost: '',
+          subdomains: {},
+        ),
+      );
+      final res = await githubWebhook()(handler)(context);
 
-    test('Falls through when no secret', () async {});
+      final body = await res.body();
+      expect(body, fallthroughResponseBody);
+    });
+
+    test('Falls through when no secret', () async {
+      when(() => request.uri).thenReturn(
+        Uri.parse('http://github.example.com/'),
+      );
+      when(() => configService.config).thenReturn(
+        AppConfig(
+          redisHost: '',
+          subdomains: {
+            'github': const SubdomainConfig(
+              url: 'testing',
+            ),
+          },
+        ),
+      );
+      final res = await githubWebhook()(handler)(context);
+
+      final body = await res.body();
+      expect(body, fallthroughResponseBody);
+    });
 
     test('Unauthorized when no signature header', () async {});
 
