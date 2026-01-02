@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 
 class Forward {
-  static Future<Response> toUpstream(
+  Future<Response> toUpstream(
     Request request,
     Uri upstreamBase, {
     String? body,

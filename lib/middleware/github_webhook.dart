@@ -43,7 +43,9 @@ Middleware githubWebhook() {
 
       final upstreamUrl = Uri.parse(subdomainConfig.url);
 
-      return Forward.toUpstream(
+      final forward = context.read<Forward>();
+
+      return forward.toUpstream(
         context.request,
         upstreamUrl,
         body: body,
