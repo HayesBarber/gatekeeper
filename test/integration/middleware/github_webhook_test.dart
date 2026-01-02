@@ -67,8 +67,52 @@ void main() {
       },
     );
 
-    test('handles empty body with valid signature', () async {});
+    test('handles empty body with valid signature', () async {
+      const payload = '';
+      final secret = TestEnv.githubWebhookSecret;
+      final signature = WebhookVerifier.generateGitHubWebhookSignature(
+        payload: payload,
+        secret: secret,
+      );
+      final res = await http.post(
+        TestEnv.apiUri('/notify'),
+        headers: {
+          ...TestEnv.headersWithSubdomain(
+            'github',
+          ),
+          hubSignature: signature,
+        },
+        body: payload,
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody['method'], equals('POST'));
+      expect(jsonBody['path'], equals('/notify'));
+      expect(jsonBody['body'], equals(''));
+    });
 
-    test('handles large payload with valid signature', () async {});
+    test('handles large payload with valid signature', () async {
+      final largePayload = 'x' * 100000;
+      final secret = TestEnv.githubWebhookSecret;
+      final signature = WebhookVerifier.generateGitHubWebhookSignature(
+        payload: largePayload,
+        secret: secret,
+      );
+      final res = await http.post(
+        TestEnv.apiUri('/notify'),
+        headers: {
+          ...TestEnv.headersWithSubdomain(
+            'github',
+          ),
+          hubSignature: signature,
+        },
+        body: largePayload,
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody['method'], equals('POST'));
+      expect(jsonBody['path'], equals('/notify'));
+      expect(jsonBody['body'], equals(largePayload));
+    });
   });
 }
