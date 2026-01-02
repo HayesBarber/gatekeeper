@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
@@ -42,7 +44,7 @@ void main() {
     test('Falls through when no match', () async {
       when(() => request.uri).thenReturn(Uri.parse('http://example.com/'));
       final res = await githubWebhook()(handler)(context);
-
+      expect(res.statusCode, equals(HttpStatus.ok));
       final body = await res.body();
       expect(body, fallthroughResponseBody);
     });
@@ -58,7 +60,7 @@ void main() {
         ),
       );
       final res = await githubWebhook()(handler)(context);
-
+      expect(res.statusCode, equals(HttpStatus.ok));
       final body = await res.body();
       expect(body, fallthroughResponseBody);
     });
@@ -78,12 +80,30 @@ void main() {
         ),
       );
       final res = await githubWebhook()(handler)(context);
-
+      expect(res.statusCode, equals(HttpStatus.ok));
       final body = await res.body();
       expect(body, fallthroughResponseBody);
     });
 
-    test('Unauthorized when no signature header', () async {});
+    test('Unauthorized when no signature header', () async {
+      when(() => request.uri).thenReturn(
+        Uri.parse('http://github.example.com/'),
+      );
+      when(() => configService.config).thenReturn(
+        AppConfig(
+          redisHost: '',
+          subdomains: {
+            'github': const SubdomainConfig(
+              url: 'testing',
+              secret: 'invalid',
+            ),
+          },
+        ),
+      );
+      when(() => request.headers).thenReturn({});
+      final res = await githubWebhook()(handler)(context);
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
+    });
 
     test('Unauthorized when invalid signature header', () async {});
 
