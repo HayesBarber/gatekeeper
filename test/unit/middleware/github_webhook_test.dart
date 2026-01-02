@@ -21,5 +21,15 @@ void main() {
       final body = await res.body();
       expect(body, 'hello world');
     });
+
+    test('Falls through when no subdomain config', () async {});
+
+    test('Falls through when no secret', () async {});
+
+    test('Unauthorized when no signature header', () async {});
+
+    test('Unauthorized when invalid signature header', () async {});
+
+    test('Forwards to upstream', () async {});
   });
 }
