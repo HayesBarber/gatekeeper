@@ -26,10 +26,15 @@ void main() {
     late _MockForward forward;
 
     const fallthroughResponseBody = 'hello world';
+    const upstreamResponseBody = 'upstream response';
 
     Response handler(context) {
       return Response(body: fallthroughResponseBody);
     }
+
+    setUpAll(() {
+      registerFallbackValue(Uri.parse('http://example.com/'));
+    });
 
     setUp(() {
       context = _MockRequestContext();
@@ -129,6 +134,35 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
-    test('Forwards to upstream', () async {});
+    test('Forwards to upstream', () async {
+      const secret = "It's a Secret to Everybody";
+      const payload = 'Hello, World!';
+      const expectedSignature =
+          '757107ea0eb2509fc211221cce984b8a37570b6d7586c22c46f4379c8b043e17';
+      when(() => request.uri).thenReturn(
+        Uri.parse('http://github.example.com/'),
+      );
+      when(() => configService.config).thenReturn(
+        AppConfig(
+          redisHost: '',
+          subdomains: {
+            'github': const SubdomainConfig(
+              url: 'http://example.com',
+              secret: secret,
+            ),
+          },
+        ),
+      );
+      when(() => request.headers).thenReturn({hubSignature: expectedSignature});
+      when(() => request.body()).thenAnswer(
+        (_) async => payload,
+      );
+      when(() => forward.toUpstream(request, any(), body: any(named: 'body')))
+          .thenAnswer((_) async => Response(body: upstreamResponseBody));
+      final res = await githubWebhook()(handler)(context);
+      expect(res.statusCode, equals(HttpStatus.ok));
+      final body = await res.body();
+      expect(body, upstreamResponseBody);
+    });
   });
 }
