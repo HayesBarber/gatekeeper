@@ -1,21 +1,35 @@
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
+class _MockRequest extends Mock implements Request {}
+
+class _MockConfigService extends Mock implements ConfigService {}
+
 void main() {
   group('GitHub webhook middleware', () {
-    test('Falls through when no match', () async {
-      Response handler(context) {
-        return Response(body: 'hello world');
-      }
+    late _MockRequestContext context;
+    late _MockRequest request;
+    late _MockConfigService configService;
 
-      final request = Request.get(Uri.parse('http://localhost/'));
-      final context = _MockRequestContext();
+    Response handler(context) {
+      return Response(body: 'hello world');
+    }
+
+    setUp(() {
+      context = _MockRequestContext();
+      request = _MockRequest();
+      configService = _MockConfigService();
+
       when(() => context.request).thenReturn(request);
+      when(() => request.uri).thenReturn(Uri.parse('http://localhost/'));
+    });
 
+    test('Falls through when no match', () async {
       final res = await githubWebhook()(handler)(context);
 
       final body = await res.body();
