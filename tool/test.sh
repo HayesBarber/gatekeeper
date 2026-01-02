@@ -7,8 +7,15 @@ cleanup() {
   echo "cleaning up"
   echo "deleting redis key users:${CLIENT_ID}"
   redis-cli DEL "users:${CLIENT_ID}"
+  
+  echo "restoring original gatekeeper.yaml"
+  if [ -f gatekeeper.yaml.bak ]; then
+    mv gatekeeper.yaml.bak gatekeeper.yaml
+  fi
+  
   kill "$SERVER_PID"
   kill "$ECHO_PID"
+  kill "$GITHUB_WEBHOOK_PID"
 }
 
 setup() {
@@ -22,6 +29,9 @@ setup() {
   CLIENT_ID="it-$(openssl rand -hex 6)"
   export CLIENT_ID
 
+  GITHUB_WEBHOOK_SECRET="$(openssl rand -hex 16)"
+  export GITHUB_WEBHOOK_SECRET
+
   KEY_PAIR_JSON=$(dart run tool/keygen.dart)
   export KEY_PAIR_JSON
 
@@ -29,6 +39,9 @@ setup() {
 
   echo "creating redis key users:${CLIENT_ID}"
   redis-cli SET "users:${CLIENT_ID}" "$PUBLIC_KEY"
+
+  echo "substituting GitHub webhook secret in config"
+  sed -i.bak "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" gatekeeper.yaml
 
   echo "creating build"
   dart_frog build
@@ -43,6 +56,11 @@ setup() {
   ECHO_PID=$!
   echo "echo server PID: $ECHO_PID"
 
+  echo "starting FastAPI github webhook server"
+  uvicorn tool.echo_server:app --host 127.0.0.1 --port 6000 --log-level critical &
+  GITHUB_WEBHOOK_PID=$!
+  echo "github webhook server PID: $GITHUB_WEBHOOK_PID"
+
   API_BASE_URL="http://localhost:8080"
   export API_BASE_URL
 
@@ -56,6 +74,11 @@ setup() {
 
   echo "waiting for echo server"
   until curl -sf http://127.0.0.1:3000/ >/dev/null; do
+    sleep 0.2
+  done
+
+  echo "waiting for github webhook server"
+  until curl -sf http://127.0.0.1:6000/ >/dev/null; do
     sleep 0.2
   done
 

@@ -19,6 +19,7 @@ final class TestEnv {
   static final String clientId = _require('CLIENT_ID');
   static final String keyPairJson = _require('KEY_PAIR_JSON');
   static final String redisHost = _require('REDIS_HOST');
+  static final String githubWebhookSecret = _require('GITHUB_WEBHOOK_SECRET');
 
   static Uri apiUri(String path) {
     return _baseUri.replace(path: path);

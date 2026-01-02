@@ -1,5 +1,5 @@
 redis:
-  host: 127.0.0.1
+  host: "127.0.0.1"
 subdomains:
   api:
     url: "http://localhost:3000"
@@ -14,4 +14,7 @@ subdomains:
     blacklist:
       GET: ["/config"]
       POST: ["/shutdown"]
+  github:
+    url: "http://localhost:6000"
+    secret: "{{GITHUB_WEBHOOK_SECRET}}"
 

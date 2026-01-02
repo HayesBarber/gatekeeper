@@ -5,6 +5,7 @@ import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
@@ -74,63 +75,14 @@ Middleware subdomainGatekeeper() {
 
       final upstreamUrl = Uri.parse(subdomainConfig.url);
 
-      return forwardToUpstream(
+      final forward = context.read<Forward>();
+
+      return forward.toUpstream(
         context.request,
         upstreamUrl,
       );
     };
   };
-}
-
-Future<Response> forwardToUpstream(
-  Request request,
-  Uri upstreamBase,
-) async {
-  final client = HttpClient();
-
-  final upstreamUri = upstreamBase.replace(
-    path: request.uri.path,
-    query: request.uri.query,
-  );
-
-  final upstreamReq = await client.openUrl(
-    request.method.value,
-    upstreamUri,
-  );
-
-  request.headers.forEach((key, value) {
-    final lower = key.toLowerCase();
-    if (_hopByHopHeaders.contains(lower)) return;
-    if (lower == HttpHeaders.contentLengthHeader) return;
-
-    upstreamReq.headers.set(key, value);
-  });
-
-  final body = await request.body();
-  if (body.isNotEmpty) {
-    upstreamReq.write(body);
-  }
-
-  final upstreamRes = await upstreamReq.close();
-
-  final responseBytes = await upstreamRes.fold<List<int>>(
-    <int>[],
-    (acc, chunk) => acc..addAll(chunk),
-  );
-
-  final responseHeaders = <String, String>{};
-  upstreamRes.headers.forEach((key, values) {
-    final lower = key.toLowerCase();
-    if (_hopByHopHeaders.contains(lower)) return;
-
-    responseHeaders[key] = values.join(',');
-  });
-
-  return Response.bytes(
-    body: responseBytes,
-    statusCode: upstreamRes.statusCode,
-    headers: responseHeaders,
-  );
 }
 
 String? _extractBearerToken(String? authHeader) {
@@ -142,14 +94,3 @@ String? _extractBearerToken(String? authHeader) {
   final token = parts.sublist(1).join(' ').trim();
   return token.isEmpty ? null : token;
 }
-
-const _hopByHopHeaders = {
-  'connection',
-  'keep-alive',
-  'proxy-authenticate',
-  'proxy-authorization',
-  'te',
-  'trailer',
-  'transfer-encoding',
-  'upgrade',
-};
