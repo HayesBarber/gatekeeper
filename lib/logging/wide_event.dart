@@ -2,7 +2,7 @@ class WideEvent {
   WideEvent({
     required this.requestId,
     required this.request,
-    this.response,
+    required this.response,
     this.authentication,
     this.webhook,
     this.upstream,
@@ -11,10 +11,10 @@ class WideEvent {
   });
   final String requestId;
   final RequestContext request;
+  final ResponseContext response;
   final AuthenticationContext? authentication;
   final WebhookContext? webhook;
   final UpstreamContext? upstream;
-  final ResponseContext? response;
   final ErrorContext? error;
   final ChallengeContext? challenge;
 
@@ -22,7 +22,7 @@ class WideEvent {
     final json = <String, dynamic>{
       'request_id': requestId,
       'request': request.toJson(),
-      if (response != null) 'response': response!.toJson(),
+      'response': response.toJson(),
       if (authentication != null) 'authentication': authentication!.toJson(),
       if (webhook != null) 'webhook': webhook!.toJson(),
       if (upstream != null) 'upstream': upstream!.toJson(),
