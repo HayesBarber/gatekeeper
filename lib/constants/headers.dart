@@ -5,3 +5,5 @@ const String userAgent = 'user-agent';
 const String forwardedFor = 'x-forwarded-for';
 const String realIp = 'x-real-ip';
 const String contentLength = 'content-length';
+const String githubDelivery = 'X-GitHub-Delivery';
+const String githubEvent = 'X-GitHub-Event';
