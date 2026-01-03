@@ -1,3 +1,9 @@
 const String headerAuthorization = 'authorization';
 const String headerRequestorId = 'x-requestor-id';
 const String hubSignature = 'X-Hub-Signature-256';
+const String userAgent = 'user-agent';
+const String forwardedFor = 'x-forwarded-for';
+const String realIp = 'x-real-ip';
+const String contentLength = 'content-length';
+const String githubDelivery = 'X-GitHub-Delivery';
+const String githubEvent = 'X-GitHub-Event';

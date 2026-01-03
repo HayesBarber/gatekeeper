@@ -40,8 +40,8 @@ setup() {
   echo "creating redis key users:${CLIENT_ID}"
   redis-cli SET "users:${CLIENT_ID}" "$PUBLIC_KEY"
 
-  echo "substituting GitHub webhook secret in config"
-  sed -i.bak "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" gatekeeper.yaml
+  echo "substituting GitHub webhook secret and disabling logging in config"
+  sed -i.bak -e "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" -e "s/enabled: true/enabled: false/g" gatekeeper.yaml
 
   echo "creating build"
   dart_frog build

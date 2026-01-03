@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -19,12 +21,15 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
+class _MockWideEvent extends Mock implements we.WideEvent {}
+
 void main() {
   group('POST /challenge', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockConfigService configService;
     late _MockRedisClient redisClient;
+    late _MockWideEvent wideEvent;
 
     const clientId = 'client-123';
     const redisUserKey = 'user-123';
@@ -35,16 +40,19 @@ void main() {
       request = _MockRequest();
       configService = _MockConfigService();
       redisClient = _MockRedisClient();
+      wideEvent = _MockWideEvent();
 
       when(() => context.request).thenReturn(request);
       when(() => request.method).thenReturn(HttpMethod.post);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
+      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
         AppConfig(
           redisHost: redisHost,
           subdomains: {},
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
     });

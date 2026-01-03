@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
 import 'package:mocktail/mocktail.dart';
@@ -22,6 +24,8 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
+class _MockWideEvent extends Mock implements we.WideEvent {}
+
 class _MockSignatureVerifier extends Mock {
   bool call(String m, String s, String k);
 }
@@ -33,6 +37,7 @@ void main() {
     late _MockConfigService configService;
     late _MockRedisClient redisClient;
     late _MockSignatureVerifier verifier;
+    late _MockWideEvent wideEvent;
 
     const clientId = 'client-123';
     const publicKey = 'public-key';
@@ -45,17 +50,20 @@ void main() {
       configService = _MockConfigService();
       redisClient = _MockRedisClient();
       verifier = _MockSignatureVerifier();
+      wideEvent = _MockWideEvent();
 
       when(() => context.request).thenReturn(request);
       when(() => request.method).thenReturn(HttpMethod.post);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
       when(() => context.read<SignatureVerifier>()).thenReturn(verifier.call);
+      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
         AppConfig(
           redisHost: 'localhost',
           subdomains: {},
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
     });
