@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
@@ -10,15 +10,12 @@ import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
-import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware subdomainGatekeeper() {
   return (handler) {
     return (context) async {
-      final config = context.read<ConfigService>().config;
-      final subdomain = Subdomain.fromUri(context.request.uri);
-      final subdomainConfig = config.subdomains[subdomain];
-      if (subdomain == null || subdomainConfig == null) {
+      final subdomainContext = context.read<SubdomainContext>();
+      if (!subdomainContext.isValid) {
         return handler(context);
       }
 
@@ -90,7 +87,8 @@ Middleware subdomainGatekeeper() {
         );
       }
 
-      final blacklistedPaths = subdomainConfig.getBlacklistedPathsForMethod(
+      final blacklistedPaths =
+          subdomainContext.config!.getBlacklistedPathsForMethod(
         context.request.method.value,
       );
       final pathBlacklisted = blacklistedPaths.isNotEmpty &&
@@ -113,7 +111,7 @@ Middleware subdomainGatekeeper() {
         );
       }
 
-      final upstreamUrl = Uri.parse(subdomainConfig.url);
+      final upstreamUrl = Uri.parse(subdomainContext.config!.url);
 
       final forward = context.read<Forward>();
 
