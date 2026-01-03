@@ -143,11 +143,10 @@ class ResponseContext {
     required this.durationMs,
     this.contentLength,
   });
-  const ResponseContext.unknown({
-    this.statusCode = -1,
-    this.durationMs = -1,
-    this.contentLength = -1,
-  });
+  const ResponseContext.unknown()
+      : statusCode = -1,
+        durationMs = -1,
+        contentLength = -1;
   final int statusCode;
   final int durationMs;
   final int? contentLength;

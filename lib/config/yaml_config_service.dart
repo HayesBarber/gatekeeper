@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:yaml/yaml.dart';
 
@@ -47,6 +48,7 @@ class YamlConfigService implements ConfigService {
     return AppConfig(
       redisHost: _getRedisHost(doc),
       subdomains: _getSubdomainUpstreams(doc),
+      logging: _getLoggingConfig(doc),
     );
   }
 
@@ -77,6 +79,19 @@ class YamlConfigService implements ConfigService {
       );
     }
     return {};
+  }
+
+  static LoggingConfig _getLoggingConfig(YamlMap? doc) {
+    final logging = doc?['logging'];
+    if (logging is YamlMap) {
+      return LoggingConfig(
+        loggingEnabled: logging['enabled'] as bool? ?? true,
+        slowRequestThresholdMs:
+            logging['slowRequestThresholdMs'] as int? ?? 1000,
+        successfulSampleRate: logging['successfulSampleRate'] as double? ?? 0.1,
+      );
+    }
+    return const LoggingConfig.defaultConfig();
   }
 
   static Map<String, List<String>>? _parseBlacklistedPaths(dynamic blacklist) {

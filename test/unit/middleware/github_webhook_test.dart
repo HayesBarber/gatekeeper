@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
@@ -63,6 +64,7 @@ void main() {
         AppConfig(
           redisHost: '',
           subdomains: {},
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
       final res = await githubWebhook()(handler)(context);
@@ -83,6 +85,7 @@ void main() {
               url: 'testing',
             ),
           },
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
       final res = await githubWebhook()(handler)(context);
@@ -104,6 +107,7 @@ void main() {
               secret: 'invalid',
             ),
           },
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
       when(() => request.headers).thenReturn({});
@@ -124,6 +128,7 @@ void main() {
               secret: 'invalid',
             ),
           },
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
       when(() => request.headers).thenReturn({hubSignature: 'invalid'});
@@ -151,6 +156,7 @@ void main() {
               secret: secret,
             ),
           },
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
       when(() => request.headers).thenReturn({hubSignature: expectedSignature});

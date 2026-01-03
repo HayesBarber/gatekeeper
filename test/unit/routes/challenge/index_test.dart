@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
@@ -45,6 +46,7 @@ void main() {
         AppConfig(
           redisHost: redisHost,
           subdomains: {},
+          logging: const LoggingConfig.defaultConfig(),
         ),
       );
     });

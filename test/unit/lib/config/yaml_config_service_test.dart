@@ -1,3 +1,4 @@
+import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:test/test.dart';
@@ -10,6 +11,14 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '192.168.1.10');
+      expect(
+        config.logging,
+        const LoggingConfig(
+          loggingEnabled: true,
+          slowRequestThresholdMs: 500,
+          successfulSampleRate: 0.05,
+        ),
+      );
       expect(config.subdomains, <String, SubdomainConfig>{
         'api': const SubdomainConfig(
           url: 'http://localhost:3000',
@@ -39,6 +48,14 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
+      expect(
+        config.logging,
+        const LoggingConfig(
+          loggingEnabled: true,
+          slowRequestThresholdMs: 1000,
+          successfulSampleRate: 0.1,
+        ),
+      );
       expect(config.subdomains, <String, SubdomainConfig>{});
     });
 
@@ -48,6 +65,14 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
+      expect(
+        config.logging,
+        const LoggingConfig(
+          loggingEnabled: false,
+          slowRequestThresholdMs: 1000,
+          successfulSampleRate: 0.1,
+        ),
+      );
       expect(config.subdomains, <String, SubdomainConfig>{});
     });
   });
