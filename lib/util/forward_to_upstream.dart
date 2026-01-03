@@ -4,10 +4,11 @@ import 'package:dart_frog/dart_frog.dart';
 
 class Forward {
   Future<Response> toUpstream(
-    Request request,
+    RequestContext context,
     Uri upstreamBase, {
     String? body,
   }) async {
+    final request = context.request;
     final client = HttpClient();
 
     final upstreamUri = upstreamBase.replace(

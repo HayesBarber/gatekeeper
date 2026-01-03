@@ -46,7 +46,7 @@ Middleware githubWebhook() {
       final forward = context.read<Forward>();
 
       return forward.toUpstream(
-        context.request,
+        context,
         upstreamUrl,
         body: body,
       );

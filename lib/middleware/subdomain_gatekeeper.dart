@@ -121,7 +121,7 @@ Middleware subdomainGatekeeper() {
         authDurationMs: DateTime.now().since(start),
       );
       return forward.toUpstream(
-        context.request,
+        context,
         upstreamUrl,
       );
     };

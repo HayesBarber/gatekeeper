@@ -163,7 +163,7 @@ void main() {
       when(() => request.body()).thenAnswer(
         (_) async => payload,
       );
-      when(() => forward.toUpstream(request, any(), body: any(named: 'body')))
+      when(() => forward.toUpstream(context, any(), body: any(named: 'body')))
           .thenAnswer((_) async => Response(body: upstreamResponseBody));
       final res = await githubWebhook()(handler)(context);
       expect(res.statusCode, equals(HttpStatus.ok));
