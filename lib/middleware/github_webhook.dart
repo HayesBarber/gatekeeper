@@ -5,6 +5,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/constants/subdomains.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
@@ -22,8 +24,21 @@ Middleware githubWebhook() {
         return handler(context);
       }
 
+      final eventBuilder = context.read<we.WideEvent>();
+      final start = DateTime.now();
+
+      final eventType = context.request.headers[githubEvent];
+      final deliveryId = context.request.headers[githubDelivery];
+
       final signature = context.request.headers[hubSignature];
       if (signature == null) {
+        eventBuilder.webhook = we.WebhookContext(
+          verificationDurationMs: DateTime.now().since(start),
+          eventType: eventType,
+          deliveryId: deliveryId,
+          signaturePresent: false,
+          signatureValid: false,
+        );
         return Response(
           statusCode: HttpStatus.unauthorized,
         );
@@ -36,6 +51,13 @@ Middleware githubWebhook() {
         secret: subdomainConfig.secret!,
       );
       if (!verified) {
+        eventBuilder.webhook = we.WebhookContext(
+          verificationDurationMs: DateTime.now().since(start),
+          eventType: eventType,
+          deliveryId: deliveryId,
+          signaturePresent: true,
+          signatureValid: false,
+        );
         return Response(
           statusCode: HttpStatus.unauthorized,
         );
@@ -45,6 +67,13 @@ Middleware githubWebhook() {
 
       final forward = context.read<Forward>();
 
+      eventBuilder.webhook = we.WebhookContext(
+        verificationDurationMs: DateTime.now().since(start),
+        eventType: eventType,
+        deliveryId: deliveryId,
+        signaturePresent: true,
+        signatureValid: true,
+      );
       return forward.toUpstream(
         context,
         upstreamUrl,
