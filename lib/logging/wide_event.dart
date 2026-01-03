@@ -11,12 +11,12 @@ class WideEvent {
   });
   final String requestId;
   final RequestContext request;
-  final ResponseContext response;
-  final AuthenticationContext? authentication;
-  final WebhookContext? webhook;
-  final UpstreamContext? upstream;
-  final ErrorContext? error;
-  final ChallengeContext? challenge;
+  ResponseContext response;
+  AuthenticationContext? authentication;
+  WebhookContext? webhook;
+  UpstreamContext? upstream;
+  ErrorContext? error;
+  ChallengeContext? challenge;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
@@ -38,6 +38,7 @@ class RequestContext {
   RequestContext({
     required this.method,
     required this.path,
+    required this.timestamp,
     this.subdomain,
     this.userAgent,
     this.clientIp,
@@ -46,6 +47,7 @@ class RequestContext {
   });
   final String method;
   final String path;
+  final int timestamp;
   final String? subdomain;
   final String? userAgent;
   final String? clientIp;
@@ -56,6 +58,7 @@ class RequestContext {
     return {
       'method': method,
       'path': path,
+      'timestamp': timestamp,
       if (subdomain != null) 'subdomain': subdomain,
       if (userAgent != null) 'user_agent': userAgent,
       if (clientIp != null) 'client_ip': clientIp,
