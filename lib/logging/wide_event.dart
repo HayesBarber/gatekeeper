@@ -70,25 +70,28 @@ class RequestContext {
 
 class AuthenticationContext {
   AuthenticationContext({
-    required this.apiKeyPresent,
-    required this.apiKeyValid,
-    required this.keyExpired,
-    required this.pathBlacklisted,
-    required this.authDurationMs,
+    this.apiKeyHeaderPresent,
+    this.apiKeyStored,
+    this.apiKeyValid,
+    this.keyExpired,
+    this.pathBlacklisted,
+    this.authDurationMs,
   });
-  final bool apiKeyPresent;
-  final bool apiKeyValid;
-  final bool keyExpired;
-  final bool pathBlacklisted;
-  final int authDurationMs;
+  final bool? apiKeyHeaderPresent;
+  final bool? apiKeyStored;
+  final bool? apiKeyValid;
+  final bool? keyExpired;
+  final bool? pathBlacklisted;
+  final int? authDurationMs;
 
   Map<String, dynamic> toJson() {
     return {
-      'api_key_present': apiKeyPresent,
-      'api_key_valid': apiKeyValid,
-      'key_expired': keyExpired,
-      'path_blacklisted': pathBlacklisted,
-      'auth_duration_ms': authDurationMs,
+      if (authDurationMs != null) 'api_key_header_present': apiKeyHeaderPresent,
+      if (apiKeyStored != null) 'api_key_stored': apiKeyStored,
+      if (apiKeyValid != null) 'api_key_valid': apiKeyValid,
+      if (keyExpired != null) 'key_expired': keyExpired,
+      if (pathBlacklisted != null) 'path_blacklisted': pathBlacklisted,
+      if (authDurationMs != null) 'auth_duration_ms': authDurationMs,
     };
   }
 }

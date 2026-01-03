@@ -5,7 +5,9 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
 import 'package:gatekeeper/util/subdomain.dart';
@@ -27,9 +29,16 @@ Middleware subdomainGatekeeper() {
         );
       }
 
+      final eventBuilder = context.read<we.WideEvent>();
+      final start = DateTime.now();
+
       final apiKey =
           _extractBearerToken(context.request.headers[headerAuthorization]);
       if (apiKey == null) {
+        eventBuilder.authentication = we.AuthenticationContext(
+          authDurationMs: DateTime.now().since(start),
+          apiKeyHeaderPresent: false,
+        );
         return Response(
           statusCode: HttpStatus.unauthorized,
         );
@@ -41,6 +50,11 @@ Middleware subdomainGatekeeper() {
         key: clientId,
       );
       if (storedApiKeyData == null) {
+        eventBuilder.authentication = we.AuthenticationContext(
+          authDurationMs: DateTime.now().since(start),
+          apiKeyHeaderPresent: true,
+          apiKeyStored: false,
+        );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
@@ -51,12 +65,26 @@ Middleware subdomainGatekeeper() {
       );
 
       if (!CryptoUtils.constantTimeCompare(apiKey, storedApiKey.apiKey)) {
+        eventBuilder.authentication = we.AuthenticationContext(
+          authDurationMs: DateTime.now().since(start),
+          apiKeyHeaderPresent: true,
+          apiKeyStored: true,
+          apiKeyValid: false,
+        );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
       }
 
-      if (storedApiKey.expiresAt.isBefore(DateTime.now())) {
+      final keyExpired = storedApiKey.expiresAt.isBefore(DateTime.now());
+      if (keyExpired) {
+        eventBuilder.authentication = we.AuthenticationContext(
+          authDurationMs: DateTime.now().since(start),
+          apiKeyHeaderPresent: true,
+          apiKeyStored: true,
+          apiKeyValid: true,
+          keyExpired: true,
+        );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
@@ -65,19 +93,33 @@ Middleware subdomainGatekeeper() {
       final blacklistedPaths = subdomainConfig.getBlacklistedPathsForMethod(
         context.request.method.value,
       );
-      if (blacklistedPaths.isNotEmpty) {
-        final requestPath = context.request.uri.path;
-        if (PathMatcher.isPathBlacklisted(blacklistedPaths, requestPath)) {
-          return Response(
-            statusCode: HttpStatus.forbidden,
+      final pathBlacklisted = blacklistedPaths.isNotEmpty &&
+          PathMatcher.isPathBlacklisted(
+            blacklistedPaths,
+            context.request.uri.path,
           );
-        }
+
+      if (pathBlacklisted) {
+        eventBuilder.authentication = we.AuthenticationContext(
+          authDurationMs: DateTime.now().since(start),
+          apiKeyHeaderPresent: true,
+          apiKeyStored: true,
+          apiKeyValid: true,
+          keyExpired: true,
+          pathBlacklisted: true,
+        );
+        return Response(
+          statusCode: HttpStatus.forbidden,
+        );
       }
 
       final upstreamUrl = Uri.parse(subdomainConfig.url);
 
       final forward = context.read<Forward>();
 
+      eventBuilder.authentication = we.AuthenticationContext(
+        authDurationMs: DateTime.now().since(start),
+      );
       return forward.toUpstream(
         context.request,
         upstreamUrl,

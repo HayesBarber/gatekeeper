@@ -18,8 +18,6 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final eventBuilder = context.read<we.WideEvent>();
-  final start = DateTime.now();
   final headers = context.request.headers;
   final clientId = headers[headerRequestorId];
 
@@ -28,6 +26,9 @@ Future<Response> _onPost(RequestContext context) async {
       statusCode: HttpStatus.unauthorized,
     );
   }
+
+  final eventBuilder = context.read<we.WideEvent>();
+  final start = DateTime.now();
 
   final redis = context.read<RedisClientBase>();
   final publicKey = await redis.get(ns: Namespace.users, key: clientId);
