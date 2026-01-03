@@ -2,7 +2,7 @@ class WideEvent {
   WideEvent({
     required this.requestId,
     required this.request,
-    required this.response,
+    this.response = const ResponseContext.unknown(),
     this.authentication,
     this.webhook,
     this.upstream,
@@ -139,6 +139,11 @@ class ResponseContext {
     required this.statusCode,
     required this.durationMs,
     this.contentLength,
+  });
+  const ResponseContext.unknown({
+    this.statusCode = -1,
+    this.durationMs = -1,
+    this.contentLength = -1,
   });
   final int statusCode;
   final int durationMs;
