@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:gatekeeper/logging/wide_event.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,16 +30,7 @@ class Logger {
       return;
     }
 
-    try {
-      final jsonString =
-          const JsonEncoder.withIndent('').convert(event.toJson());
-      print(jsonString);
-    } catch (e) {
-      print(
-        // ignore: lines_longer_than_80_chars
-        '{"ts":${DateTime.now().millisecondsSinceEpoch},"error":"logging_failed","details":"$e"}',
-      );
-    }
+    print(event.toJson());
   }
 
   String generateRequestId() {
