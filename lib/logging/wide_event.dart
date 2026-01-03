@@ -98,25 +98,26 @@ class AuthenticationContext {
 
 class WebhookContext {
   WebhookContext({
-    required this.signaturePresent,
-    required this.signatureValid,
-    required this.verificationDurationMs,
+    this.signaturePresent,
+    this.signatureValid,
+    this.verificationDurationMs,
     this.eventType,
     this.deliveryId,
   });
-  final bool signaturePresent;
-  final bool signatureValid;
+  final bool? signaturePresent;
+  final bool? signatureValid;
+  final int? verificationDurationMs;
   final String? eventType;
   final String? deliveryId;
-  final int verificationDurationMs;
 
   Map<String, dynamic> toJson() {
     return {
-      'signature_present': signaturePresent,
-      'signature_valid': signatureValid,
+      if (signaturePresent != null) 'signature_present': signaturePresent,
+      if (signatureValid != null) 'signature_valid': signatureValid,
+      if (verificationDurationMs != null)
+        'verification_duration_ms': verificationDurationMs,
       if (eventType != null) 'event_type': eventType,
       if (deliveryId != null) 'delivery_id': deliveryId,
-      'verification_duration_ms': verificationDurationMs,
     };
   }
 }
