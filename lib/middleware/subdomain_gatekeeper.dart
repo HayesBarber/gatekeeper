@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
@@ -49,7 +50,7 @@ Middleware subdomainGatekeeper() {
         storedApiKeyData,
       );
 
-      if (apiKey != storedApiKey.apiKey) {
+      if (!CryptoUtils.constantTimeCompare(apiKey, storedApiKey.apiKey)) {
         return Response(
           statusCode: HttpStatus.forbidden,
         );

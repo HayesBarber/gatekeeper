@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
-import 'package:gatekeeper/util/random_bytes.dart';
 
 class ChallengeVerificationResponse {
   ChallengeVerificationResponse({
@@ -10,7 +10,7 @@ class ChallengeVerificationResponse {
   });
 
   factory ChallengeVerificationResponse.random() {
-    final apiKey = RandomBytes.generate();
+    final apiKey = CryptoUtils.generateApiKey();
     final ttlSeconds = Namespace.apiKeys.ttlSeconds();
     final expiresAt = DateTime.now().toUtc().add(Duration(seconds: ttlSeconds));
 
