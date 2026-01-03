@@ -38,7 +38,7 @@ class Logger {
   }
 
   void emitEvent(WideEvent event) {
-    if (!shouldSample(event)) {
+    if (!loggingEnabled || !shouldSample(event)) {
       return;
     }
 
