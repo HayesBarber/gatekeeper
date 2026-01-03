@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/util/extensions.dart';
 
 class Forward {
   Future<Response> toUpstream(
@@ -8,6 +10,9 @@ class Forward {
     Uri upstreamBase, {
     String? body,
   }) async {
+    final eventBuilder = context.read<we.WideEvent>();
+    final start = DateTime.now();
+
     final request = context.request;
     final client = HttpClient();
 
@@ -48,6 +53,11 @@ class Forward {
 
       responseHeaders[key] = values.join(',');
     });
+
+    eventBuilder.upstream = we.UpstreamContext(
+      targetHost: upstreamBase.host,
+      forwardDurationMs: DateTime.now().since(start),
+    );
 
     return Response.bytes(
       body: responseBytes,

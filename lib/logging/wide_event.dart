@@ -123,17 +123,14 @@ class WebhookContext {
 
 class UpstreamContext {
   UpstreamContext({
-    required this.forwarded,
     this.targetHost,
     this.forwardDurationMs,
   });
-  final bool forwarded;
   final String? targetHost;
   final int? forwardDurationMs;
 
   Map<String, dynamic> toJson() {
     return {
-      'forwarded': forwarded,
       if (targetHost != null) 'target_host': targetHost,
       if (forwardDurationMs != null) 'forward_duration_ms': forwardDurationMs,
     };
