@@ -6,6 +6,7 @@ import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:mocktail/mocktail.dart';
@@ -19,12 +20,15 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockForward extends Mock implements Forward {}
 
+class _MockWideEvent extends Mock implements we.WideEvent {}
+
 void main() {
   group('GitHub webhook middleware', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockConfigService configService;
     late _MockForward forward;
+    late _MockWideEvent wideEvent;
 
     const fallthroughResponseBody = 'hello world';
     const upstreamResponseBody = 'upstream response';
@@ -42,10 +46,12 @@ void main() {
       request = _MockRequest();
       configService = _MockConfigService();
       forward = _MockForward();
+      wideEvent = _MockWideEvent();
 
       when(() => context.request).thenReturn(request);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<Forward>()).thenReturn(forward);
+      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
     });
 
     test('Falls through when no match', () async {
