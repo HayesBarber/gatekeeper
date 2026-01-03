@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/request_logger.dart' as gl;
+import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
