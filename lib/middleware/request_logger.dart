@@ -1,9 +1,9 @@
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/util/extensions.dart';
-import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware requestLogger(Logger logger) {
   return (handler) {
@@ -12,7 +12,7 @@ Middleware requestLogger(Logger logger) {
       final startTime = DateTime.now();
 
       final request = context.request;
-      final subdomain = Subdomain.fromUri(context.request.uri);
+      final subdomainContext = context.read<SubdomainContext>();
 
       final wideEvent = we.WideEvent(
         requestId: requestId,
@@ -20,7 +20,7 @@ Middleware requestLogger(Logger logger) {
           method: request.method.value,
           path: request.uri.path,
           timestamp: startTime.millisecondsSinceEpoch,
-          subdomain: subdomain,
+          subdomain: subdomainContext.subdomain,
           userAgent: request.headers[userAgent],
           clientIp: request.headers[forwardedFor] ?? request.headers[realIp],
           contentLength: request.headers[contentLength] != null

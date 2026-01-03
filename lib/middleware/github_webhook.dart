@@ -2,25 +2,23 @@ import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/config_service.dart';
+import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/constants/subdomains.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
-import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware githubWebhook() {
   return (handler) {
     return (context) async {
-      final subdomain = Subdomain.fromUri(context.request.uri);
-      if (subdomain != github) {
+      final subdomainContext = context.read<SubdomainContext>();
+      if (subdomainContext.subdomain != github) {
         return handler(context);
       }
 
-      final config = context.read<ConfigService>().config;
-      final subdomainConfig = config.subdomains[subdomain];
-      if (subdomainConfig == null || subdomainConfig.secret == null) {
+      if (!subdomainContext.hasConfig ||
+          subdomainContext.config!.secret == null) {
         return handler(context);
       }
 
@@ -47,7 +45,7 @@ Middleware githubWebhook() {
       final verified = WebhookVerifier.verifyGitHubWebhook(
         payload: body,
         signature: signature,
-        secret: subdomainConfig.secret!,
+        secret: subdomainContext.config!.secret!,
       );
       if (!verified) {
         eventBuilder.webhook = we.WebhookContext(
@@ -62,7 +60,7 @@ Middleware githubWebhook() {
         );
       }
 
-      final upstreamUrl = Uri.parse(subdomainConfig.url);
+      final upstreamUrl = Uri.parse(subdomainContext.config!.url);
 
       final forward = context.read<Forward>();
 

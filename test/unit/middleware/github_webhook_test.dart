@@ -5,6 +5,7 @@ import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
+import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/github_webhook.dart';
@@ -18,6 +19,8 @@ class _MockRequest extends Mock implements Request {}
 
 class _MockConfigService extends Mock implements ConfigService {}
 
+class _MockSubdomainContext extends Mock implements SubdomainContext {}
+
 class _MockForward extends Mock implements Forward {}
 
 class _MockWideEvent extends Mock implements we.WideEvent {}
@@ -29,6 +32,7 @@ void main() {
     late _MockConfigService configService;
     late _MockForward forward;
     late _MockWideEvent wideEvent;
+    late _MockSubdomainContext subdomainContext;
 
     const fallthroughResponseBody = 'hello world';
     const upstreamResponseBody = 'upstream response';
@@ -47,11 +51,16 @@ void main() {
       configService = _MockConfigService();
       forward = _MockForward();
       wideEvent = _MockWideEvent();
+      subdomainContext = _MockSubdomainContext();
 
       when(() => context.request).thenReturn(request);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<Forward>()).thenReturn(forward);
       when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.read<SubdomainContext>()).thenReturn(subdomainContext);
+
+      when(() => subdomainContext.subdomain).thenReturn('api');
+      when(() => subdomainContext.hasConfig).thenReturn(false);
     });
 
     test('Falls through when no match', () async {
@@ -101,8 +110,18 @@ void main() {
     });
 
     test('Unauthorized when no signature header', () async {
+      final subdomainContext = context.read<SubdomainContext>();
+
       when(() => request.uri).thenReturn(
         Uri.parse('http://github.example.com/'),
+      );
+      when(() => subdomainContext.subdomain).thenReturn('github');
+      when(() => subdomainContext.hasConfig).thenReturn(true);
+      when(() => subdomainContext.config).thenReturn(
+        const SubdomainConfig(
+          url: 'testing',
+          secret: 'invalid',
+        ),
       );
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -122,8 +141,18 @@ void main() {
     });
 
     test('Unauthorized when invalid signature header', () async {
+      final subdomainContext = context.read<SubdomainContext>();
+
       when(() => request.uri).thenReturn(
         Uri.parse('http://github.example.com/'),
+      );
+      when(() => subdomainContext.subdomain).thenReturn('github');
+      when(() => subdomainContext.hasConfig).thenReturn(true);
+      when(() => subdomainContext.config).thenReturn(
+        const SubdomainConfig(
+          url: 'testing',
+          secret: 'invalid',
+        ),
       );
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -150,8 +179,18 @@ void main() {
       const payload = 'Hello, World!';
       const expectedSignature =
           '757107ea0eb2509fc211221cce984b8a37570b6d7586c22c46f4379c8b043e17';
+      final subdomainContext = context.read<SubdomainContext>();
+
       when(() => request.uri).thenReturn(
         Uri.parse('http://github.example.com/'),
+      );
+      when(() => subdomainContext.subdomain).thenReturn('github');
+      when(() => subdomainContext.hasConfig).thenReturn(true);
+      when(() => subdomainContext.config).thenReturn(
+        const SubdomainConfig(
+          url: 'testing',
+          secret: secret,
+        ),
       );
       when(() => configService.config).thenReturn(
         AppConfig(

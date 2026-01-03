@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/subdomain_context.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
@@ -18,12 +19,15 @@ class _MockWideEvent extends Mock implements we.WideEvent {}
 
 class _FakeWideEvent extends Fake implements we.WideEvent {}
 
+class _MockSubdomainContext extends Mock implements SubdomainContext {}
+
 void main() {
   group('Request logger middleware', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockLogger logger;
     late _MockWideEvent wideEvent;
+    late _MockSubdomainContext subdomainContext;
 
     const responseBody = 'hello world';
 
@@ -41,10 +45,13 @@ void main() {
       request = _MockRequest();
       logger = _MockLogger();
       wideEvent = _MockWideEvent();
+      subdomainContext = _MockSubdomainContext();
 
       when(() => context.request).thenReturn(request);
       when(() => context.provide<we.WideEvent>(any())).thenReturn(context);
       when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.read<SubdomainContext>()).thenReturn(subdomainContext);
+      when(() => subdomainContext.subdomain).thenReturn('api');
       when(() => logger.generateRequestId()).thenReturn('test-123');
       when(() => wideEvent.requestId).thenReturn('test-123');
     });

@@ -6,6 +6,7 @@ import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/request_logger.dart' as request_logger;
 import 'package:gatekeeper/middleware/subdomain_gatekeeper.dart';
+import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
@@ -20,9 +21,10 @@ Handler middleware(Handler handler) {
   return handler
       .use(subdomainGatekeeper())
       .use(githubWebhook())
+      .use(request_logger.requestLogger(_logger))
+      .use(subdomainProvider())
       .use(provider<SignatureVerifier>((_) => ECCKeyPair.verifySignatureStatic))
       .use(provider<Forward>((_) => _forward))
       .use(provider<ConfigService>((_) => _config))
-      .use(provider<RedisClientBase>((_) => _redis))
-      .use(request_logger.requestLogger(_logger));
+      .use(provider<RedisClientBase>((_) => _redis));
 }
