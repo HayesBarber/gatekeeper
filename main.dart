@@ -10,8 +10,6 @@ Future<void> init(InternetAddress ip, int port) async {
 
   Logger.init(
     loggingEnabled: configService.config.logging.loggingEnabled,
-    slowRequestThresholdMs: configService.config.logging.slowRequestThresholdMs,
-    successfulSampleRate: configService.config.logging.successfulSampleRate,
   );
 
   await ShorebirdRedisClient.connect(

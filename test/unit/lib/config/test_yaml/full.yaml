@@ -3,8 +3,6 @@ redis:
   host: "192.168.1.10"
 logging:
   enabled: true
-  slowRequestThresholdMs: 500
-  successfulSampleRate: 0.05
 subdomains:
   api:
     url: "http://localhost:3000"

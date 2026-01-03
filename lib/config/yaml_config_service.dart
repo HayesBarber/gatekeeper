@@ -86,9 +86,6 @@ class YamlConfigService implements ConfigService {
     if (logging is YamlMap) {
       return LoggingConfig(
         loggingEnabled: logging['enabled'] as bool? ?? true,
-        slowRequestThresholdMs:
-            logging['slowRequestThresholdMs'] as int? ?? 1000,
-        successfulSampleRate: logging['successfulSampleRate'] as double? ?? 0.1,
       );
     }
     return const LoggingConfig.defaultConfig();

@@ -1,5 +1,3 @@
 client_id_header: "x-custom-id"
-logging:
-  enabled: false
 subdomains:
 

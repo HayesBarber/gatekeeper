@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:gatekeeper/logging/wide_event.dart';
 import 'package:uuid/uuid.dart';
@@ -7,27 +6,18 @@ import 'package:uuid/uuid.dart';
 class Logger {
   factory Logger.init({
     required bool loggingEnabled,
-    required int slowRequestThresholdMs,
-    required double successfulSampleRate,
   }) {
     _instance = Logger._(
       loggingEnabled: loggingEnabled,
-      slowRequestThresholdMs: slowRequestThresholdMs,
-      successfulSampleRate: successfulSampleRate,
     );
     return _instance!;
   }
   Logger._({
     required this.loggingEnabled,
-    required this.slowRequestThresholdMs,
-    required this.successfulSampleRate,
   });
 
   static Logger? _instance;
   final bool loggingEnabled;
-  final int slowRequestThresholdMs;
-  final double successfulSampleRate;
-  final Random _random = Random();
   final Uuid _uuid = const Uuid();
 
   static Logger instance() {
@@ -38,7 +28,7 @@ class Logger {
   }
 
   void emitEvent(WideEvent event) {
-    if (!loggingEnabled || !shouldSample(event)) {
+    if (!loggingEnabled) {
       return;
     }
 
@@ -52,32 +42,6 @@ class Logger {
         '{"ts":${DateTime.now().millisecondsSinceEpoch},"error":"logging_failed","details":"$e"}',
       );
     }
-  }
-
-  bool shouldSample(WideEvent event) {
-    // errors
-    if (event.response.statusCode >= 400) return true;
-    if (event.error != null) return true;
-
-    // authentication failures
-    if (event.authentication?.apiKeyValid == false) return true;
-
-    // webhook signature failures
-    if (event.webhook?.signatureValid == false) return true;
-
-    // slow requests
-    if (event.response.durationMs > slowRequestThresholdMs) return true;
-
-    // upstream failures
-    if (event.upstream?.forwarded == false) return true;
-
-    // path blacklist rejections
-    if (event.authentication?.pathBlacklisted ?? false) return true;
-
-    // expired API key attempts
-    if (event.authentication?.keyExpired ?? false) return true;
-
-    return _random.nextDouble() < successfulSampleRate;
   }
 
   String generateRequestId() {

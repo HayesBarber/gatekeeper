@@ -15,8 +15,6 @@ void main() {
         config.logging,
         const LoggingConfig(
           loggingEnabled: true,
-          slowRequestThresholdMs: 500,
-          successfulSampleRate: 0.05,
         ),
       );
       expect(config.subdomains, <String, SubdomainConfig>{
@@ -52,8 +50,6 @@ void main() {
         config.logging,
         const LoggingConfig(
           loggingEnabled: true,
-          slowRequestThresholdMs: 1000,
-          successfulSampleRate: 0.1,
         ),
       );
       expect(config.subdomains, <String, SubdomainConfig>{});
@@ -68,9 +64,7 @@ void main() {
       expect(
         config.logging,
         const LoggingConfig(
-          loggingEnabled: false,
-          slowRequestThresholdMs: 1000,
-          successfulSampleRate: 0.1,
+          loggingEnabled: true,
         ),
       );
       expect(config.subdomains, <String, SubdomainConfig>{});
