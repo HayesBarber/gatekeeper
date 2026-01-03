@@ -37,7 +37,6 @@ Middleware githubWebhook() {
           eventType: eventType,
           deliveryId: deliveryId,
           signaturePresent: false,
-          signatureValid: false,
         );
         return Response(
           statusCode: HttpStatus.unauthorized,
@@ -71,8 +70,6 @@ Middleware githubWebhook() {
         verificationDurationMs: DateTime.now().since(start),
         eventType: eventType,
         deliveryId: deliveryId,
-        signaturePresent: true,
-        signatureValid: true,
       );
       return forward.toUpstream(
         context,
