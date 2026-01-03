@@ -2,13 +2,14 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/subdomain.dart';
 
 Middleware requestLogger(Logger logger) {
   return (handler) {
     return (context) async {
       final requestId = logger.generateRequestId();
-      final startTime = DateTime.now().millisecondsSinceEpoch;
+      final startTime = DateTime.now();
 
       final request = context.request;
       final subdomain = Subdomain.fromUri(context.request.uri);
@@ -18,12 +19,10 @@ Middleware requestLogger(Logger logger) {
         request: we.RequestContext(
           method: request.method.value,
           path: request.uri.path,
-          timestamp: startTime,
+          timestamp: startTime.millisecondsSinceEpoch,
           subdomain: subdomain,
           userAgent: request.headers[userAgent],
-          clientIp: request.headers[forwardedFor] ??
-              request.headers[realIp] ??
-              'unknown',
+          clientIp: request.headers[forwardedFor] ?? request.headers[realIp],
           contentLength: request.headers[contentLength] != null
               ? int.tryParse(request.headers[contentLength]!)
               : null,
@@ -38,7 +37,7 @@ Middleware requestLogger(Logger logger) {
       try {
         final response = await handler(contextWithProvider);
 
-        final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+        final duration = DateTime.now().since(startTime);
 
         wideEvent.response = we.ResponseContext(
           durationMs: duration,
@@ -52,7 +51,7 @@ Middleware requestLogger(Logger logger) {
 
         return response;
       } catch (error) {
-        final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+        final duration = DateTime.now().since(startTime);
 
         wideEvent
           ..response = we.ResponseContext(

@@ -184,15 +184,15 @@ class ErrorContext {
 
 class ChallengeContext {
   ChallengeContext({
-    required this.operation,
-    required this.operationDurationMs,
+    this.operationDurationMs,
+    this.publicKeyPresent,
     this.challengeId,
     this.challengePresent,
     this.challengeExpired,
     this.signatureValid,
   });
-  final String operation;
-  final int operationDurationMs;
+  final int? operationDurationMs;
+  final bool? publicKeyPresent;
   final String? challengeId;
   final bool? challengePresent;
   final bool? challengeExpired;
@@ -200,8 +200,9 @@ class ChallengeContext {
 
   Map<String, dynamic> toJson() {
     return {
-      'operation': operation,
-      'operation_duration_ms': operationDurationMs,
+      if (operationDurationMs != null)
+        'operation_duration_ms': operationDurationMs,
+      if (publicKeyPresent != null) 'public_key_present': publicKeyPresent,
       if (challengeId != null) 'challenge_id': challengeId,
       if (challengePresent != null) 'challenge_present': challengePresent,
       if (challengeExpired != null) 'challenge_expired': challengeExpired,

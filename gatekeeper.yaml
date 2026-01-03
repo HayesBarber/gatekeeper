@@ -1,7 +1,7 @@
 redis:
   host: "127.0.0.1"
 logging:
-  enabled: false
+  enabled: true
 subdomains:
   api:
     url: "http://localhost:3000"
