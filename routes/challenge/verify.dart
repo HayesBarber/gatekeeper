@@ -5,8 +5,10 @@ import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
+import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
+import 'package:gatekeeper/util/extensions.dart';
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -16,6 +18,8 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
+  final eventBuilder = context.read<we.WideEvent>();
+  final start = DateTime.now();
   final headers = context.request.headers;
   final clientId = headers[headerRequestorId];
 
@@ -29,33 +33,56 @@ Future<Response> _onPost(RequestContext context) async {
   final publicKey = await redis.get(ns: Namespace.users, key: clientId);
 
   if (publicKey == null) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: false,
+    );
     return Response(
       statusCode: HttpStatus.unauthorized,
     );
   }
-
-  final bodyString = await context.request.body();
-  final request = ChallengeVerificationRequest.decode(bodyString);
 
   final challengeData = await redis.get(
     ns: Namespace.challenges,
     key: clientId,
   );
   if (challengeData == null) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: true,
+      challengePresent: false,
+    );
     return Response(
       statusCode: HttpStatus.notFound,
     );
   }
 
   final challenge = ChallengeResponse.decode(challengeData);
+  final bodyString = await context.request.body();
+  final request = ChallengeVerificationRequest.decode(bodyString);
 
   if (challenge.challengeId != request.challengeId) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: true,
+      challengePresent: true,
+      challengeId: challenge.challengeId,
+      challengeIdMismatch: true,
+    );
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   }
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: true,
+      challengePresent: true,
+      challengeId: challenge.challengeId,
+      challengeIdMismatch: false,
+      challengeExpired: true,
+    );
     return Response(
       statusCode: HttpStatus.badRequest,
     );
@@ -70,6 +97,15 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   if (!isValid) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: true,
+      challengePresent: true,
+      challengeId: challenge.challengeId,
+      challengeIdMismatch: false,
+      challengeExpired: false,
+      signatureValid: false,
+    );
     return Response(
       statusCode: HttpStatus.forbidden,
     );
@@ -83,6 +119,9 @@ Future<Response> _onPost(RequestContext context) async {
     value: apiKey.encode(),
   );
 
+  eventBuilder.challenge = we.ChallengeContext(
+    operationDurationMs: DateTime.now().since(start),
+  );
   return Response.json(
     body: apiKey,
   );

@@ -189,6 +189,7 @@ class ChallengeContext {
     this.challengeId,
     this.challengePresent,
     this.challengeExpired,
+    this.challengeIdMismatch,
     this.signatureValid,
   });
   final int? operationDurationMs;
@@ -196,6 +197,7 @@ class ChallengeContext {
   final String? challengeId;
   final bool? challengePresent;
   final bool? challengeExpired;
+  final bool? challengeIdMismatch;
   final bool? signatureValid;
 
   Map<String, dynamic> toJson() {
@@ -206,6 +208,8 @@ class ChallengeContext {
       if (challengeId != null) 'challenge_id': challengeId,
       if (challengePresent != null) 'challenge_present': challengePresent,
       if (challengeExpired != null) 'challenge_expired': challengeExpired,
+      if (challengeIdMismatch != null)
+        'challenge_id_mismatch': challengeIdMismatch,
       if (signatureValid != null) 'signature_valid': signatureValid,
     };
   }

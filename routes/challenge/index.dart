@@ -23,7 +23,6 @@ Future<Response> _onPost(RequestContext context) async {
   if (clientId == null) {
     return Response(
       statusCode: HttpStatus.unauthorized,
-      body: 'Unauthorized',
     );
   }
 
@@ -37,7 +36,6 @@ Future<Response> _onPost(RequestContext context) async {
     );
     return Response(
       statusCode: HttpStatus.unauthorized,
-      body: 'Unauthorized',
     );
   }
 
@@ -51,8 +49,6 @@ Future<Response> _onPost(RequestContext context) async {
 
   eventBuilder.challenge = we.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
-    publicKeyPresent: true,
-    challengeId: challenge.challengeId,
   );
   return Response.json(
     body: challenge,
