@@ -29,11 +29,18 @@ Middleware subdomainGatekeeper() {
       final eventBuilder = context.read<we.WideEvent>();
       final start = DateTime.now();
 
-      final apiKey = context.request.headers.bearer();
+      var apiKey = context.request.headers.bearer();
+      var apiKeySource = 'header';
+      if (apiKey == null) {
+        final cookies = context.request.headers.cookies();
+        apiKey = cookies?['api_key'];
+        apiKeySource = 'cookie';
+      }
+
       if (apiKey == null) {
         eventBuilder.authentication = we.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyHeaderPresent: false,
+          apiKeyPresent: false,
         );
         return Response(
           statusCode: HttpStatus.unauthorized,
@@ -48,7 +55,8 @@ Middleware subdomainGatekeeper() {
       if (storedApiKeyData == null) {
         eventBuilder.authentication = we.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyHeaderPresent: true,
+          apiKeyPresent: true,
+          apiKeySource: apiKeySource,
           apiKeyStored: false,
         );
         return Response(
@@ -63,7 +71,8 @@ Middleware subdomainGatekeeper() {
       if (!CryptoUtils.constantTimeCompare(apiKey, storedApiKey.apiKey)) {
         eventBuilder.authentication = we.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyHeaderPresent: true,
+          apiKeyPresent: true,
+          apiKeySource: apiKeySource,
           apiKeyStored: true,
           apiKeyValid: false,
         );
@@ -76,7 +85,8 @@ Middleware subdomainGatekeeper() {
       if (keyExpired) {
         eventBuilder.authentication = we.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyHeaderPresent: true,
+          apiKeyPresent: true,
+          apiKeySource: apiKeySource,
           apiKeyStored: true,
           apiKeyValid: true,
           keyExpired: true,
@@ -99,7 +109,8 @@ Middleware subdomainGatekeeper() {
       if (pathBlacklisted) {
         eventBuilder.authentication = we.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyHeaderPresent: true,
+          apiKeyPresent: true,
+          apiKeySource: apiKeySource,
           apiKeyStored: true,
           apiKeyValid: true,
           keyExpired: true,

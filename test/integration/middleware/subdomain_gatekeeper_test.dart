@@ -169,5 +169,28 @@ void main() {
       expect(jsonBody['method'], equals('GET'));
       expect(jsonBody['path'], equals('/echo'));
     });
+
+    test('returns 200 from upstream when api key is valid via cookie',
+        () async {
+      final apiKey = ChallengeVerificationResponse.random();
+      await redis.set(
+        ns: Namespace.apiKeys,
+        key: TestEnv.clientId,
+        value: apiKey.encode(),
+      );
+      final res = await http.get(
+        TestEnv.apiUri('/echo'),
+        headers: {
+          ...TestEnv.headersWithSubdomain(
+            'api',
+          ),
+          'Cookie': 'api_key=${apiKey.apiKey}',
+        },
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+      final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody['method'], equals('GET'));
+      expect(jsonBody['path'], equals('/echo'));
+    });
   });
 }
