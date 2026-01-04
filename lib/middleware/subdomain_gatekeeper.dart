@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
+import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/extensions.dart';
@@ -20,7 +20,7 @@ Middleware subdomainGatekeeper() {
         return handler(context);
       }
 
-      final clientId = context.request.headers[headerRequestorId];
+      final clientId = context.read<ClientIdContext>().clientId;
       if (clientId == null) {
         return Response(
           statusCode: HttpStatus.unauthorized,
