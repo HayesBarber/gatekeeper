@@ -184,7 +184,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          'Cookie': 'api_key=${apiKey.apiKey}',
+          cookie: 'api_key=${apiKey.apiKey}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
