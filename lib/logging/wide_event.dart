@@ -44,6 +44,7 @@ class RequestContext {
     this.clientIp,
     this.contentLength,
     this.clientId,
+    this.clientIdSource,
   });
   final String method;
   final String path;
@@ -53,6 +54,7 @@ class RequestContext {
   final String? clientIp;
   final int? contentLength;
   final String? clientId;
+  final String? clientIdSource;
 
   Map<String, dynamic> toJson() {
     return {
@@ -64,6 +66,7 @@ class RequestContext {
       if (clientIp != null) 'client_ip': clientIp,
       if (contentLength != null) 'content_length': contentLength,
       if (clientId != null) 'client_id': clientId,
+      if (clientIdSource != null) 'client_id_source': clientIdSource,
     };
   }
 }

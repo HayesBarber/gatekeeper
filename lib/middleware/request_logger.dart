@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
@@ -26,7 +27,8 @@ Middleware requestLogger(Logger logger) {
           contentLength: request.headers[contentLength] != null
               ? int.tryParse(request.headers[contentLength]!)
               : null,
-          clientId: request.headers[headerRequestorId],
+          clientId: context.read<ClientIdContext>().clientId,
+          clientIdSource: context.read<ClientIdContext>().source,
         ),
       );
 

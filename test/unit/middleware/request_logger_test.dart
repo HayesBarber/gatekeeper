@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/logger.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/middleware/request_logger.dart' as gl;
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:mocktail/mocktail.dart';
@@ -21,6 +22,8 @@ class _FakeWideEvent extends Fake implements we.WideEvent {}
 
 class _MockSubdomainContext extends Mock implements SubdomainContext {}
 
+class _MockClientIdContext extends Mock implements ClientIdContext {}
+
 void main() {
   group('Request logger middleware', () {
     late _MockRequestContext context;
@@ -28,6 +31,7 @@ void main() {
     late _MockLogger logger;
     late _MockWideEvent wideEvent;
     late _MockSubdomainContext subdomainContext;
+    late _MockClientIdContext clientIdContext;
 
     const responseBody = 'hello world';
 
@@ -46,6 +50,7 @@ void main() {
       logger = _MockLogger();
       wideEvent = _MockWideEvent();
       subdomainContext = _MockSubdomainContext();
+      clientIdContext = _MockClientIdContext();
 
       when(() => context.request).thenReturn(request);
       when(() => context.provide<we.WideEvent>(any())).thenReturn(context);
@@ -54,6 +59,7 @@ void main() {
       when(() => subdomainContext.subdomain).thenReturn('api');
       when(() => logger.generateRequestId()).thenReturn('test-123');
       when(() => wideEvent.requestId).thenReturn('test-123');
+      when(() => context.read<ClientIdContext>()).thenReturn(clientIdContext);
     });
 
     test('Creates wide event and logs on successful response', () async {
