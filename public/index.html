@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gatekeeper</title>
+    <title>Authenticate - gatekeeper</title>
     <style>
         * {
             margin: 0;
@@ -21,7 +21,7 @@
             padding: 20px;
         }
 
-        .login-card {
+        .auth-card {
             background: #1e1e1e;
             border-radius: 16px;
             padding: 40px;
@@ -31,7 +31,7 @@
             border: 1px solid #333;
         }
 
-        .login-title {
+        .auth-title {
             color: #fff;
             font-size: 24px;
             font-weight: 600;
@@ -72,7 +72,7 @@
             color: #555;
         }
 
-        .login-button {
+        .auth-button {
             width: 100%;
             padding: 12px 24px;
             background: #dc2626;
@@ -85,19 +85,19 @@
             transition: background-color 0.2s, transform 0.1s;
         }
 
-        .login-button:hover {
+        .auth-button:hover {
             background: #b91c1c;
             transform: translateY(-1px);
         }
 
-        .login-button:active {
+        .auth-button:active {
             transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h1 class="login-title">gatekeeper</h1>
+    <div class="auth-card">
+        <h1 class="auth-title">gatekeeper</h1>
         <form>
             <div class="form-group">
                 <label class="form-label" for="client-id">Client ID</label>
@@ -119,7 +119,7 @@
                     required
                 >
             </div>
-            <button type="submit" class="login-button">Login</button>
+            <button type="submit" class="auth-button">Authenticate</button>
         </form>
     </div>
 </body>
