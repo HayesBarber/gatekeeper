@@ -95,6 +95,7 @@ void main() {
 
     test('returns 404 if challenge not found', () async {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -120,7 +121,7 @@ void main() {
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
-
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
@@ -149,6 +150,7 @@ void main() {
       );
 
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -176,6 +178,7 @@ void main() {
       );
 
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
@@ -209,6 +212,7 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(

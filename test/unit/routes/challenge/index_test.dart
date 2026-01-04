@@ -87,6 +87,7 @@ void main() {
 
     test('returns 200 and challenge if user exists', () async {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
+      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(
         () => redisClient.get(
           ns: Namespace.users,
