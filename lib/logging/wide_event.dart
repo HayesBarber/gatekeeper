@@ -70,14 +70,16 @@ class RequestContext {
 
 class AuthenticationContext {
   AuthenticationContext({
-    this.apiKeyHeaderPresent,
+    this.apiKeyPresent,
+    this.apiKeySource,
     this.apiKeyStored,
     this.apiKeyValid,
     this.keyExpired,
     this.pathBlacklisted,
     this.authDurationMs,
   });
-  final bool? apiKeyHeaderPresent;
+  final bool? apiKeyPresent;
+  final String? apiKeySource;
   final bool? apiKeyStored;
   final bool? apiKeyValid;
   final bool? keyExpired;
@@ -86,7 +88,8 @@ class AuthenticationContext {
 
   Map<String, dynamic> toJson() {
     return {
-      if (authDurationMs != null) 'api_key_header_present': apiKeyHeaderPresent,
+      if (apiKeyPresent != null) 'api_key_present': apiKeyPresent,
+      if (apiKeySource != null) 'api_key_source': apiKeySource,
       if (apiKeyStored != null) 'api_key_stored': apiKeyStored,
       if (apiKeyValid != null) 'api_key_valid': apiKeyValid,
       if (keyExpired != null) 'key_expired': keyExpired,

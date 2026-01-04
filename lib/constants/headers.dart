@@ -1,4 +1,5 @@
 const String headerAuthorization = 'authorization';
+const String cookie = 'cookie';
 const String headerRequestorId = 'x-requestor-id';
 const String hubSignature = 'X-Hub-Signature-256';
 const String userAgent = 'user-agent';
