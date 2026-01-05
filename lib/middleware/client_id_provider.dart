@@ -1,6 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper/middleware/cookie_provider.dart';
 
 class ClientIdContext {
   const ClientIdContext({
@@ -20,8 +20,8 @@ Middleware clientIdProvider() {
       var clientId = context.request.headers[headerRequestorId];
       var clientIdSource = 'header';
       if (clientId == null) {
-        final cookies = context.request.headers.cookies();
-        clientId = cookies?['client_id'];
+        final cookieContext = context.read<CookieContext>();
+        clientId = cookieContext['client_id'];
         clientIdSource = 'cookie';
       }
 
