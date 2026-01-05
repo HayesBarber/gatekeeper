@@ -1,4 +1,5 @@
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/middleware/cookie_provider.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
 class ApiKeyContext {
@@ -19,8 +20,8 @@ Middleware apiKeyProvider() {
       var apiKey = context.request.headers.bearer();
       var apiKeySource = 'header';
       if (apiKey == null) {
-        final cookies = context.request.headers.cookies();
-        apiKey = cookies?['api_key'];
+        final cookieContext = context.read<CookieContext>();
+        apiKey = cookieContext['api_key'];
         apiKeySource = 'cookie';
       }
 
