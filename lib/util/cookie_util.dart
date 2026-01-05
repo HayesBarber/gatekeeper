@@ -43,18 +43,6 @@ class CookieUtil {
     return cookieParts.join('; ');
   }
 
-  static String buildSecureCookie(
-    String name,
-    String value, {
-    DateTime? expires,
-  }) {
-    return buildSetCookieHeader(
-      name,
-      value,
-      expires: expires,
-    );
-  }
-
   static String _formatExpires(DateTime expires) {
     return HttpDate.format(expires);
   }

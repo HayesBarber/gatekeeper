@@ -112,35 +112,6 @@ void main() {
       });
     });
 
-    group('buildSecureCookie', () {
-      test('builds cookie with default security attributes', () {
-        final header = CookieUtil.buildSecureCookie('auth', 'token');
-
-        expect(header, equals('auth=token; HttpOnly; Secure; SameSite=Lax'));
-      });
-
-      test('builds cookie with expiration using security defaults', () {
-        final expires = DateTime.now().add(const Duration(days: 7));
-        final header = CookieUtil.buildSecureCookie(
-          'session',
-          'abc123',
-          expires: expires,
-        );
-
-        expect(header, contains('session=abc123'));
-        expect(header, contains('Expires='));
-        expect(header, contains('HttpOnly'));
-        expect(header, contains('Secure'));
-        expect(header, contains('SameSite=Lax'));
-      });
-
-      test('builds cookie without expiration using security defaults', () {
-        final header = CookieUtil.buildSecureCookie('pref', 'light');
-
-        expect(header, equals('pref=light; HttpOnly; Secure; SameSite=Lax'));
-      });
-    });
-
     group('_formatExpires', () {
       test('formats UTC datetime correctly', () {
         final expires = DateTime.utc(2023, 12, 25, 15, 30, 45);
