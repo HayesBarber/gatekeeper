@@ -1,7 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/middleware/cookie_provider.dart';
-import 'package:gatekeeper/util/extensions.dart';
 
 class ClientIdContext {
   const ClientIdContext({
