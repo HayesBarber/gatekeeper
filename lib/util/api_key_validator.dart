@@ -63,8 +63,8 @@ class ApiKeyValidator {
       return ApiKeyValidationResult.noApiKey();
     }
 
-    final redis = context.read<RedisClientBase>();
     final start = DateTime.now();
+    final redis = context.read<RedisClientBase>();
     final result = await validateApiKey(
       clientId: clientId,
       apiKey: apiKeyContext.apiKey!,
