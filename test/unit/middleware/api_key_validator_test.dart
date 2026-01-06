@@ -4,7 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
-import 'package:gatekeeper/middleware/client_id_provider.dart';
+
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/api_key_validation_result.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
@@ -23,7 +23,6 @@ void main() {
     late _MockWideEvent mockEventBuilder;
     late _MockRedisClient mockRedis;
     late ApiKeyContext apiKeyContext;
-    late ClientIdContext clientIdContext;
 
     setUp(() {
       mockContext = _MockRequestContext();
@@ -33,31 +32,21 @@ void main() {
         apiKey: 'provided_api_key',
         source: 'header',
       );
-      clientIdContext = const ClientIdContext(
-        clientId: 'test_client_id',
-        source: 'header',
-      );
       when(() => mockContext.read<we.WideEvent>()).thenReturn(mockEventBuilder);
       when(() => mockContext.read<RedisClientBase>()).thenReturn(mockRedis);
     });
 
     group('validateApiKeyContext', () {
       test('returns noApiKey when client ID is missing', () async {
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(const ClientIdContext(clientId: null, source: null));
-
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
         );
 
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.noApiKey));
-        verify(() => mockContext.read<ClientIdContext>()).called(1);
       });
 
       test('returns noApiKey when API key context has no key', () async {
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(
           const ApiKeyContext(
             apiKey: null,
@@ -71,13 +60,10 @@ void main() {
 
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.noApiKey));
-        verify(() => mockContext.read<ClientIdContext>()).called(1);
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
       });
 
       test('returns failure when Redis lookup fails', () async {
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => null);
@@ -100,8 +86,6 @@ void main() {
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
 
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => storedApiKey.encode());
@@ -112,7 +96,6 @@ void main() {
 
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.apiKeyInvalid));
-        verify(() => mockContext.read<ClientIdContext>()).called(1);
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
           () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
@@ -125,8 +108,6 @@ void main() {
           expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
         );
 
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => expiredApiKey.encode());
@@ -137,7 +118,6 @@ void main() {
 
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.apiKeyExpired));
-        verify(() => mockContext.read<ClientIdContext>()).called(1);
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
           () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
@@ -150,8 +130,6 @@ void main() {
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
 
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => validApiKey.encode());
@@ -163,7 +141,6 @@ void main() {
         expect(result.isValid, isTrue);
         expect(result.storedApiKey?.apiKey, equals('provided_api_key'));
         expect(result.error, isNull);
-        verify(() => mockContext.read<ClientIdContext>()).called(1);
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
           () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
@@ -176,8 +153,6 @@ void main() {
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
 
-        when(() => mockContext.read<ClientIdContext>())
-            .thenReturn(clientIdContext);
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => validApiKey.encode());
@@ -206,7 +181,6 @@ void main() {
             .thenAnswer((_) async => validApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKey(
-          clientId: 'test_client_id',
           apiKey: 'provided_api_key',
           apiKeySource: 'header',
           redis: mockRedis,
@@ -223,7 +197,6 @@ void main() {
 
       test('returns noApiKey when API key is empty', () async {
         final result = await ApiKeyValidator.validateApiKey(
-          clientId: 'test_client_id',
           apiKey: '',
           apiKeySource: 'header',
           redis: mockRedis,
@@ -243,7 +216,6 @@ void main() {
             .thenAnswer((_) async => null);
 
         final result = await ApiKeyValidator.validateApiKey(
-          clientId: 'test_client_id',
           apiKey: 'provided_api_key',
           apiKeySource: 'header',
           redis: mockRedis,
