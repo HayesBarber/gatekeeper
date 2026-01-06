@@ -56,8 +56,9 @@ void main() {
 
       test('returns failure when Redis lookup fails', () async {
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => null);
 
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
@@ -66,7 +67,7 @@ void main() {
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.apiKeyNotFound));
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
 
@@ -78,8 +79,9 @@ void main() {
         );
 
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => storedApiKey.encode());
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => storedApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
@@ -89,19 +91,20 @@ void main() {
         expect(result.error, equals(ApiKeyValidationError.apiKeyInvalid));
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
 
       test('returns failure when API key has expired', () async {
         final expiredApiKey = ChallengeVerificationResponse(
-          apiKey: 'provided_api_key', // Match the provided key
+          apiKey: 'provided_api_key',
           expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
         );
 
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => expiredApiKey.encode());
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => expiredApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
@@ -111,7 +114,7 @@ void main() {
         expect(result.error, equals(ApiKeyValidationError.apiKeyExpired));
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
 
@@ -122,8 +125,9 @@ void main() {
         );
 
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => validApiKey.encode());
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => validApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
@@ -134,7 +138,7 @@ void main() {
         expect(result.error, isNull);
         verify(() => mockContext.read<ApiKeyContext>()).called(1);
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
 
@@ -145,8 +149,9 @@ void main() {
         );
 
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(apiKeyContext);
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => validApiKey.encode());
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => validApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
@@ -168,8 +173,9 @@ void main() {
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
 
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => validApiKey.encode());
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => validApiKey.encode());
 
         final result = await ApiKeyValidator.validateApiKey(
           apiKey: 'provided_api_key',
@@ -182,7 +188,7 @@ void main() {
         expect(result.storedApiKey?.apiKey, equals('provided_api_key'));
         expect(result.error, isNull);
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
 
@@ -203,8 +209,9 @@ void main() {
       });
 
       test('returns failure when Redis lookup returns null', () async {
-        when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
+        ).thenAnswer((_) async => null);
 
         final result = await ApiKeyValidator.validateApiKey(
           apiKey: 'provided_api_key',
@@ -217,7 +224,7 @@ void main() {
         expect(result.error, equals(ApiKeyValidationError.apiKeyNotFound));
         expect(result.errorResponse?.statusCode, equals(HttpStatus.forbidden));
         verify(
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
+          () => mockRedis.get(ns: Namespace.apiKeys, key: 'provided_api_key'),
         ).called(1);
       });
     });
