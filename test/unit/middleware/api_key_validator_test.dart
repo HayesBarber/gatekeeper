@@ -37,6 +37,8 @@ void main() {
         clientId: 'test_client_id',
         source: 'header',
       );
+      when(() => mockContext.read<we.WideEvent>()).thenReturn(mockEventBuilder);
+      when(() => mockContext.read<RedisClientBase>()).thenReturn(mockRedis);
     });
 
     group('validateApiKeyContext', () {
