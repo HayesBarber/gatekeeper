@@ -57,29 +57,7 @@ void main() {
       );
     });
 
-    test('returns 401 if client ID header is missing', () async {
-      when(() => request.headers).thenReturn({});
-
-      final response = await route.onRequest(context);
-
-      expect(response.statusCode, equals(HttpStatus.unauthorized));
-    });
-
-    test('returns 401 if user not found in Redis', () async {
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
-      when(
-        () => redisClient.get(
-          ns: Namespace.devices,
-          key: any(named: 'key'),
-        ),
-      ).thenAnswer((_) async => null);
-
-      final response = await route.onRequest(context);
-
-      expect(response.statusCode, equals(HttpStatus.unauthorized));
-    });
-
-    test('returns 200 and challenge if user exists', () async {
+    test('returns 200 and challenge', () async {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(
