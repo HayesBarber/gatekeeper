@@ -239,6 +239,13 @@ void main() {
 
       when(
         () => redisClient.set(
+          ns: Namespace.challenges,
+          key: clientId,
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
+      when(
+        () => redisClient.set(
           ns: Namespace.apiKeys,
           key: clientId,
           value: any(named: 'value'),

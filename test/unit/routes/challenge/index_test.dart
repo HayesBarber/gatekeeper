@@ -95,6 +95,12 @@ void main() {
         ),
       ).thenAnswer((_) async => redisUserKey);
       when(
+        () => redisClient.get(
+          ns: Namespace.challenges,
+          key: any(named: 'key'),
+        ),
+      ).thenAnswer((_) async => null);
+      when(
         () => redisClient.set(
           ns: Namespace.challenges,
           key: any(named: 'key'),
