@@ -31,7 +31,13 @@ Future<Response> _onPost(RequestContext context) async {
     operationDurationMs: DateTime.now().since(start),
     challengeId: challenge.challengeId,
   );
+
   return Response.json(
-    body: challenge,
+    body: {
+      'challenge_id': challenge.challengeId,
+      'challenge': challenge.challenge,
+      'expires_at': challenge.expiresAt.toUtc().toIso8601String(),
+      'challenge_code': challenge.challengeCode,
+    },
   );
 }
