@@ -44,7 +44,6 @@ void main() {
 
   group('non-POST methods', () {
     final methods = [
-      (http.get, 'GET'),
       (http.put, 'PUT'),
       (http.patch, 'PATCH'),
       (http.delete, 'DELETE'),

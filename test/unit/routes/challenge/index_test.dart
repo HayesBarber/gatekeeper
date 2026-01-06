@@ -7,6 +7,7 @@ import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
+import 'package:gatekeeper/middleware/api_key_provider.dart';
 import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:mocktail/mocktail.dart';
@@ -27,6 +28,9 @@ class _MockWideEvent extends Mock implements we.WideEvent {}
 class _MockClientIdContext extends Mock implements ClientIdContext {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(Namespace.users);
+  });
   group('POST /challenge', () {
     late _MockRequestContext context;
     late _MockRequest request;
@@ -122,6 +126,45 @@ void main() {
     });
   });
 
+  group('GET /challenge', () {
+    late Request request;
+    late RequestContext context;
+
+    setUp(() {
+      request = _MockRequest();
+      context = _MockRequestContext();
+      final eventBuilder = _MockWideEvent();
+
+      when(() => context.request).thenReturn(request);
+      when(() => context.read<we.WideEvent>()).thenReturn(eventBuilder);
+    });
+
+    test('returns 401 if client ID is missing', () async {
+      when(() => request.method).thenReturn(HttpMethod.get);
+      when(() => context.read<ClientIdContext>()).thenReturn(
+        const ClientIdContext(clientId: null, source: null),
+      );
+
+      final response = await route.onRequest(context);
+
+      expect(response.statusCode, equals(HttpStatus.unauthorized));
+    });
+
+    test('returns 401 if API key is missing', () async {
+      when(() => request.method).thenReturn(HttpMethod.get);
+      when(() => context.read<ClientIdContext>()).thenReturn(
+        const ClientIdContext(clientId: 'test-client', source: 'header'),
+      );
+      when(() => context.read<ApiKeyContext>()).thenReturn(
+        const ApiKeyContext(apiKey: null, source: null),
+      );
+
+      final response = await route.onRequest(context);
+
+      expect(response.statusCode, equals(HttpStatus.unauthorized));
+    });
+  });
+
   group('non-POST methods', () {
     late Request request;
     late RequestContext context;
@@ -134,7 +177,6 @@ void main() {
     });
 
     final methods = <HttpMethod>[
-      HttpMethod.get,
       HttpMethod.put,
       HttpMethod.patch,
       HttpMethod.delete,
