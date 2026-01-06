@@ -15,7 +15,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../../../../routes/challenge/verify.dart' as route;
-import '../../../integration/util/test_env.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
@@ -69,16 +68,14 @@ void main() {
       );
     });
 
-    test('returns 401 if client ID header is missing', () async {
-      when(() => request.headers).thenReturn({});
-
-      final response = await route.onRequest(context);
-
-      expect(response.statusCode, equals(HttpStatus.unauthorized));
-    });
-
     test('returns 401 if public key not found', () async {
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
+      when(() => request.body()).thenAnswer(
+        (_) async => ChallengeVerificationRequest(
+          challengeId: challengeId,
+          signature: 'sig',
+          deviceId: clientId,
+        ).encode(),
+      );
       when(
         () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => null);
@@ -89,12 +86,11 @@ void main() {
     });
 
     test('returns 404 if challenge not found', () async {
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
-          deviceId: TestEnv.clientId,
+          deviceId: clientId,
         ).encode(),
       );
 
@@ -102,7 +98,7 @@ void main() {
         () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
-        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+        () => redisClient.get(ns: Namespace.challenges, key: challengeId),
       ).thenAnswer((_) async => null);
 
       final response = await route.onRequest(context);
@@ -116,12 +112,11 @@ void main() {
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: 'wrong-id',
           signature: 'sig',
-          deviceId: TestEnv.clientId,
+          deviceId: clientId,
         ).encode(),
       );
 
@@ -129,7 +124,7 @@ void main() {
         () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
-        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+        () => redisClient.get(ns: Namespace.challenges, key: 'wrong-id'),
       ).thenAnswer((_) async => challenge.encode());
 
       final response = await route.onRequest(context);
@@ -144,12 +139,11 @@ void main() {
         expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
       );
 
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
-          deviceId: TestEnv.clientId,
+          deviceId: clientId,
         ).encode(),
       );
 
@@ -157,7 +151,7 @@ void main() {
         () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
-        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+        () => redisClient.get(ns: Namespace.challenges, key: challengeId),
       ).thenAnswer((_) async => challenge.encode());
 
       final response = await route.onRequest(context);
@@ -172,12 +166,11 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'bad-sig',
-          deviceId: TestEnv.clientId,
+          deviceId: clientId,
         ).encode(),
       );
 
@@ -185,7 +178,7 @@ void main() {
         () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
-        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+        () => redisClient.get(ns: Namespace.challenges, key: challengeId),
       ).thenAnswer((_) async => challenge.encode());
       when(
         () => verifier(
@@ -207,12 +200,11 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'valid-signature',
-          deviceId: TestEnv.clientId,
+          deviceId: clientId,
         ).encode(),
       );
 
@@ -221,7 +213,7 @@ void main() {
       ).thenAnswer((_) async => publicKey);
 
       when(
-        () => redisClient.get(ns: Namespace.challenges, key: clientId),
+        () => redisClient.get(ns: Namespace.challenges, key: challengeId),
       ).thenAnswer((_) async => challenge.encode());
 
       when(
@@ -235,7 +227,7 @@ void main() {
       when(
         () => redisClient.set(
           ns: Namespace.apiKeys,
-          key: clientId,
+          key: any(named: 'key'),
           value: any(named: 'value'),
         ),
       ).thenAnswer((_) async => {});
