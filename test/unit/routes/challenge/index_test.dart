@@ -75,7 +75,7 @@ void main() {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(
-          ns: Namespace.users,
+          ns: Namespace.devices,
           key: any(named: 'key'),
         ),
       ).thenAnswer((_) async => null);
@@ -90,7 +90,7 @@ void main() {
       when(() => clientIdContext.clientId).thenReturn(clientId);
       when(
         () => redisClient.get(
-          ns: Namespace.users,
+          ns: Namespace.devices,
           key: any(named: 'key'),
         ),
       ).thenAnswer((_) async => redisUserKey);

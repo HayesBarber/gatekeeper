@@ -85,7 +85,7 @@ void main() {
     test('returns 401 if public key not found', () async {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => null);
 
       final response = await route.onRequest(context);
@@ -104,7 +104,7 @@ void main() {
       );
 
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: clientId),
@@ -131,7 +131,7 @@ void main() {
       );
 
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: clientId),
@@ -159,7 +159,7 @@ void main() {
       );
 
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: clientId),
@@ -187,7 +187,7 @@ void main() {
       );
 
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: clientId),
@@ -222,7 +222,7 @@ void main() {
       );
 
       when(
-        () => redisClient.get(ns: Namespace.users, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: clientId),
       ).thenAnswer((_) async => publicKey);
 
       when(
