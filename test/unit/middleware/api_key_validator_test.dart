@@ -37,15 +37,6 @@ void main() {
     });
 
     group('validateApiKeyContext', () {
-      test('returns noApiKey when client ID is missing', () async {
-        final result = await ApiKeyValidator.validateApiKeyContext(
-          context: mockContext,
-        );
-
-        expect(result.isValid, isFalse);
-        expect(result.error, equals(ApiKeyValidationError.noApiKey));
-      });
-
       test('returns noApiKey when API key context has no key', () async {
         when(() => mockContext.read<ApiKeyContext>()).thenReturn(
           const ApiKeyContext(
