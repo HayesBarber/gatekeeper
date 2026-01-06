@@ -35,13 +35,6 @@ void main() {
       await redis.close();
     });
 
-    test('returns 401 if client ID header is missing', () async {
-      final res = await http.post(
-        TestEnv.apiUri('/challenge/verify'),
-      );
-      expect(res.statusCode, equals(HttpStatus.unauthorized));
-    });
-
     test('returns 401 if no public key found for client', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
@@ -61,6 +54,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
           signature: 'invalid',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.notFound));
@@ -76,6 +70,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: '${challenge.challengeId}-invalid',
           signature: 'invalid',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
@@ -103,6 +98,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
@@ -118,6 +114,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -139,6 +136,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: signature,
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.ok));

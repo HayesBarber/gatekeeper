@@ -5,8 +5,8 @@ MODE=${1:-all}
 
 cleanup() {
   echo "cleaning up"
-  echo "deleting redis key users:${CLIENT_ID}"
-  redis-cli DEL "users:${CLIENT_ID}"
+  echo "deleting redis key devices:${CLIENT_ID}"
+  redis-cli DEL "devices:${CLIENT_ID}"
   
   echo "restoring original gatekeeper.yaml"
   if [ -f gatekeeper.yaml.bak ]; then
@@ -37,8 +37,8 @@ setup() {
 
   PUBLIC_KEY=$(echo "$KEY_PAIR_JSON" | jq -r '.publicKey')
 
-  echo "creating redis key users:${CLIENT_ID}"
-  redis-cli SET "users:${CLIENT_ID}" "$PUBLIC_KEY"
+  echo "creating redis key devices:${CLIENT_ID}"
+  redis-cli SET "devices:${CLIENT_ID}" "$PUBLIC_KEY"
 
   echo "substituting GitHub webhook secret and disabling logging in config"
   sed -i.bak -e "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" -e "s/enabled: true/enabled: false/g" gatekeeper.yaml
