@@ -39,7 +39,7 @@ void main() {
       final apiKey = ChallengeVerificationResponse.random();
       await redis.set(
         ns: Namespace.apiKeys,
-        key: TestEnv.clientId,
+        key: apiKey.apiKey,
         value: apiKey.encode(),
       );
 
