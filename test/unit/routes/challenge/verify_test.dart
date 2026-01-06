@@ -9,13 +9,13 @@ import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
-import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../../../../routes/challenge/verify.dart' as route;
+import '../../../integration/util/test_env.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
@@ -26,8 +26,6 @@ class _MockConfigService extends Mock implements ConfigService {}
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
 class _MockWideEvent extends Mock implements we.WideEvent {}
-
-class _MockClientIdContext extends Mock implements ClientIdContext {}
 
 class _MockSignatureVerifier extends Mock {
   bool call(String m, String s, String k);
@@ -41,7 +39,6 @@ void main() {
     late _MockRedisClient redisClient;
     late _MockSignatureVerifier verifier;
     late _MockWideEvent wideEvent;
-    late _MockClientIdContext clientIdContext;
 
     const clientId = 'client-123';
     const publicKey = 'public-key';
@@ -55,7 +52,6 @@ void main() {
       redisClient = _MockRedisClient();
       verifier = _MockSignatureVerifier();
       wideEvent = _MockWideEvent();
-      clientIdContext = _MockClientIdContext();
 
       when(() => context.request).thenReturn(request);
       when(() => request.method).thenReturn(HttpMethod.post);
@@ -63,7 +59,6 @@ void main() {
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
       when(() => context.read<SignatureVerifier>()).thenReturn(verifier.call);
       when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
-      when(() => context.read<ClientIdContext>()).thenReturn(clientIdContext);
 
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -95,11 +90,11 @@ void main() {
 
     test('returns 404 if challenge not found', () async {
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
-      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
 
@@ -121,12 +116,12 @@ void main() {
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
-      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: 'wrong-id',
           signature: 'sig',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
 
@@ -150,11 +145,11 @@ void main() {
       );
 
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
-      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
 
@@ -178,11 +173,11 @@ void main() {
       );
 
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
-      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'bad-sig',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
 
@@ -212,12 +207,12 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
       );
 
-      when(() => clientIdContext.clientId).thenReturn(clientId);
       when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'valid-signature',
+          deviceId: TestEnv.clientId,
         ).encode(),
       );
 
