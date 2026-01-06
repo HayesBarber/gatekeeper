@@ -14,8 +14,8 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final eventBuilder = context.read<we.WideEvent>();
   final start = DateTime.now();
+  final eventBuilder = context.read<we.WideEvent>();
 
   final redis = context.read<RedisClientBase>();
 
