@@ -81,8 +81,18 @@ void main() {
       await redis.close();
     });
 
-    test('returns 401 if API key is missing', () async {
+    test('returns 401 if client id is missing', () async {
       final res = await http.get(TestEnv.apiUri('/challenge'));
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
+    });
+
+    test('returns 401 if API key is missing', () async {
+      final res = await http.get(
+        TestEnv.apiUri('/challenge'),
+        headers: {
+          headerRequestorId: TestEnv.clientId,
+        },
+      );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
