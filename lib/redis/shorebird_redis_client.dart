@@ -65,11 +65,15 @@ class ShorebirdRedisClient extends RedisClientBase {
       );
 
   @override
-  Future<List<String>> getAll({required Namespace ns}) async {
+  Future<List<T>> getAll<T>({
+    required Namespace ns,
+    required T Function(String) parser,
+  }) async {
     final pattern = '${ns.key}:*';
     final fullKeys = await _client.keys(pattern: pattern);
-    return fullKeys
-        .map((fullKey) => fullKey.replaceFirst('${ns.key}:', ''))
+    final results = fullKeys
+        .map((fullKey) => parser(fullKey.replaceFirst('${ns.key}:', '')))
         .toList();
+    return results;
   }
 }

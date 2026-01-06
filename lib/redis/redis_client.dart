@@ -26,7 +26,10 @@ abstract class RedisClientBase {
     required String value,
     Duration? ttl,
   });
-  Future<List<String>> getAll({required Namespace ns});
+  Future<List<T>> getAll<T>({
+    required Namespace ns,
+    required T Function(String) parser,
+  });
   Future<void> close();
 
   String redisKey(Namespace ns, String key) {
