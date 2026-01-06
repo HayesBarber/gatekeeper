@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/dto/challenge_collection.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/challenge_helper.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
 Future<Response> onRequest(RequestContext context) {
@@ -41,11 +43,12 @@ Future<Response> _onPost(RequestContext context) async {
 
   final challenge = ChallengeResponse.random();
 
-  await redis.set(
-    ns: Namespace.challenges,
-    key: clientId,
-    value: challenge.encode(),
-  );
+  final collection =
+      await ChallengeHelper.getChallengeCollection(redis, clientId) ??
+          ChallengeCollection.empty()
+        ..addChallenge(challenge);
+
+  await ChallengeHelper.saveChallengeCollection(redis, clientId, collection);
 
   eventBuilder.challenge = we.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
