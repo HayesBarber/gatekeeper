@@ -29,6 +29,7 @@ Future<Response> _onPost(RequestContext context) async {
 
   eventBuilder.challenge = we.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
+    challengeId: challenge.challengeId,
   );
   return Response.json(
     body: challenge,
