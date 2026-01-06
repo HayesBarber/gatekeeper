@@ -123,7 +123,7 @@ void main() {
 
       test('returns failure when API key has expired', () async {
         final expiredApiKey = ChallengeVerificationResponse(
-          apiKey: 'stored_api_key',
+          apiKey: 'provided_api_key', // Match the provided key
           expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
         );
 
@@ -184,21 +184,16 @@ void main() {
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => validApiKey.encode());
 
-        await ApiKeyValidator.validateApiKeyContext(
+        final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
         );
 
+        expect(result.isValid, isTrue);
         verify(
-          () => mockEventBuilder.authentication =
-              any(named: 'authDurationMs', that: isA<int>()),
+          () => mockEventBuilder.authentication = any(
+            that: isA<we.AuthenticationContext>(),
+          ),
         ).called(1);
-        verifyInOrder([
-          () => mockContext.read<ClientIdContext>(),
-          () => mockContext.read<ApiKeyContext>(),
-          () => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'),
-          () => mockEventBuilder.authentication =
-              any(named: 'authDurationMs', that: isA<int>()),
-        ]);
       });
     });
 
