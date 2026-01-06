@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
-import 'package:gatekeeper/util/challenge_helper.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
 Future<Response> onRequest(RequestContext context) {
@@ -42,9 +42,11 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final collection =
-      await ChallengeHelper.getChallengeCollection(redis, clientId);
-  if (collection == null) {
+  final challengeData = await redis.get(
+    ns: Namespace.challenges,
+    key: clientId,
+  );
+  if (challengeData == null) {
     eventBuilder.challenge = we.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: true,
@@ -55,31 +57,21 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
+  final challenge = ChallengeResponse.decode(challengeData);
   final bodyString = await context.request.body();
   final request = ChallengeVerificationRequest.decode(bodyString);
-  final challenge = collection.getChallenge(request.challengeId);
 
-  if (challenge == null) {
-    if (collection.challenges.isNotEmpty) {
-      eventBuilder.challenge = we.ChallengeContext(
-        operationDurationMs: DateTime.now().since(start),
-        publicKeyPresent: true,
-        challengePresent: true,
-        challengeIdMismatch: true,
-      );
-      return Response(
-        statusCode: HttpStatus.badRequest,
-      );
-    } else {
-      eventBuilder.challenge = we.ChallengeContext(
-        operationDurationMs: DateTime.now().since(start),
-        publicKeyPresent: true,
-        challengePresent: false,
-      );
-      return Response(
-        statusCode: HttpStatus.notFound,
-      );
-    }
+  if (challenge.challengeId != request.challengeId) {
+    eventBuilder.challenge = we.ChallengeContext(
+      operationDurationMs: DateTime.now().since(start),
+      publicKeyPresent: true,
+      challengePresent: true,
+      challengeId: challenge.challengeId,
+      challengeIdMismatch: true,
+    );
+    return Response(
+      statusCode: HttpStatus.badRequest,
+    );
   }
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
@@ -120,10 +112,6 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   final apiKey = ChallengeVerificationResponse.random();
-  final verifiedChallenge = challenge.markAsVerified(apiKey: apiKey.encode());
-
-  collection.addChallenge(verifiedChallenge);
-  await ChallengeHelper.saveChallengeCollection(redis, clientId, collection);
 
   await redis.set(
     ns: Namespace.apiKeys,

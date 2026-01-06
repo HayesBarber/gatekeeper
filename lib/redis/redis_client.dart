@@ -1,6 +1,6 @@
 enum Namespace {
   users(key: 'users'),
-  challenges(key: 'challenges', ttl: Duration(minutes: 2)),
+  challenges(key: 'challenges', ttl: Duration(seconds: 30)),
   apiKeys(key: 'api_keys', ttl: Duration(minutes: 5));
 
   const Namespace({required this.key, this.ttl});
