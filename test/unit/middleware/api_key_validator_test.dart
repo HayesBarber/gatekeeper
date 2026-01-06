@@ -82,12 +82,10 @@ void main() {
         when(() => mockRedis.get(ns: Namespace.apiKeys, key: 'test_client_id'))
             .thenAnswer((_) async => null);
 
-        // Act
         final result = await ApiKeyValidator.validateApiKeyContext(
           context: mockContext,
         );
 
-        // Assert
         expect(result.isValid, isFalse);
         expect(result.error, equals(ApiKeyValidationError.apiKeyNotFound));
         verify(
