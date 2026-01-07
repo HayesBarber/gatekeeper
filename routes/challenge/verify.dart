@@ -106,6 +106,13 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   final apiKey = ChallengeVerificationResponse.random();
+  final verifiedChallenge = challenge.markAsVerified(apiKey: apiKey.encode());
+
+  await redis.set(
+    ns: Namespace.challenges,
+    key: verifiedChallenge.challengeId,
+    value: verifiedChallenge.encode(),
+  );
 
   await redis.set(
     ns: Namespace.apiKeys,
