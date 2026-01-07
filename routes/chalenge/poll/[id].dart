@@ -41,6 +41,10 @@ Future<Response> _onGet(
 
   final challenge = ChallengeResponse.decode(challengeData);
 
+  if (challenge.expiresAt.isBefore(DateTime.now())) {
+    return Response(statusCode: HttpStatus.badRequest);
+  }
+
   if (challenge.sessionId != sessionId) {
     return Response(statusCode: HttpStatus.forbidden);
   }
