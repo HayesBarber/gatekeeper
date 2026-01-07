@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authenticate - gatekeeper</title>
+    <title>Challenge - gatekeeper</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
             border-radius: 16px;
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             border: 1px solid #333;
         }
@@ -39,89 +39,159 @@
             text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 24px;
+        .loading-state {
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+            padding: 40px 0;
         }
 
-        .form-label {
-            display: block;
-            color: #ccc;
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #333;
+            border-top: 3px solid #dc2626;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .challenge-display {
+            text-align: center;
+        }
+
+        .challenge-code {
+            font-size: 48px;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 24px;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .challenge-info {
+            color: #999;
             font-size: 14px;
-            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .challenge-info-item {
             margin-bottom: 8px;
         }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: #fff;
+        .challenge-info-label {
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .error-state {
+            text-align: center;
+            color: #dc2626;
             font-size: 16px;
-            transition: border-color 0.2s, background-color 0.2s;
+            padding: 20px 0;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: #dc2626;
-            background: #333;
-        }
-
-        .form-input::placeholder {
-            color: #555;
-        }
-
-        .auth-button {
-            width: 100%;
-            padding: 12px 24px;
-            background: #dc2626;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-
-        .auth-button:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-
-        .auth-button:active {
-            transform: translateY(0);
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="auth-card">
         <h1 class="auth-title">gatekeeper</h1>
-        <form>
-            <div class="form-group">
-                <label class="form-label" for="client-id">Client ID</label>
-                <input 
-                    type="text" 
-                    id="client-id" 
-                    class="form-input" 
-                    placeholder="Enter your client ID"
-                    required
-                >
+        
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <div>Loading challenge...</div>
+        </div>
+
+        <div id="challengeDisplay" class="challenge-display hidden">
+            <div class="challenge-code" id="challengeCode"></div>
+            <div class="challenge-info">
+                <div class="challenge-info-item">
+                    <span class="challenge-info-label">Challenge ID:</span>
+                    <span id="challengeId"></span>
+                </div>
+                <div class="challenge-info-item">
+                    <span class="challenge-info-label">Expires:</span>
+                    <span id="expiresAt"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="api-key">API Key</label>
-                <input 
-                    type="password" 
-                    id="api-key" 
-                    class="form-input" 
-                    placeholder="Enter your API key"
-                    required
-                >
-            </div>
-            <button type="submit" class="auth-button">Authenticate</button>
-        </form>
+        </div>
+
+        <div id="errorState" class="error-state hidden">
+            Failed to load challenge. Please try again later.
+        </div>
     </div>
+
+    <script>
+        async function init() {
+            try {
+                const response = await getChallenge();
+                displayChallenge(response);
+            } catch (error) {
+                displayError();
+            }
+        }
+
+        async function getChallenge() {
+            const response = await fetch('/challenge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch challenge');
+            }
+
+            const data = await response.json();
+            return data;
+        }
+
+        function displayChallenge(data) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            
+            document.getElementById('challengeCode').textContent = data.challenge_code || '';
+            document.getElementById('challengeId').textContent = data.challenge_id || '';
+            document.getElementById('expiresAt').textContent = formatDateTime(data.expires_at);
+            
+            document.getElementById('challengeDisplay').classList.remove('hidden');
+        }
+
+        function displayError() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('challengeDisplay').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return 'Unknown';
+            
+            try {
+                const date = new Date(isoString);
+                const options = {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                };
+                return date.toLocaleString('en-US', options);
+            } catch (error) {
+                return 'Invalid date';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
 
