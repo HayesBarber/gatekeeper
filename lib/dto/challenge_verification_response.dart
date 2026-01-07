@@ -10,7 +10,7 @@ class ChallengeVerificationResponse {
   });
 
   factory ChallengeVerificationResponse.random() {
-    final apiKey = CryptoUtils.generateApiKey();
+    final apiKey = CryptoUtils.generateBytes();
     final ttlSeconds = Namespace.apiKeys.ttlSeconds();
     final expiresAt = DateTime.now().toUtc().add(Duration(seconds: ttlSeconds));
 

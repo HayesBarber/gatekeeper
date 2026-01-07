@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -11,9 +10,6 @@ class ItUtil {
   static Future<ChallengeResponse> getChallenge() async {
     final challengeRes = await http.post(
       TestEnv.apiUri('/challenge'),
-      headers: {
-        headerRequestorId: TestEnv.clientId,
-      },
     );
     expect(challengeRes.statusCode, equals(HttpStatus.ok));
     expect(challengeRes.body, isNotEmpty);

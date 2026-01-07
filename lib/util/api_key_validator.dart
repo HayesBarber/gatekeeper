@@ -3,14 +3,12 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
-import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/api_key_validation_result.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
 class ApiKeyValidator {
   static Future<ApiKeyValidationResult> validateApiKey({
-    required String clientId,
     required String apiKey,
     required String apiKeySource,
     required RedisClientBase redis,
@@ -22,7 +20,7 @@ class ApiKeyValidator {
 
     final storedApiKeyData = await redis.get(
       ns: Namespace.apiKeys,
-      key: clientId,
+      key: apiKey,
     );
     if (storedApiKeyData == null) {
       return ApiKeyValidationResult.notFound();
@@ -45,14 +43,6 @@ class ApiKeyValidator {
     required RequestContext context,
   }) async {
     final eventBuilder = context.read<we.WideEvent>();
-    final clientId = context.read<ClientIdContext>().clientId;
-    if (clientId == null) {
-      eventBuilder.authentication = we.AuthenticationContext(
-        authDurationMs: 0,
-        apiKeyPresent: false,
-      );
-      return ApiKeyValidationResult.noApiKey();
-    }
 
     final apiKeyContext = context.read<ApiKeyContext>();
     if (!apiKeyContext.apiKeyFound) {
@@ -66,7 +56,6 @@ class ApiKeyValidator {
     final start = DateTime.now();
     final redis = context.read<RedisClientBase>();
     final result = await validateApiKey(
-      clientId: clientId,
       apiKey: apiKeyContext.apiKey!,
       apiKeySource: apiKeyContext.source!,
       redis: redis,

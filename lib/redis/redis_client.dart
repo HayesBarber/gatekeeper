@@ -1,5 +1,5 @@
 enum Namespace {
-  users(key: 'users'),
+  devices(key: 'devices'),
   challenges(key: 'challenges', ttl: Duration(seconds: 30)),
   apiKeys(key: 'api_keys', ttl: Duration(minutes: 5));
 

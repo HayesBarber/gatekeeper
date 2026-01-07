@@ -1,7 +1,6 @@
 const String headerAuthorization = 'authorization';
 const String cookie = 'cookie';
 const String headerSetCookie = 'Set-Cookie';
-const String headerRequestorId = 'x-requestor-id';
 const String hubSignature = 'X-Hub-Signature-256';
 const String userAgent = 'user-agent';
 const String forwardedFor = 'x-forwarded-for';

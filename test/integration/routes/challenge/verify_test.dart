@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
-import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
@@ -17,6 +16,7 @@ import '../../util/test_env.dart';
 void main() {
   group('POST /challenge/verify', () {
     late RedisClientBase redis;
+    const challengeId = '77d17169-176c-4b36-bf94-08bcb3acd1ba';
 
     setUpAll(() async {
       redis = await ShorebirdRedisClient.connect(
@@ -27,7 +27,7 @@ void main() {
     tearDown(() async {
       await redis.delete(
         ns: Namespace.challenges,
-        key: TestEnv.clientId,
+        key: challengeId,
       );
     });
 
@@ -35,19 +35,14 @@ void main() {
       await redis.close();
     });
 
-    test('returns 401 if client ID header is missing', () async {
-      final res = await http.post(
-        TestEnv.apiUri('/challenge/verify'),
-      );
-      expect(res.statusCode, equals(HttpStatus.unauthorized));
-    });
-
     test('returns 401 if no public key found for client', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: 'eb893043-d510-460b-ace7-c9b9057d16d9',
-        },
+        body: ChallengeVerificationRequest(
+          challengeId: 'dummy',
+          signature: 'sig',
+          deviceId: 'dummy',
+        ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
@@ -55,54 +50,34 @@ void main() {
     test('returns 404 if challenge not found for client', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: TestEnv.clientId,
-        },
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
           signature: 'invalid',
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.notFound));
     });
 
-    test('returns 400 if challenge ID does not match provided', () async {
-      final challenge = await ItUtil.getChallenge();
-      final res = await http.post(
-        TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: TestEnv.clientId,
-        },
-        body: ChallengeVerificationRequest(
-          challengeId: '${challenge.challengeId}-invalid',
-          signature: 'invalid',
-        ).encode(),
-      );
-      expect(res.statusCode, equals(HttpStatus.badRequest));
-    });
-
     test('returns 400 if challenge is expired', () async {
-      final challenge = await ItUtil.getChallenge();
       final copy = ChallengeResponse(
-        challengeId: challenge.challengeId,
-        challenge: challenge.challenge,
+        challengeId: challengeId,
+        challenge: 'challenge',
         expiresAt: DateTime.now().subtract(
           const Duration(seconds: 30),
         ),
       );
       await redis.set(
         ns: Namespace.challenges,
-        key: TestEnv.clientId,
+        key: challengeId,
         value: copy.encode(),
       );
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: TestEnv.clientId,
-        },
         body: ChallengeVerificationRequest(
-          challengeId: challenge.challengeId,
+          challengeId: challengeId,
           signature: 'invalid',
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
@@ -112,12 +87,10 @@ void main() {
       final challenge = await ItUtil.getChallenge();
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: TestEnv.clientId,
-        },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -133,12 +106,10 @@ void main() {
       final signature = await keyPair.createSignature(challenge.challenge);
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
-        headers: {
-          headerRequestorId: TestEnv.clientId,
-        },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: signature,
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.ok));

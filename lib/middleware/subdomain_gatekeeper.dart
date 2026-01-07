@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
-import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
@@ -16,13 +15,6 @@ Middleware subdomainGatekeeper() {
       final subdomainContext = context.read<SubdomainContext>();
       if (!subdomainContext.isValid) {
         return handler(context);
-      }
-
-      final clientId = context.read<ClientIdContext>().clientId;
-      if (clientId == null) {
-        return Response(
-          statusCode: HttpStatus.unauthorized,
-        );
       }
 
       final eventBuilder = context.read<we.WideEvent>();

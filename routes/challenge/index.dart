@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
-import 'package:gatekeeper/middleware/client_id_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
@@ -15,42 +14,30 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final clientId = context.read<ClientIdContext>().clientId;
-
-  if (clientId == null) {
-    return Response(
-      statusCode: HttpStatus.unauthorized,
-    );
-  }
-
-  final eventBuilder = context.read<we.WideEvent>();
   final start = DateTime.now();
+  final eventBuilder = context.read<we.WideEvent>();
 
   final redis = context.read<RedisClientBase>();
-  final publicKey = await redis.get(ns: Namespace.users, key: clientId);
-
-  if (publicKey == null) {
-    eventBuilder.challenge = we.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: false,
-    );
-    return Response(
-      statusCode: HttpStatus.unauthorized,
-    );
-  }
 
   final challenge = ChallengeResponse.random();
 
   await redis.set(
     ns: Namespace.challenges,
-    key: clientId,
+    key: challenge.challengeId,
     value: challenge.encode(),
   );
 
   eventBuilder.challenge = we.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
+    challengeId: challenge.challengeId,
   );
+
   return Response.json(
-    body: challenge,
+    body: {
+      'challenge_id': challenge.challengeId,
+      'challenge': challenge.challenge,
+      'expires_at': challenge.expiresAt.toUtc().toIso8601String(),
+      'challenge_code': challenge.challengeCode,
+    },
   );
 }
