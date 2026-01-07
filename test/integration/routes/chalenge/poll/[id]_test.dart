@@ -110,16 +110,97 @@ void main() {
     });
 
     test('returns pending status when challenge is not verified', () async {
-      // TODO: Implement test
+      final sessionId = CryptoUtils.generateId();
+      final unverifiedChallenge = ChallengeResponse(
+        challengeId: CryptoUtils.generateId(),
+        challenge: CryptoUtils.generateBytes(),
+        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+        sessionId: sessionId,
+      );
+
+      await redis.set(
+        ns: Namespace.challenges,
+        key: unverifiedChallenge.challengeId,
+        value: unverifiedChallenge.encode(),
+      );
+
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/${unverifiedChallenge.challengeId}'),
+        headers: {'cookie': 'session_id=$sessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(body['status'], equals('pending'));
     });
 
     test('returns 410 when challenge has already been polled', () async {
-      // TODO: Implement test
+      final sessionId = CryptoUtils.generateId();
+      final apiKey = CryptoUtils.generateId();
+      final polledChallenge = ChallengeResponse(
+        challengeId: CryptoUtils.generateId(),
+        challenge: CryptoUtils.generateBytes(),
+        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+        sessionId: sessionId,
+        isVerified: true,
+        verifiedAt: DateTime.now(),
+        isPolled: true,
+        apiKey: apiKey,
+      );
+
+      await redis.set(
+        ns: Namespace.challenges,
+        key: polledChallenge.challengeId,
+        value: polledChallenge.encode(),
+      );
+
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/${polledChallenge.challengeId}'),
+        headers: {'cookie': 'session_id=$sessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.gone));
     });
 
     test('returns approved status and sets API key cookie on success',
         () async {
-      // TODO: Implement test
+      final sessionId = CryptoUtils.generateId();
+      final apiKey = CryptoUtils.generateId();
+      final verifiedChallenge = ChallengeResponse(
+        challengeId: CryptoUtils.generateId(),
+        challenge: CryptoUtils.generateBytes(),
+        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+        sessionId: sessionId,
+        isVerified: true,
+        verifiedAt: DateTime.now(),
+        apiKey: apiKey,
+      );
+
+      await redis.set(
+        ns: Namespace.challenges,
+        key: verifiedChallenge.challengeId,
+        value: verifiedChallenge.encode(),
+      );
+
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/${verifiedChallenge.challengeId}'),
+        headers: {'cookie': 'session_id=$sessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.ok));
+
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(body['status'], equals('approved'));
+
+      expect(res.headers['set-cookie'], isNotNull);
+      expect(res.headers['set-cookie']!.contains('api_key=$apiKey'), isTrue);
+
+      final updatedChallengeData = await redis.get(
+        ns: Namespace.challenges,
+        key: verifiedChallenge.challengeId,
+      );
+      expect(updatedChallengeData, isNotNull);
+
+      final updatedChallenge = ChallengeResponse.decode(updatedChallengeData!);
+      expect(updatedChallenge.isPolled, isTrue);
     });
   });
 }
