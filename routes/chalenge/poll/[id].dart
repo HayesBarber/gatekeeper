@@ -1,6 +1,10 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/constants/headers.dart';
+import 'package:gatekeeper/dto/challenge_response.dart';
+import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper/util/cookie_util.dart';
 
 Future<Response> onRequest(
   RequestContext context,
@@ -16,5 +20,47 @@ Future<Response> _onGet(
   RequestContext context,
   String id,
 ) async {
-  return Response();
+  final redis = context.read<RedisClientBase>();
+
+  final challengeData = await redis.get(
+    ns: Namespace.challenges,
+    key: id,
+  );
+
+  if (challengeData == null) {
+    return Response(statusCode: HttpStatus.notFound);
+  }
+
+  final challenge = ChallengeResponse.decode(challengeData);
+
+  if (!challenge.isVerified) {
+    return Response.json(
+      body: {'status': 'pending'},
+    );
+  }
+
+  if (challenge.isPolled) {
+    return Response(
+      statusCode: HttpStatus.gone,
+    );
+  }
+
+  final polledChallenge = challenge.markAsPolled();
+  await redis.set(
+    ns: Namespace.challenges,
+    key: id,
+    value: polledChallenge.encode(),
+  );
+
+  final setCookieHeader = CookieUtil.buildSetCookieHeader(
+    'api_key',
+    challenge.apiKey!,
+  );
+
+  return Response.json(
+    body: {'status': 'approved'},
+    headers: {
+      headerSetCookie: setCookieHeader,
+    },
+  );
 }
