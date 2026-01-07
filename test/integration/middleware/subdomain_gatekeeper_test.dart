@@ -48,7 +48,6 @@ void main() {
         TestEnv.apiUri('/health'),
         headers: TestEnv.headersWithSubdomain(
           'api',
-          includeClientId: false,
         ),
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -89,7 +88,6 @@ void main() {
           headers: {
             ...TestEnv.headersWithSubdomain(
               'api',
-              includeClientId: false,
             ),
             headerRequestorId: '${TestEnv.deviceId}-invalid',
             headerAuthorization: 'Bearer dummy-key',

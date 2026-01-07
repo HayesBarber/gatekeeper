@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:gatekeeper/constants/headers.dart';
-
 final class TestEnv {
   static String _require(String key) {
     final value = Platform.environment[key];
@@ -25,16 +23,12 @@ final class TestEnv {
     return _baseUri.replace(path: path);
   }
 
-  static Map<String, String> headersWithSubdomain(
-    String subdomain, {
-    bool includeClientId = true,
-  }) {
+  static Map<String, String> headersWithSubdomain(String subdomain) {
     final host = _baseUri.hasPort
         ? '$subdomain.${_baseUri.host}:${_baseUri.port}'
         : '$subdomain.${_baseUri.host}';
 
     return {
-      if (includeClientId) headerRequestorId: deviceId,
       'host': host,
     };
   }
