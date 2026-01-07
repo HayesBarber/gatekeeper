@@ -49,19 +49,64 @@ void main() {
     });
 
     test('returns 401 when session_id cookie is missing', () async {
-      // TODO: Implement test
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/invalid-id'),
+      );
+      expect(res.statusCode, equals(HttpStatus.unauthorized));
     });
 
     test('returns 404 when challenge does not exist', () async {
-      // TODO: Implement test
+      final sessionId = CryptoUtils.generateId();
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/nonexistent-id'),
+        headers: {'cookie': 'session_id=$sessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.notFound));
     });
 
     test('returns 400 when challenge is expired', () async {
-      // TODO: Implement test
+      final sessionId = CryptoUtils.generateId();
+      final expiredChallenge = ChallengeResponse(
+        challengeId: CryptoUtils.generateId(),
+        challenge: CryptoUtils.generateBytes(),
+        expiresAt: DateTime.now().subtract(const Duration(minutes: 1)),
+        sessionId: sessionId,
+      );
+
+      await redis.set(
+        ns: Namespace.challenges,
+        key: expiredChallenge.challengeId,
+        value: expiredChallenge.encode(),
+      );
+
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/${expiredChallenge.challengeId}'),
+        headers: {'cookie': 'session_id=$sessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.badRequest));
     });
 
     test('returns 403 when session ID does not match', () async {
-      // TODO: Implement test
+      final correctSessionId = CryptoUtils.generateId();
+      final wrongSessionId = CryptoUtils.generateId();
+      final challenge = ChallengeResponse(
+        challengeId: CryptoUtils.generateId(),
+        challenge: CryptoUtils.generateBytes(),
+        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+        sessionId: correctSessionId,
+      );
+
+      await redis.set(
+        ns: Namespace.challenges,
+        key: challenge.challengeId,
+        value: challenge.encode(),
+      );
+
+      final res = await http.get(
+        TestEnv.apiUri('/challenge/poll/${challenge.challengeId}'),
+        headers: {'cookie': 'session_id=$wrongSessionId'},
+      );
+      expect(res.statusCode, equals(HttpStatus.forbidden));
     });
 
     test('returns pending status when challenge is not verified', () async {
