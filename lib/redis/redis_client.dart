@@ -30,6 +30,9 @@ abstract class RedisClientBase {
     required Namespace ns,
     required T Function(String) parser,
   });
+  Future<void> deleteAll({
+    required Namespace ns,
+  });
   Future<void> close();
 
   String redisKey(Namespace ns, String key) {

@@ -230,6 +230,13 @@ void main() {
           value: any(named: 'value'),
         ),
       ).thenAnswer((_) async => {});
+      when(
+        () => redisClient.set(
+          ns: Namespace.challenges,
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       final response = await route.onRequest(context);
 

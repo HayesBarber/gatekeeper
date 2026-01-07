@@ -1,10 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
@@ -98,23 +95,10 @@ void main() {
 
     test('returns 200 and api key for valid handshake', () async {
       final challenge = await ItUtil.getChallenge();
-      final keyPair = ECCKeyPair.fromJson(
-        Map<String, String>.from(
-          jsonDecode(TestEnv.keyPairJson) as Map<String, dynamic>,
-        ),
+      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+        challenge.challengeId,
+        challenge.challenge,
       );
-      final signature = await keyPair.createSignature(challenge.challenge);
-      final res = await http.post(
-        TestEnv.apiUri('/challenge/verify'),
-        body: ChallengeVerificationRequest(
-          challengeId: challenge.challengeId,
-          signature: signature,
-          deviceId: TestEnv.deviceId,
-        ).encode(),
-      );
-      expect(res.statusCode, equals(HttpStatus.ok));
-      expect(res.body, isNotEmpty);
-      final apiKeyResponse = ChallengeVerificationResponse.decode(res.body);
       expect(apiKeyResponse.apiKey, isNotEmpty);
       expect(apiKeyResponse.expiresAt, isNotNull);
     });
