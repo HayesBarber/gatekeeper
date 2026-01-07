@@ -254,6 +254,9 @@
                 } else if (response.status === 400) {
                     stopPolling();
                     displayError('Challenge expired.');
+                } else if (response.status === 404) {
+                    stopPolling();
+                    displayError('Challenge not found.');
                 } else {
                     pollBackoffMs = Math.min(pollBackoffMs * 2, 30000);
                 }
