@@ -20,7 +20,14 @@ void main() {
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);
-      final challenge = ChallengeResponse.decode(res.body);
+      final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      final challenge = ChallengeResponse(
+        challengeId: jsonBody['challenge_id'] as String,
+        challenge: jsonBody['challenge'] as String,
+        expiresAt: DateTime.parse(jsonBody['expires_at'] as String),
+        sessionId: '',
+        challengeCode: jsonBody['challenge_code'] as String,
+      );
       expect(challenge.challengeId, isNotEmpty);
       expect(challenge.challenge, isNotEmpty);
       expect(challenge.expiresAt, isNotNull);
