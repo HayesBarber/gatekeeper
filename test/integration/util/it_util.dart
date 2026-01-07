@@ -12,7 +12,7 @@ class ItUtil {
     final challengeRes = await http.post(
       TestEnv.apiUri('/challenge'),
       headers: {
-        headerRequestorId: TestEnv.clientId,
+        headerRequestorId: TestEnv.deviceId,
       },
     );
     expect(challengeRes.statusCode, equals(HttpStatus.ok));

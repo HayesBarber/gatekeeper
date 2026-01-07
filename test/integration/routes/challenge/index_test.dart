@@ -13,7 +13,7 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerRequestorId: TestEnv.clientId,
+          headerRequestorId: TestEnv.deviceId,
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));

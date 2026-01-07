@@ -54,7 +54,7 @@ void main() {
         body: ChallengeVerificationRequest(
           challengeId: 'invalid',
           signature: 'invalid',
-          deviceId: TestEnv.clientId,
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.notFound));
@@ -76,12 +76,12 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          headerRequestorId: TestEnv.clientId,
+          headerRequestorId: TestEnv.deviceId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'invalid',
-          deviceId: TestEnv.clientId,
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.badRequest));
@@ -92,12 +92,12 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          headerRequestorId: TestEnv.clientId,
+          headerRequestorId: TestEnv.deviceId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: 'invalid',
-          deviceId: TestEnv.clientId,
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -114,12 +114,12 @@ void main() {
       final res = await http.post(
         TestEnv.apiUri('/challenge/verify'),
         headers: {
-          headerRequestorId: TestEnv.clientId,
+          headerRequestorId: TestEnv.deviceId,
         },
         body: ChallengeVerificationRequest(
           challengeId: challenge.challengeId,
           signature: signature,
-          deviceId: TestEnv.clientId,
+          deviceId: TestEnv.deviceId,
         ).encode(),
       );
       expect(res.statusCode, equals(HttpStatus.ok));

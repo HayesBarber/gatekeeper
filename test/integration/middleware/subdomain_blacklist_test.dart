@@ -23,11 +23,11 @@ void main() {
     tearDown(() async {
       await redis.delete(
         ns: Namespace.challenges,
-        key: TestEnv.clientId,
+        key: TestEnv.deviceId,
       );
       await redis.delete(
         ns: Namespace.apiKeys,
-        key: TestEnv.clientId,
+        key: TestEnv.deviceId,
       );
     });
 

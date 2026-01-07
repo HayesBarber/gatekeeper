@@ -16,7 +16,7 @@ final class TestEnv {
 
   static final Uri _baseUri = Uri.parse(_require('API_BASE_URL'));
 
-  static final String clientId = _require('CLIENT_ID');
+  static final String deviceId = _require('DEVICE_ID');
   static final String keyPairJson = _require('KEY_PAIR_JSON');
   static final String redisHost = _require('REDIS_HOST');
   static final String githubWebhookSecret = _require('GITHUB_WEBHOOK_SECRET');
@@ -34,7 +34,7 @@ final class TestEnv {
         : '$subdomain.${_baseUri.host}';
 
     return {
-      if (includeClientId) headerRequestorId: clientId,
+      if (includeClientId) headerRequestorId: deviceId,
       'host': host,
     };
   }
