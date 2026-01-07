@@ -21,6 +21,7 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);
       final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody.keys, isNot(contains('session_id')));
       final challenge = ChallengeResponse(
         challengeId: jsonBody['challenge_id'] as String,
         challenge: jsonBody['challenge'] as String,
@@ -130,6 +131,7 @@ void main() {
       expect(challenges[0]['challenge_id'], equals(challenge1.challengeId));
       expect(challenges[0]['challenge'], equals(challenge1.challenge));
       expect(challenges[0]['challenge_code'], equals(challenge1.challengeCode));
+      expect(challenges[0].keys, isNot(contains('session_id')));
     });
 
     test('returns challenges with correct fields only', () async {
@@ -161,6 +163,7 @@ void main() {
           ['challenge_id', 'challenge', 'expires_at', 'challenge_code'],
         ),
       );
+      expect(challengeData.keys, isNot(contains('session_id')));
       expect(challengeData['challenge_id'], equals(challenge2.challengeId));
       expect(challengeData['challenge'], equals(challenge2.challenge));
       expect(challengeData['challenge_code'], equals(challenge2.challengeCode));
