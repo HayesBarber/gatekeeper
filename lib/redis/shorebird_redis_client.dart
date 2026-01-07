@@ -80,4 +80,15 @@ class ShorebirdRedisClient extends RedisClientBase {
         .toList();
     return results;
   }
+
+  @override
+  Future<void> deleteAll({
+    required Namespace ns,
+  }) async {
+    final pattern = '${ns.key}:*';
+    final fullKeys = await _client.keys(pattern: pattern);
+    for (final key in fullKeys) {
+      await _client.delete(key: key);
+    }
+  }
 }
