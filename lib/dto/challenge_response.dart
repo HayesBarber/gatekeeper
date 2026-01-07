@@ -8,6 +8,7 @@ class ChallengeResponse {
     required this.challengeId,
     required this.challenge,
     required this.expiresAt,
+    required this.sessionId,
     String? challengeCode,
     this.isVerified = false,
     this.verifiedAt,
@@ -17,6 +18,7 @@ class ChallengeResponse {
 
   factory ChallengeResponse.random() {
     final challengeId = CryptoUtils.generateId();
+    final sessionId = CryptoUtils.generateId();
     final challenge = CryptoUtils.generateBytes();
     final code = CryptoUtils.generateThreeDigitCode();
     final ttlSeconds = Namespace.challenges.ttlSeconds();
@@ -27,6 +29,7 @@ class ChallengeResponse {
       challenge: challenge,
       expiresAt: expiresAt,
       challengeCode: code,
+      sessionId: sessionId,
     );
   }
 
@@ -42,6 +45,7 @@ class ChallengeResponse {
           : null,
       isPolled: json['is_polled'] as bool? ?? false,
       apiKey: json['api_key'] as String?,
+      sessionId: json['session_id'] as String,
     );
   }
 
@@ -72,6 +76,9 @@ class ChallengeResponse {
   /// API key generated when challenge was verified (for polling)
   final String? apiKey;
 
+  /// Session ID for challenge validation
+  final String sessionId;
+
   Map<String, dynamic> toJson() {
     return {
       'challenge_id': challengeId,
@@ -82,6 +89,7 @@ class ChallengeResponse {
       'verified_at': verifiedAt?.toUtc().toIso8601String(),
       'is_polled': isPolled,
       'api_key': apiKey,
+      'session_id': sessionId,
     };
   }
 
@@ -98,6 +106,7 @@ class ChallengeResponse {
       verifiedAt: now,
       isPolled: isPolled,
       apiKey: apiKey,
+      sessionId: sessionId,
     );
   }
 
@@ -111,6 +120,7 @@ class ChallengeResponse {
       verifiedAt: verifiedAt,
       isPolled: true,
       apiKey: apiKey,
+      sessionId: sessionId,
     );
   }
 

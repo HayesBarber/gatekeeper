@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
@@ -77,7 +78,14 @@ void main() {
       expect(response.statusCode, equals(HttpStatus.ok));
 
       final body = await response.body();
-      final challenge = ChallengeResponse.decode(body);
+      final jsonBody = jsonDecode(body) as Map<String, dynamic>;
+      final challenge = ChallengeResponse(
+        challengeId: jsonBody['challenge_id'] as String,
+        challenge: jsonBody['challenge'] as String,
+        expiresAt: DateTime.parse(jsonBody['expires_at'] as String),
+        sessionId: '',
+        challengeCode: jsonBody['challenge_code'] as String,
+      );
       expect(challenge.challengeId, isNotEmpty);
       expect(challenge.challenge, isNotEmpty);
       expect(challenge.expiresAt, isNotNull);

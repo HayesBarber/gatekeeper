@@ -110,6 +110,7 @@ void main() {
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
+        sessionId: 'test-session-id',
       );
       when(() => request.body()).thenAnswer(
         (_) async => ChallengeVerificationRequest(
@@ -136,6 +137,7 @@ void main() {
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
+        sessionId: 'test-session-id',
       );
 
       when(() => request.body()).thenAnswer(
@@ -163,6 +165,7 @@ void main() {
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
+        sessionId: 'test-session-id',
       );
 
       when(() => request.body()).thenAnswer(
@@ -197,6 +200,7 @@ void main() {
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
+        sessionId: 'test-session-id',
       );
 
       when(() => request.body()).thenAnswer(
