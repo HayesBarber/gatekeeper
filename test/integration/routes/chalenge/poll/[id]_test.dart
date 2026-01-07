@@ -33,7 +33,19 @@ void main() {
     });
 
     test('returns 405 for non-GET methods', () async {
-      // TODO: Implement test
+      final methods = [
+        (http.post, 'POST'),
+        (http.put, 'PUT'),
+        (http.patch, 'PATCH'),
+        (http.delete, 'DELETE'),
+      ];
+
+      for (final record in methods) {
+        final res = await record.$1(
+          TestEnv.apiUri('/challenge/poll/invalid-id'),
+        );
+        expect(res.statusCode, equals(HttpStatus.methodNotAllowed));
+      }
     });
 
     test('returns 401 when session_id cookie is missing', () async {
