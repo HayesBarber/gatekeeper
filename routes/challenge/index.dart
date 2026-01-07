@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
+import 'package:gatekeeper/util/cookie_util.dart';
 import 'package:gatekeeper/util/extensions.dart';
 
 Future<Response> onRequest(RequestContext context) {
@@ -34,12 +36,22 @@ Future<Response> _onPost(RequestContext context) async {
     challengeId: challenge.challengeId,
   );
 
+  final setCookieHeader = CookieUtil.buildSetCookieHeader(
+    'session_id',
+    challenge.sessionId,
+    path: '/',
+    sameSite: 'Strict',
+  );
+
   return Response.json(
     body: {
       'challenge_id': challenge.challengeId,
       'challenge': challenge.challenge,
       'expires_at': challenge.expiresAt.toUtc().toIso8601String(),
       'challenge_code': challenge.challengeCode,
+    },
+    headers: {
+      headerSetCookie: setCookieHeader,
     },
   );
 }

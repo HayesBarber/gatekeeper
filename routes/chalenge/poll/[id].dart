@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
+import 'package:gatekeeper/middleware/cookie_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
 
@@ -20,6 +21,13 @@ Future<Response> _onGet(
   RequestContext context,
   String id,
 ) async {
+  final cookieContext = context.read<CookieContext>();
+  final sessionId = cookieContext['session_id'];
+
+  if (sessionId == null) {
+    return Response(statusCode: HttpStatus.unauthorized);
+  }
+
   final redis = context.read<RedisClientBase>();
 
   final challengeData = await redis.get(
@@ -32,6 +40,10 @@ Future<Response> _onGet(
   }
 
   final challenge = ChallengeResponse.decode(challengeData);
+
+  if (challenge.sessionId != sessionId) {
+    return Response(statusCode: HttpStatus.forbidden);
+  }
 
   if (!challenge.isVerified) {
     return Response.json(

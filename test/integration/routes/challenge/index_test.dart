@@ -171,6 +171,7 @@ void main() {
         challengeId: CryptoUtils.generateId(),
         challenge: CryptoUtils.generateBytes(),
         expiresAt: DateTime.now().subtract(const Duration(seconds: 45)),
+        sessionId: 'test-session-id',
       );
 
       await redis.set(

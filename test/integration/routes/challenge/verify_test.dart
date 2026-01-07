@@ -63,6 +63,7 @@ void main() {
         expiresAt: DateTime.now().subtract(
           const Duration(seconds: 30),
         ),
+        sessionId: 'test-session-id',
       );
       await redis.set(
         ns: Namespace.challenges,
