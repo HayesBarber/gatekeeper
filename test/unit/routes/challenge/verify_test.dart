@@ -38,7 +38,7 @@ void main() {
     late _MockSignatureVerifier verifier;
     late _MockWideEvent wideEvent;
 
-    const clientId = 'client-123';
+    const deviceId = 'device-123';
     const publicKey = 'public-key';
     const challengeId = 'challenge-id';
     const challengeValue = 'challenge-value';
@@ -72,11 +72,11 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => null);
 
       final response = await route.onRequest(context);
@@ -89,12 +89,12 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
 
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: challengeId),
@@ -115,12 +115,12 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: 'wrong-id',
           signature: 'sig',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
 
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: 'wrong-id'),
@@ -142,12 +142,12 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
 
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: challengeId),
@@ -169,12 +169,12 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'bad-sig',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
 
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => publicKey);
       when(
         () => redisClient.get(ns: Namespace.challenges, key: challengeId),
@@ -203,12 +203,12 @@ void main() {
         (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'valid-signature',
-          deviceId: clientId,
+          deviceId: deviceId,
         ).encode(),
       );
 
       when(
-        () => redisClient.get(ns: Namespace.devices, key: clientId),
+        () => redisClient.get(ns: Namespace.devices, key: deviceId),
       ).thenAnswer((_) async => publicKey);
 
       when(

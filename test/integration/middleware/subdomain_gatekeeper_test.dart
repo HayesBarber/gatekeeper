@@ -89,7 +89,6 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerRequestorId: '${TestEnv.deviceId}-invalid',
             headerAuthorization: 'Bearer dummy-key',
           },
         );

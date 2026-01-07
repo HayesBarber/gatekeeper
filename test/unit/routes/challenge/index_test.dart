@@ -4,7 +4,6 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
-import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
@@ -31,7 +30,6 @@ void main() {
     late _MockRedisClient redisClient;
     late _MockWideEvent wideEvent;
 
-    const clientId = 'client-123';
     const redisUserKey = 'user-123';
     const redisHost = '127.0.0.1';
 
@@ -58,7 +56,6 @@ void main() {
     });
 
     test('returns 200 and challenge', () async {
-      when(() => request.headers).thenReturn({headerRequestorId: clientId});
       when(
         () => redisClient.get(
           ns: Namespace.devices,

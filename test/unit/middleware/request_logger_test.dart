@@ -64,7 +64,6 @@ void main() {
         userAgent: 'test-agent',
         forwardedFor: '192.168.1.1',
         contentLength: '100',
-        headerRequestorId: 'client-123',
       });
 
       final middleware = gl.requestLogger(logger);

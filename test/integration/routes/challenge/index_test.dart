@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -12,9 +11,6 @@ void main() {
     test('returns 200 and challenge', () async {
       final res = await http.post(
         TestEnv.apiUri('/challenge'),
-        headers: {
-          headerRequestorId: TestEnv.deviceId,
-        },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);
