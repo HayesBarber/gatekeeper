@@ -46,21 +46,17 @@ void main() {
 
   group('GET /challenge', () {
     late RedisClientBase redis;
-    const challengeId = 'a729da79-d2c6-4283-aa27-e8b11cce1bc1';
-    const mockApiKey = 'e74df6a2-f6a0-43c7-b66d-155d9b9309b6';
 
     setUpAll(() async {
       redis = await ShorebirdRedisClient.connect(host: TestEnv.redisHost);
     });
 
     tearDown(() async {
-      await redis.delete(
+      await redis.deleteAll(
         ns: Namespace.challenges,
-        key: challengeId,
       );
-      await redis.delete(
+      await redis.deleteAll(
         ns: Namespace.apiKeys,
-        key: mockApiKey,
       );
     });
 
