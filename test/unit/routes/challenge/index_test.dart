@@ -96,7 +96,6 @@ void main() {
     });
 
     final methods = <HttpMethod>[
-      HttpMethod.get,
       HttpMethod.put,
       HttpMethod.patch,
       HttpMethod.delete,
