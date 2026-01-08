@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/middleware/cookie_provider.dart';
@@ -68,10 +69,12 @@ Future<Response> _onGet(
     value: polledChallenge.encode(),
   );
 
+  final config = context.read<ConfigService>().config;
   final setCookieHeader = CookieUtil.buildSetCookieHeader(
     'api_key',
     challenge.apiKey!,
     path: '/',
+    domain: config.domain,
   );
 
   return Response.json(

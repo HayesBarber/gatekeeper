@@ -11,6 +11,7 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '192.168.1.10');
+      expect(config.domain, 'test-domain.com');
       expect(
         config.logging,
         const LoggingConfig(
@@ -46,6 +47,7 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
+      expect(config.domain, isNull);
       expect(
         config.logging,
         const LoggingConfig(
@@ -61,6 +63,7 @@ void main() {
       final config = service.config;
 
       expect(config.redisHost, '127.0.0.1');
+      expect(config.domain, isNull);
       expect(
         config.logging,
         const LoggingConfig(
