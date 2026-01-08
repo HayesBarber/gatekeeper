@@ -79,17 +79,68 @@ Future<Map<String, dynamic>> runVerificationFlow(Config config) async {
     final challenges =
         (jsonDecode(challengesRes.body) as List).cast<Map<String, dynamic>>();
 
+    final additionalResults = <Map<String, dynamic>>[];
+    var verifiedCount = 0;
+    var failedCount = 0;
+
     for (final challenge in challenges) {
-      //todo sign each challenge and verify it
+      try {
+        final signature =
+            await keyPair.createSignature(challenge['challenge'] as String);
+        final verificationRequest = ChallengeVerificationRequest(
+          challengeId: challenge['challenge_id'] as String,
+          signature: signature,
+          deviceId: config.deviceId,
+        );
+
+        final verificationResponse = await http.post(
+          Uri.parse('${config.baseUrl}/challenge/verify'),
+          body: verificationRequest.encode(),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        if (verificationResponse.statusCode == 200) {
+          verifiedCount++;
+          additionalResults.add({
+            'challenge_id': challenge['challenge_id'],
+            'success': true,
+            'error': null,
+          });
+        } else {
+          failedCount++;
+          additionalResults.add({
+            'challenge_id': challenge['challenge_id'],
+            'success': false,
+            'error': 'HTTP ${verificationResponse.statusCode}',
+          });
+        }
+      } catch (e) {
+        failedCount++;
+        additionalResults.add({
+          'challenge_id': challenge['challenge_id'],
+          'success': false,
+          'error': e.toString(),
+        });
+      }
     }
 
+    final allAdditionalSucceeded = failedCount == 0 && challenges.isNotEmpty;
+
+    final overallSuccess = allAdditionalSucceeded;
+
     return {
-      'success': true,
-      'challenge': {
+      'success': overallSuccess,
+      'initial_challenge': {
         'challenge_id': challengeData['challenge_id'],
         'challenge': challenge,
         'challenge_code': challengeData['challenge_code'],
         'expires_at': challengeData['expires_at'],
+      },
+      'additional_challenges': {
+        'total': challenges.length,
+        'verified': verifiedCount,
+        'failed': failedCount,
+        'results': additionalResults,
       },
       'verification': {
         'api_key': verificationData.apiKey,
