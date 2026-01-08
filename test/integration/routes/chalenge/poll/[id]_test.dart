@@ -8,7 +8,6 @@ import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import '../../../util/it_util.dart';
 import '../../../util/test_env.dart';
 
 void main() {
