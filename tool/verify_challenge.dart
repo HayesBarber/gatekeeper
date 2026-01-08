@@ -68,6 +68,20 @@ Future<Map<String, dynamic>> runVerificationFlow(Config config) async {
 
     final verificationData =
         ChallengeVerificationResponse.decode(verificationResponse.body);
+    final apiKey = verificationData.apiKey;
+
+    final challengesRes = await http.get(
+      Uri.parse('${config.baseUrl}/challenge'),
+      headers: {
+        'authorization': 'Bearer $apiKey',
+      },
+    );
+    final challenges =
+        (jsonDecode(challengesRes.body) as List).cast<Map<String, dynamic>>();
+
+    for (final challenge in challenges) {
+      //todo sign each challenge and verify it
+    }
 
     return {
       'success': true,
