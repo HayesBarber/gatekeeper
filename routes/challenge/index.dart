@@ -40,7 +40,6 @@ Future<Response> _onPost(RequestContext context) async {
     'session_id',
     challenge.sessionId,
     path: '/',
-    sameSite: 'Strict',
   );
 
   return Response.json(

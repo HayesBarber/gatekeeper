@@ -7,7 +7,7 @@ void main() {
       test('builds basic cookie header with default security attributes', () {
         final header = CookieUtil.buildSetCookieHeader('test', 'value');
 
-        expect(header, equals('test=value; HttpOnly; Secure; SameSite=Lax'));
+        expect(header, equals('test=value; HttpOnly; Secure; SameSite=Strict'));
       });
 
       test('builds cookie with all attributes', () {
@@ -21,7 +21,7 @@ void main() {
           maxAge: 3600,
           httpOnly: false,
           secure: false,
-          sameSite: 'Strict',
+          sameSite: 'Lax',
         );
 
         expect(header, contains('session=abc123'));
@@ -31,7 +31,7 @@ void main() {
         expect(header, contains('Max-Age=3600'));
         expect(header, isNot(contains('HttpOnly')));
         expect(header, isNot(contains('Secure')));
-        expect(header, contains('SameSite=Strict'));
+        expect(header, contains('SameSite=Lax'));
       });
 
       test('builds cookie with only expiration', () {
@@ -46,7 +46,7 @@ void main() {
         expect(header, contains('Expires='));
         expect(header, contains('HttpOnly'));
         expect(header, contains('Secure'));
-        expect(header, contains('SameSite=Lax'));
+        expect(header, contains('SameSite=Strict'));
         expect(header, isNot(contains('Domain=')));
         expect(header, isNot(contains('Path=')));
         expect(header, isNot(contains('Max-Age=')));
@@ -65,7 +65,7 @@ void main() {
         expect(header, contains('Path=/api'));
         expect(header, contains('HttpOnly'));
         expect(header, contains('Secure'));
-        expect(header, contains('SameSite=Lax'));
+        expect(header, contains('SameSite=Strict'));
       });
 
       test('builds cookie with max-age only', () {
@@ -79,13 +79,13 @@ void main() {
         expect(header, contains('Max-Age=7200'));
         expect(header, contains('HttpOnly'));
         expect(header, contains('Secure'));
-        expect(header, contains('SameSite=Lax'));
+        expect(header, contains('SameSite=Strict'));
       });
 
       test('handles empty values correctly', () {
         final header = CookieUtil.buildSetCookieHeader('empty', '');
 
-        expect(header, equals('empty=; HttpOnly; Secure; SameSite=Lax'));
+        expect(header, equals('empty=; HttpOnly; Secure; SameSite=Strict'));
       });
 
       test('handles special characters in values', () {
@@ -99,7 +99,6 @@ void main() {
         final strict = CookieUtil.buildSetCookieHeader(
           'strict',
           'value',
-          sameSite: 'Strict',
         );
         final none = CookieUtil.buildSetCookieHeader(
           'none',
@@ -157,7 +156,7 @@ void main() {
         final header = CookieUtil.buildSetCookieHeader(longName, longValue);
 
         expect(header, startsWith('$longName=$longValue'));
-        expect(header, contains('HttpOnly; Secure; SameSite=Lax'));
+        expect(header, contains('HttpOnly; Secure; SameSite=Strict'));
       });
 
       test('handles cookies with underscores in names', () {
@@ -229,7 +228,7 @@ void main() {
         expect(header, contains('Max-Age=3600'));
         expect(header, contains('HttpOnly'));
         expect(header, contains('Secure'));
-        expect(header, contains('SameSite=Lax'));
+        expect(header, contains('SameSite=Strict'));
       });
 
       test('separates attributes with semicolon and space', () {

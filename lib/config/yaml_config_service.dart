@@ -49,7 +49,12 @@ class YamlConfigService implements ConfigService {
       redisHost: _getRedisHost(doc),
       subdomains: _getSubdomainUpstreams(doc),
       logging: _getLoggingConfig(doc),
+      domain: _getDomain(doc),
     );
+  }
+
+  static String? _getDomain(YamlMap? doc) {
+    return doc?['domain'] as String?;
   }
 
   static String _getRedisHost(YamlMap? doc) {

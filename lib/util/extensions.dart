@@ -1,3 +1,5 @@
+import 'package:gatekeeper/constants/headers.dart';
+
 extension DateTimeDiff on DateTime {
   /// Duration from [start] to this DateTime (this - start) in ms
   int since(DateTime start) => difference(start).inMilliseconds;
@@ -18,7 +20,7 @@ extension Headers on Map<String, String> {
   String? bearer() => authorization('Bearer');
 
   Map<String, String>? cookies() {
-    final cookieString = this['Cookie'];
+    final cookieString = this[cookie];
     if (cookieString == null) return null;
 
     final cookiesEntries = cookieString.split('; ').map((cookie) {
