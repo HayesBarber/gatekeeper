@@ -10,7 +10,7 @@ class CookieUtil {
     int? maxAge,
     bool httpOnly = true,
     bool secure = true,
-    String sameSite = 'Lax',
+    String sameSite = 'Strict',
   }) {
     final cookieParts = <String>['$name=$value'];
 

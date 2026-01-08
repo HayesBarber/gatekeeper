@@ -71,6 +71,7 @@ Future<Response> _onGet(
   final setCookieHeader = CookieUtil.buildSetCookieHeader(
     'api_key',
     challenge.apiKey!,
+    path: '/',
   );
 
   return Response.json(
