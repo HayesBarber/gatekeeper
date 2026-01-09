@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
@@ -23,6 +24,7 @@ Future<Response> _onPost(RequestContext context) async {
   final request = ChallengeVerificationRequest.decode(bodyString);
 
   final redis = context.read<RedisClientBase>();
+  final config = context.read<ConfigService>();
   final publicKey = await redis.get(
     ns: Namespace.devices,
     key: request.deviceId,
@@ -105,8 +107,12 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final apiKey = ChallengeVerificationResponse.random();
-  final verifiedChallenge = challenge.markAsVerified(apiKey: apiKey.apiKey);
+  final apiKey =
+      ChallengeVerificationResponse.random(ttl: config.config.redis.apiKeysTtl);
+  final verifiedChallenge = challenge.markAsVerified(
+    apiKey: apiKey.apiKey,
+    pollingTtl: config.config.redis.challengesTtl,
+  );
 
   await redis.set(
     ns: Namespace.challenges,
@@ -118,6 +124,7 @@ Future<Response> _onPost(RequestContext context) async {
     ns: Namespace.apiKeys,
     key: apiKey.apiKey,
     value: apiKey.encode(),
+    ttl: config.config.redis.apiKeysTtl,
   );
 
   eventBuilder.challenge = we.ChallengeContext(

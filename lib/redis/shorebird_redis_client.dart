@@ -61,7 +61,7 @@ class ShorebirdRedisClient extends RedisClientBase {
       _client.set(
         key: super.redisKey(ns, key),
         value: value,
-        ttl: ttl ?? ns.ttl,
+        ttl: ttl,
       );
 
   @override

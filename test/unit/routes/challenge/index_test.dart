@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
+import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
@@ -32,7 +33,6 @@ void main() {
     late _MockWideEvent wideEvent;
 
     const redisUserKey = 'user-123';
-    const redisHost = '127.0.0.1';
 
     setUp(() {
       context = _MockRequestContext();
@@ -49,7 +49,7 @@ void main() {
 
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: redisHost,
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {},
           logging: const LoggingConfig.defaultConfig(),
         ),
@@ -68,6 +68,7 @@ void main() {
           ns: Namespace.challenges,
           key: any(named: 'key'),
           value: any(named: 'value'),
+          ttl: any(named: 'ttl'),
         ),
       ).thenAnswer(
         (_) async => {},

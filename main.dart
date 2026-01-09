@@ -13,7 +13,7 @@ Future<void> init(InternetAddress ip, int port) async {
   );
 
   await ShorebirdRedisClient.connect(
-    host: configService.config.redisHost,
+    host: configService.config.redis.host,
   );
 }
 

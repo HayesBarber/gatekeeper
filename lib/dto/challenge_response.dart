@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
-import 'package:gatekeeper/redis/redis_client.dart';
 
 class ChallengeResponse {
   ChallengeResponse({
@@ -16,13 +15,13 @@ class ChallengeResponse {
     this.apiKey,
   }) : challengeCode = challengeCode ?? CryptoUtils.generateThreeDigitCode();
 
-  factory ChallengeResponse.random() {
+  factory ChallengeResponse.random({Duration? ttl}) {
     final challengeId = CryptoUtils.generateId();
     final sessionId = CryptoUtils.generateId();
     final challenge = CryptoUtils.generateBytes();
     final code = CryptoUtils.generateThreeDigitCode();
-    final ttlSeconds = Namespace.challenges.ttlSeconds();
-    final expiresAt = DateTime.now().toUtc().add(Duration(seconds: ttlSeconds));
+    final effectiveTtl = ttl ?? const Duration(seconds: 30);
+    final expiresAt = DateTime.now().toUtc().add(effectiveTtl);
 
     return ChallengeResponse(
       challengeId: challengeId,
@@ -93,9 +92,13 @@ class ChallengeResponse {
     };
   }
 
-  ChallengeResponse markAsVerified({required String apiKey}) {
+  ChallengeResponse markAsVerified({
+    required String apiKey,
+    Duration? pollingTtl,
+  }) {
     final now = DateTime.now().toUtc();
-    final pollingExpiresAt = now.add(const Duration(seconds: 30));
+    final effectivePollingTtl = pollingTtl ?? const Duration(seconds: 30);
+    final pollingExpiresAt = now.add(effectivePollingTtl);
 
     return ChallengeResponse(
       challengeId: challengeId,

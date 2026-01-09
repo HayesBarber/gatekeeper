@@ -10,7 +10,7 @@ void main() {
       final service = await YamlConfigService.load(path: fullYaml);
       final config = service.config;
 
-      expect(config.redisHost, '192.168.1.10');
+      expect(config.redis.host, '192.168.1.10');
       expect(config.domain, 'test-domain.com');
       expect(
         config.logging,
@@ -46,7 +46,7 @@ void main() {
       final service = await YamlConfigService.load(path: invalidPath);
       final config = service.config;
 
-      expect(config.redisHost, '127.0.0.1');
+      expect(config.redis.host, '127.0.0.1');
       expect(config.domain, isNull);
       expect(
         config.logging,
@@ -62,7 +62,7 @@ void main() {
       final service = await YamlConfigService.load(path: partialYaml);
       final config = service.config;
 
-      expect(config.redisHost, '127.0.0.1');
+      expect(config.redis.host, '127.0.0.1');
       expect(config.domain, isNull);
       expect(
         config.logging,

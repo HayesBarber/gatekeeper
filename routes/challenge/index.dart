@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
@@ -22,13 +23,16 @@ Future<Response> _onPost(RequestContext context) async {
   final eventBuilder = context.read<we.WideEvent>();
 
   final redis = context.read<RedisClientBase>();
+  final config = context.read<ConfigService>();
 
-  final challenge = ChallengeResponse.random();
+  final challenge =
+      ChallengeResponse.random(ttl: config.config.redis.challengesTtl);
 
   await redis.set(
     ns: Namespace.challenges,
     key: challenge.challengeId,
     value: challenge.encode(),
+    ttl: config.config.redis.challengesTtl,
   );
 
   eventBuilder.challenge = we.ChallengeContext(
