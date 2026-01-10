@@ -67,28 +67,28 @@ class RequestContext {
 
 class AuthenticationContext {
   AuthenticationContext({
-    this.apiKeyPresent,
-    this.apiKeySource,
-    this.apiKeyStored,
-    this.apiKeyValid,
+    this.authTokenPresent,
+    this.authTokenSource,
+    this.authTokenStored,
+    this.authTokenValid,
     this.keyExpired,
     this.pathBlacklisted,
     this.authDurationMs,
   });
-  final bool? apiKeyPresent;
-  final String? apiKeySource;
-  final bool? apiKeyStored;
-  final bool? apiKeyValid;
+  final bool? authTokenPresent;
+  final String? authTokenSource;
+  final bool? authTokenStored;
+  final bool? authTokenValid;
   final bool? keyExpired;
   final bool? pathBlacklisted;
   final int? authDurationMs;
 
   Map<String, dynamic> toJson() {
     return {
-      if (apiKeyPresent != null) 'api_key_present': apiKeyPresent,
-      if (apiKeySource != null) 'api_key_source': apiKeySource,
-      if (apiKeyStored != null) 'api_key_stored': apiKeyStored,
-      if (apiKeyValid != null) 'api_key_valid': apiKeyValid,
+      if (authTokenPresent != null) 'auth_token_present': authTokenPresent,
+      if (authTokenSource != null) 'auth_token_source': authTokenSource,
+      if (authTokenStored != null) 'auth_token_stored': authTokenStored,
+      if (authTokenValid != null) 'auth_token_valid': authTokenValid,
       if (keyExpired != null) 'key_expired': keyExpired,
       if (pathBlacklisted != null) 'path_blacklisted': pathBlacklisted,
       if (authDurationMs != null) 'auth_duration_ms': authDurationMs,
@@ -145,9 +145,9 @@ class ResponseContext {
     this.contentLength,
   });
   const ResponseContext.unknown()
-      : statusCode = -1,
-        durationMs = -1,
-        contentLength = -1;
+    : statusCode = -1,
+      durationMs = -1,
+      contentLength = -1;
   final int statusCode;
   final int durationMs;
   final int? contentLength;
