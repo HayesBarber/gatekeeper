@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 

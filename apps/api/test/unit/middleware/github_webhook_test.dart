@@ -1,14 +1,10 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/app_config.dart';
-import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/config/logging_config.dart';
-import 'package:gatekeeper/config/redis_config.dart';
-import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';

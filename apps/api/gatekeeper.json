@@ -1,0 +1,30 @@
+{
+  "redis": {
+    "host": "127.0.0.1",
+    "ttl": {
+      "challenges": "30s",
+      "auth_tokens": "5m"
+    }
+  },
+  "subdomains": {
+    "api": {
+      "url": "http://localhost:3000",
+      "blacklist": {
+        "GET": ["/admin/*", "/health"],
+        "POST": ["/users/delete"]
+      }
+    },
+    "github": {
+      "url": "http://localhost:6000",
+      "secret": "github-webhook-secret"
+    },
+    "webhooks": {
+      "url": "https://webhook.example.com"
+    }
+  },
+  "logging": {
+    "enabled": true
+  },
+  "domain": "example-domain.com"
+}
+

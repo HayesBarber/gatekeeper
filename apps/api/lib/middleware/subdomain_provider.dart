@@ -1,7 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/util/subdomain.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 
 class SubdomainContext {
   const SubdomainContext({
