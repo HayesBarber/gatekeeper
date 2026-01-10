@@ -72,11 +72,15 @@ void main() {
         Uri.parse('http://github.example.com/'),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {},
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': <String, dynamic>{},
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       final res = await githubWebhook()(handler)(context);
       expect(res.statusCode, equals(HttpStatus.ok));
@@ -89,15 +93,19 @@ void main() {
         Uri.parse('http://github.example.com/'),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': {
+            'github': SubdomainConfig(
               url: 'testing',
             ),
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       final res = await githubWebhook()(handler)(context);
       expect(res.statusCode, equals(HttpStatus.ok));
