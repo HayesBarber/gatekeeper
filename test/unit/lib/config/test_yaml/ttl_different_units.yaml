@@ -1,0 +1,7 @@
+redis:
+  host: "test-host"
+  ttl:
+    challenges: "1h"
+    api_keys: "2d"
+subdomains:
+

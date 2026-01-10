@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
+import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/constants/headers.dart';
 import 'package:gatekeeper/logging/wide_event.dart' as we;
@@ -77,7 +78,7 @@ void main() {
       );
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: '',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {},
           logging: const LoggingConfig.defaultConfig(),
         ),
@@ -94,7 +95,7 @@ void main() {
       );
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: '',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {
             'github': const SubdomainConfig(
               url: 'testing',
@@ -125,7 +126,7 @@ void main() {
       );
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: '',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {
             'github': const SubdomainConfig(
               url: 'testing',
@@ -156,7 +157,7 @@ void main() {
       );
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: '',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {
             'github': const SubdomainConfig(
               url: 'testing',
@@ -194,7 +195,7 @@ void main() {
       );
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: '',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {
             'github': const SubdomainConfig(
               url: 'http://example.com',

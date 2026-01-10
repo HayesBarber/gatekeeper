@@ -1,6 +1,9 @@
 domain: "example-domain.com"
 redis:
   host: "127.0.0.1"
+  ttl:
+    challenges: "30s"
+    api_keys: "5m"
 logging:
   enabled: true
 subdomains:

@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
+import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/dto/challenge_verification_response.dart';
@@ -60,7 +61,7 @@ void main() {
 
       when(() => configService.config).thenReturn(
         AppConfig(
-          redisHost: 'localhost',
+          redis: const RedisConfig.defaultConfig(),
           subdomains: {},
           logging: const LoggingConfig.defaultConfig(),
         ),
@@ -232,6 +233,7 @@ void main() {
           ns: Namespace.apiKeys,
           key: any(named: 'key'),
           value: any(named: 'value'),
+          ttl: any(named: 'ttl'),
         ),
       ).thenAnswer((_) async => {});
       when(
@@ -239,6 +241,7 @@ void main() {
           ns: Namespace.challenges,
           key: any(named: 'key'),
           value: any(named: 'value'),
+          ttl: any(named: 'ttl'),
         ),
       ).thenAnswer((_) async => {});
 

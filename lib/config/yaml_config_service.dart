@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
+import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:yaml/yaml.dart';
 
@@ -46,7 +47,7 @@ class YamlConfigService implements ConfigService {
 
   static AppConfig _parseAppConfig(YamlMap? doc) {
     return AppConfig(
-      redisHost: _getRedisHost(doc),
+      redis: _getRedisConfig(doc),
       subdomains: _getSubdomainUpstreams(doc),
       logging: _getLoggingConfig(doc),
       domain: _getDomain(doc),
@@ -57,12 +58,43 @@ class YamlConfigService implements ConfigService {
     return doc?['domain'] as String?;
   }
 
-  static String _getRedisHost(YamlMap? doc) {
+  static RedisConfig _getRedisConfig(YamlMap? doc) {
     final redis = doc?['redis'];
     if (redis is YamlMap) {
-      return redis['host'] as String? ?? '127.0.0.1';
+      final ttl = redis['ttl'] as YamlMap?;
+      return RedisConfig(
+        host: redis['host'] as String? ?? '127.0.0.1',
+        challengesTtl: _parseDuration(ttl?['challenges'] as String?) ??
+            const Duration(seconds: 30),
+        apiKeysTtl: _parseDuration(ttl?['api_keys'] as String?) ??
+            const Duration(minutes: 5),
+      );
     }
-    return '127.0.0.1';
+    return const RedisConfig.defaultConfig();
+  }
+
+  static Duration? _parseDuration(String? value) {
+    if (value == null || value.isEmpty) return null;
+
+    final regex = RegExp(r'^(\d+)(s|m|h|d)?$');
+    final match = regex.firstMatch(value.trim());
+    if (match == null) return null;
+
+    final number = int.parse(match.group(1)!);
+    final unit = match.group(2) ?? 's';
+
+    switch (unit) {
+      case 's':
+        return Duration(seconds: number);
+      case 'm':
+        return Duration(minutes: number);
+      case 'h':
+        return Duration(hours: number);
+      case 'd':
+        return Duration(days: number);
+      default:
+        return Duration(seconds: number);
+    }
   }
 
   static Map<String, SubdomainConfig> _getSubdomainUpstreams(YamlMap? doc) {

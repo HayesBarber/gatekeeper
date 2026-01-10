@@ -1,14 +1,11 @@
 enum Namespace {
   devices(key: 'devices'),
-  challenges(key: 'challenges', ttl: Duration(seconds: 30)),
-  apiKeys(key: 'api_keys', ttl: Duration(minutes: 5));
+  challenges(key: 'challenges'),
+  apiKeys(key: 'api_keys');
 
-  const Namespace({required this.key, this.ttl});
+  const Namespace({required this.key});
 
   final String key;
-  final Duration? ttl;
-
-  int ttlSeconds() => ttl != null ? ttl!.inSeconds : 1;
 }
 
 abstract class RedisClientBase {
