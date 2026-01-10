@@ -8,9 +8,9 @@ cleanup() {
   echo "deleting redis key devices:${DEVICE_ID}"
   redis-cli DEL "devices:${DEVICE_ID}"
   
-  echo "restoring original gatekeeper.yaml"
-  if [ -f gatekeeper.yaml.bak ]; then
-    mv gatekeeper.yaml.bak gatekeeper.yaml
+  echo "restoring original gatekeeper.json"
+  if [ -f gatekeeper.json.bak ]; then
+    mv gatekeeper.json.bak gatekeeper.json
   fi
   
   kill "$SERVER_PID"
@@ -41,7 +41,7 @@ setup() {
   redis-cli SET "devices:${DEVICE_ID}" "$PUBLIC_KEY"
 
   echo "substituting GitHub webhook secret and disabling logging in config"
-  sed -i.bak -e "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" -e "s/enabled: true/enabled: false/g" gatekeeper.yaml
+  sed -i.bak -e "s/{{GITHUB_WEBHOOK_SECRET}}/$GITHUB_WEBHOOK_SECRET/g" -e "s/\"enabled\": true/\"enabled\": false/g" gatekeeper.json
 
   echo "creating build"
   dart_frog build

@@ -1,7 +1,0 @@
-redis:
-  host: "test-host"
-  ttl:
-    challenges: "1h"
-    auth_tokens: "2d"
-subdomains:
-

@@ -1,11 +1,8 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/app_config.dart';
-import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/config/logging_config.dart';
-import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mocktail/mocktail.dart';
@@ -57,11 +54,15 @@ void main() {
       when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {},
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': <String, dynamic>{},
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
     });
 

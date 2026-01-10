@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/yaml_config_service.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart';
 
-Future<void> init(InternetAddress ip, int port) async {
-  final configService = await YamlConfigService.load(path: 'gatekeeper.yaml');
+final configService = JsonConfigService('gatekeeper.json');
 
+Future<void> init(InternetAddress ip, int port) async {
+  await configService.reload();
   Logger.init(
-    loggingEnabled: configService.config.logging.loggingEnabled,
+    loggingEnabled: configService.config.logging.enabled,
   );
 
   await ShorebirdRedisClient.connect(

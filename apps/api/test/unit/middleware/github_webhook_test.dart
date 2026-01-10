@@ -1,14 +1,10 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/config/app_config.dart';
-import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/config/logging_config.dart';
-import 'package:gatekeeper/config/redis_config.dart';
-import 'package:gatekeeper/config/subdomain_config.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -76,11 +72,15 @@ void main() {
         Uri.parse('http://github.example.com/'),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {},
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': <String, dynamic>{},
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       final res = await githubWebhook()(handler)(context);
       expect(res.statusCode, equals(HttpStatus.ok));
@@ -93,15 +93,19 @@ void main() {
         Uri.parse('http://github.example.com/'),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
-              url: 'testing',
-            ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'subdomains': {
+            'github': {
+              'url': 'testing',
+            },
+          },
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       final res = await githubWebhook()(handler)(context);
       expect(res.statusCode, equals(HttpStatus.ok));
@@ -118,22 +122,26 @@ void main() {
       when(() => subdomainContext.subdomain).thenReturn('github');
       when(() => subdomainContext.hasConfig).thenReturn(true);
       when(() => subdomainContext.config).thenReturn(
-        const SubdomainConfig(
+        SubdomainConfig(
           url: 'testing',
           secret: 'invalid',
         ),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
-              url: 'testing',
-              secret: 'invalid',
-            ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'subdomains': {
+            'github': {
+              'url': 'testing',
+              'secret': 'invalid',
+            },
+          },
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       when(() => request.headers).thenReturn({});
       final res = await githubWebhook()(handler)(context);
@@ -149,22 +157,26 @@ void main() {
       when(() => subdomainContext.subdomain).thenReturn('github');
       when(() => subdomainContext.hasConfig).thenReturn(true);
       when(() => subdomainContext.config).thenReturn(
-        const SubdomainConfig(
+        SubdomainConfig(
           url: 'testing',
           secret: 'invalid',
         ),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
-              url: 'testing',
-              secret: 'invalid',
-            ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'subdomains': {
+            'github': {
+              'url': 'testing',
+              'secret': 'invalid',
+            },
+          },
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       when(() => request.headers).thenReturn({gc.hubSignature: 'invalid'});
       when(() => request.body()).thenAnswer(
@@ -187,22 +199,26 @@ void main() {
       when(() => subdomainContext.subdomain).thenReturn('github');
       when(() => subdomainContext.hasConfig).thenReturn(true);
       when(() => subdomainContext.config).thenReturn(
-        const SubdomainConfig(
+        SubdomainConfig(
           url: 'testing',
           secret: secret,
         ),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
-              url: 'http://example.com',
-              secret: secret,
-            ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'subdomains': {
+            'github': {
+              'url': 'http://example.com',
+              'secret': secret,
+            },
+          },
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       when(() => request.headers).thenReturn({
         gc.hubSignature: expectedSignature,
