@@ -1,6 +1,0 @@
-client_id_header: "x-custom-id"
-redis:
-  ttl:
-    challenges: "2h"
-subdomains:
-
