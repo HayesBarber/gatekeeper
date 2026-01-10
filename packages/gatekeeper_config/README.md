@@ -27,6 +27,3 @@ print(config.redis.host);
 print(config.subdomains['api']?.url);
 ```
 
-## Configuration Schema
-
-See README.md for the complete JSON schema and validation rules.
