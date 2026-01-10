@@ -18,7 +18,15 @@ class ConfigValidator {
 
   static void validateAppConfig(Map<String, dynamic> json) {
     // Validate required top-level fields
-    _validateRequiredFields(json, ['redis', 'subdomains', 'logging'], '\$');
+    _validateRequiredFields(json, [
+      'redis',
+      'subdomains',
+      'logging',
+      'domain',
+    ], '\$');
+
+    // Validate required domain field
+    _validateDomainField(json);
 
     // Validate redis section
     _validateRedisSection(json['redis']);
@@ -144,7 +152,7 @@ class ConfigValidator {
     _validateRequiredFields(config, ['url'], basePath);
 
     // Validate URL
-    if (config['url'] is! String || (config['url'] as String).isEmpty) {
+    if (config['url'] is! String || config['url'].isEmpty) {
       throw ConfigValidationException(
         'url must be a non-empty string',
         basePath + '.url',
@@ -155,7 +163,7 @@ class ConfigValidator {
       Uri.parse(config['url'] as String);
     } catch (e) {
       throw ConfigValidationException(
-        'url must be a valid URL: "' + config['url'].toString() + '"',
+        'url must be a valid URL: "' + config['url'] + '"',
         basePath + '.url',
       );
     }
@@ -239,6 +247,16 @@ class ConfigValidator {
       throw ConfigValidationException(
         'logging.enabled must be a boolean',
         basePath + '.enabled',
+      );
+    }
+  }
+
+  static void _validateDomainField(Map<String, dynamic> json) {
+    final domain = json['domain'];
+    if (domain == null || domain.isEmpty) {
+      throw ConfigValidationException(
+        'domain must be a non-empty string',
+        '\$.domain',
       );
     }
   }

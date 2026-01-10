@@ -8,6 +8,7 @@ class AppConfig {
     required this.redis,
     required this.subdomains,
     required this.logging,
+    required this.domain,
   });
 
   factory AppConfig.fromJson(Map<String, dynamic> json) {
@@ -15,11 +16,7 @@ class AppConfig {
     final subdomainsJson = json['subdomains'] as Map<String, dynamic>;
     final loggingJson = json['logging'] as Map<String, dynamic>;
 
-    final redis = RedisConfig.fromJson({
-      ...redisJson,
-      'challenges': redisJson['ttl']['challenges'],
-      'auth_tokens': redisJson['ttl']['auth_tokens'],
-    });
+    final redis = RedisConfig.fromJson(redisJson);
 
     final subdomains = <String, SubdomainConfig>{};
     for (final entry in subdomainsJson.entries) {
@@ -30,20 +27,31 @@ class AppConfig {
 
     final logging = LoggingConfig.fromJson(loggingJson);
 
-    return AppConfig(redis: redis, subdomains: subdomains, logging: logging);
+    final domain = json['domain'] as String;
+
+    return AppConfig(
+      redis: redis,
+      subdomains: subdomains,
+      logging: logging,
+      domain: domain,
+    );
   }
 
   final RedisConfig redis;
   final Map<String, SubdomainConfig> subdomains;
   final LoggingConfig logging;
+  final String domain;
 
   Map<String, dynamic> toJson() {
-    return {
+    final json = <String, dynamic>{
       'redis': redis.toJson(),
       'subdomains': subdomains.map(
         (key, value) => MapEntry(key, value.toJson()),
       ),
       'logging': logging.toJson(),
+      'domain': domain,
     };
+
+    return json;
   }
 }
