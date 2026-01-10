@@ -13,7 +13,10 @@ dependencies:
       ref: v5.0.0
   dart_frog: ^1.1.0
   gatekeeper_core:
-    path: ../../packages/gatekeeper_core
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_core
+      ref: main
   shorebird_redis_client: ^0.0.12
   yaml: ^3.1.3
 
