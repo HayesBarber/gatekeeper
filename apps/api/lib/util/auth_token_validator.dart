@@ -52,7 +52,7 @@ class AuthTokenValidator {
     if (!authTokenContext.authTokenFound) {
       eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: 0,
-        apiKeyPresent: false,
+        authTokenPresent: false,
       );
       return AuthTokenValidationResult.noAuthToken();
     }
@@ -69,10 +69,11 @@ class AuthTokenValidator {
     if (!result.isValid) {
       eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: DateTime.now().since(start),
-        apiKeyPresent: true,
-        apiKeySource: authTokenContext.source,
-        apiKeyStored: result.storedAuthToken != null,
-        apiKeyValid: result.error != AuthTokenValidationError.authTokenInvalid,
+        authTokenPresent: true,
+        authTokenSource: authTokenContext.source,
+        authTokenStored: result.storedAuthToken != null,
+        authTokenValid:
+            result.error != AuthTokenValidationError.authTokenInvalid,
         keyExpired: result.error == AuthTokenValidationError.authTokenExpired,
       );
     } else {

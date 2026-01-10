@@ -44,10 +44,10 @@ Middleware subdomainGatekeeper() {
       if (pathBlacklisted) {
         eventBuilder.authentication = gc.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          apiKeyPresent: true,
-          apiKeySource: authTokenSource,
-          apiKeyStored: true,
-          apiKeyValid: true,
+          authTokenPresent: true,
+          authTokenSource: authTokenSource,
+          authTokenStored: true,
+          authTokenValid: true,
           keyExpired: true,
           pathBlacklisted: true,
         );
