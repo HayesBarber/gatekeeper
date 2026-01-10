@@ -16,7 +16,7 @@
     },
     "github": {
       "url": "http://localhost:6000",
-      "secret": "github-webhook-secret"
+      "secret": "{{GITHUB_WEBHOOK_SECRET}}"
     },
     "webhooks": {
       "url": "https://webhook.example.com"
