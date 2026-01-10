@@ -21,7 +21,7 @@ class TtlParser {
     }
 
     final value = int.parse(match.group(1)!);
-    final unit = match.group(2) ?? 's'; // Default to seconds
+    final unit = match.group(2) ?? 's';
 
     if (value < 0) {
       throw ConfigValidationException('Duration cannot be negative: $value');
