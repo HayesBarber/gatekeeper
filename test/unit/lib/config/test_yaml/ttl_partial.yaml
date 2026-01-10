@@ -1,0 +1,5 @@
+redis:
+  host: "test-host"
+  ttl:
+    challenges: "15m"
+subdomains:
