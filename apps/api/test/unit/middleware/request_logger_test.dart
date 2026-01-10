@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/logging/logger.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/request_logger.dart' as gl;
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -13,11 +11,11 @@ class _MockRequestContext extends Mock implements RequestContext {}
 
 class _MockRequest extends Mock implements Request {}
 
-class _MockLogger extends Mock implements Logger {}
+class _MockLogger extends Mock implements gc.Logger {}
 
-class _MockWideEvent extends Mock implements we.WideEvent {}
+class _MockWideEvent extends Mock implements gc.WideEvent {}
 
-class _FakeWideEvent extends Fake implements we.WideEvent {}
+class _FakeWideEvent extends Fake implements gc.WideEvent {}
 
 class _MockSubdomainContext extends Mock implements SubdomainContext {}
 
@@ -48,8 +46,8 @@ void main() {
       subdomainContext = _MockSubdomainContext();
 
       when(() => context.request).thenReturn(request);
-      when(() => context.provide<we.WideEvent>(any())).thenReturn(context);
-      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.provide<gc.WideEvent>(any())).thenReturn(context);
+      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
       when(() => context.read<SubdomainContext>()).thenReturn(subdomainContext);
       when(() => subdomainContext.subdomain).thenReturn('api');
       when(() => logger.generateRequestId()).thenReturn('test-123');
@@ -61,9 +59,9 @@ void main() {
           .thenReturn(Uri.parse('http://api.example.com/test'));
       when(() => request.method).thenReturn(HttpMethod.get);
       when(() => request.headers).thenReturn({
-        userAgent: 'test-agent',
-        forwardedFor: '192.168.1.1',
-        contentLength: '100',
+        gc.userAgent: 'test-agent',
+        gc.forwardedFor: '192.168.1.1',
+        gc.contentLength: '100',
       });
 
       final middleware = gl.requestLogger(logger);
@@ -119,7 +117,7 @@ void main() {
       when(() => request.headers).thenReturn({});
 
       Response contextAwareHandler(RequestContext context) {
-        final event = context.read<we.WideEvent>();
+        final event = context.read<gc.WideEvent>();
         expect(event, isNotNull);
         expect(event.requestId, equals('test-123'));
         return Response(body: responseBody);
