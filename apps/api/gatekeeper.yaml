@@ -1,0 +1,26 @@
+domain: "example-domain.com"
+redis:
+  host: "127.0.0.1"
+  ttl:
+    challenges: "30s"
+    api_keys: "5m"
+logging:
+  enabled: true
+subdomains:
+  api:
+    url: "http://localhost:3000"
+    blacklist:
+      GET: ["/admin/*", "/health", "/debug"]
+      POST: ["/users/delete", "/admin/reset"]
+      DELETE: ["/users/*"]
+  webhook:
+    url: "http://localhost:4000"
+  admin:
+    url: "http://localhost:5000"
+    blacklist:
+      GET: ["/config"]
+      POST: ["/shutdown"]
+  github:
+    url: "http://localhost:6000"
+    secret: "{{GITHUB_WEBHOOK_SECRET}}"
+

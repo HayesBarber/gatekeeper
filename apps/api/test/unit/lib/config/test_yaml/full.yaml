@@ -1,0 +1,26 @@
+client_id_header: "x-client-id"
+domain: "test-domain.com"
+redis:
+  host: "192.168.1.10"
+  ttl:
+    challenges: "45s"
+    api_keys: "10m"
+logging:
+  enabled: true
+subdomains:
+  api:
+    url: "http://localhost:3000"
+    blacklist:
+      GET: ["/admin/*", "/health"]
+      POST: ["/users/delete"]
+  webhook:
+    url: "http://localhost:4000"
+  admin:
+    url: "http://localhost:5000"
+    blacklist:
+      GET: ["/config"]
+      POST: ["/shutdown"]
+  github:
+    url: "http://localhost:6000"
+    secret: "test_secret"
+
