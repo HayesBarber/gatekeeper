@@ -62,19 +62,20 @@ Future<Response> _onGet(
     );
   }
 
+  final config = context.read<ConfigService>();
   final polledChallenge = challenge.markAsPolled();
   await redis.set(
     ns: Namespace.challenges,
     key: id,
     value: polledChallenge.encode(),
+    ttl: config.config.redis.challengesTtl,
   );
 
-  final config = context.read<ConfigService>().config;
   final setCookieHeader = CookieUtil.buildSetCookieHeader(
     'api_key',
     challenge.apiKey!,
     path: '/',
-    domain: config.domain,
+    domain: config.config.domain,
   );
 
   return Response.json(
