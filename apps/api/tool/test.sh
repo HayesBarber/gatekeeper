@@ -8,9 +8,9 @@ cleanup() {
   echo "deleting redis key devices:${DEVICE_ID}"
   redis-cli DEL "devices:${DEVICE_ID}"
   
-  echo "restoring original gatekeeper.yaml"
-  if [ -f gatekeeper.yaml.bak ]; then
-    mv gatekeeper.yaml.bak gatekeeper.yaml
+  echo "restoring original gatekeeper.json"
+  if [ -f gatekeeper.json.bak ]; then
+    mv gatekeeper.json.bak gatekeeper.json
   fi
   
   kill "$SERVER_PID"

@@ -99,9 +99,9 @@ void main() {
             'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
           'subdomains': {
-            'github': SubdomainConfig(
-              url: 'testing',
-            ),
+            'github': {
+              'url': 'testing',
+            },
           },
           'logging': {'enabled': true},
           'domain': 'test-domain.com',
@@ -169,10 +169,10 @@ void main() {
             'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
           'subdomains': {
-            'github': SubdomainConfig(
-              url: 'testing',
-              secret: 'invalid',
-            ),
+            'github': {
+              'url': 'testing',
+              'secret': 'invalid',
+            },
           },
           'logging': {'enabled': true},
           'domain': 'test-domain.com',
@@ -211,10 +211,10 @@ void main() {
             'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
           'subdomains': {
-            'github': SubdomainConfig(
-              url: 'http://example.com',
-              secret: secret,
-            ),
+            'github': {
+              'url': 'http://example.com',
+              'secret': secret,
+            },
           },
           'logging': {'enabled': true},
           'domain': 'test-domain.com',
