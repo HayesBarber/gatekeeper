@@ -7,13 +7,9 @@ class RedisConfig {
   });
 
   factory RedisConfig.fromJson(Map<String, dynamic> json) {
-    // Handle both flat format (challenges, auth_tokens) and nested format (ttl.challenges, ttl.auth_tokens)
-    String challengesStr;
-    String authTokensStr;
-
     final ttlJson = json['ttl'] as Map<String, dynamic>;
-    challengesStr = ttlJson['challenges'] as String;
-    authTokensStr = ttlJson['auth_tokens'] as String;
+    String challengesStr = ttlJson['challenges'] as String;
+    String authTokensStr = ttlJson['auth_tokens'] as String;
 
     return RedisConfig(
       host: json['host'] as String,
