@@ -4,3 +4,4 @@ redis:
     challenges: "30s"
     api_keys: "5m"
 subdomains:
+
