@@ -1,4 +1,4 @@
-import 'package:gatekeeper/logging/wide_event.dart';
+import 'package:gatekeeper_core/src/logging/wide_event.dart';
 import 'package:uuid/uuid.dart';
 
 class Logger {
