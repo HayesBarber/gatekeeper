@@ -1,0 +1,11 @@
+name: gatekeeper_config
+description: Gatekeeper configuration management with JSON validation
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dev_dependencies:
+  test: ^1.26.3
+  very_good_analysis: ^10.0.0
