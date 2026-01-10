@@ -30,11 +30,10 @@ Middleware subdomainGatekeeper() {
       }
 
       final authTokenSource = context.read<AuthTokenContext>().source!;
+      final blacklistedPaths = subdomainContext
+              .config!.blacklistedPaths?[context.request.method.value] ??
+          [];
 
-      final blacklistedPaths =
-          subdomainContext.config!.getBlacklistedPathsForMethod(
-        context.request.method.value,
-      );
       final pathBlacklisted = blacklistedPaths.isNotEmpty &&
           PathMatcher.isPathBlacklisted(
             blacklistedPaths,
