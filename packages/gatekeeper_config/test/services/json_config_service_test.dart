@@ -43,6 +43,7 @@ void main() {
             },
           },
           'logging': {'enabled': true},
+          'domain': 'test-domain.com',
         };
 
         await configFile.writeAsString(jsonEncode(configData));
@@ -68,6 +69,7 @@ void main() {
         );
 
         expect(config.logging.enabled, isTrue);
+        expect(config.domain, equals('test-domain.com'));
       });
 
       test('throws for missing file', () async {
@@ -92,10 +94,7 @@ void main() {
 
       test('throws for missing required fields', () async {
         final configData = {
-          'redis': {
-            'host': '127.0.0.1',
-            // Missing ttl
-          },
+          'redis': {'host': '127.0.0.1'},
           'subdomains': {},
           'logging': {'enabled': true},
         };
