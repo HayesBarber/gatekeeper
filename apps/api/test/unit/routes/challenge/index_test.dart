@@ -44,11 +44,15 @@ void main() {
       when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {},
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': <String, dynamic>{},
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
     });
 

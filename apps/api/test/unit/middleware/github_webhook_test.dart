@@ -183,22 +183,26 @@ void main() {
       when(() => subdomainContext.subdomain).thenReturn('github');
       when(() => subdomainContext.hasConfig).thenReturn(true);
       when(() => subdomainContext.config).thenReturn(
-        const SubdomainConfig(
+        SubdomainConfig(
           url: 'testing',
           secret: secret,
         ),
       );
       when(() => configService.config).thenReturn(
-        AppConfig(
-          redis: const RedisConfig.defaultConfig(),
-          subdomains: {
-            'github': const SubdomainConfig(
+        AppConfig.fromJson({
+          'redis': {
+            'host': '127.0.0.1',
+            'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
+          },
+          'subdomains': {
+            'github': SubdomainConfig(
               url: 'http://example.com',
               secret: secret,
             ),
           },
-          logging: const LoggingConfig.defaultConfig(),
-        ),
+          'logging': {'enabled': true},
+          'domain': 'test-domain.com',
+        }),
       );
       when(() => request.headers).thenReturn({
         gc.hubSignature: expectedSignature,
