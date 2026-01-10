@@ -67,12 +67,12 @@ Future<Map<String, dynamic>> runVerificationFlow(Config config) async {
 
     final verificationData =
         ChallengeVerificationResponse.decode(verificationResponse.body);
-    final apiKey = verificationData.apiKey;
+    final authToken = verificationData.authToken;
 
     final challengesRes = await http.get(
       Uri.parse('${config.baseUrl}/challenge'),
       headers: {
-        'authorization': 'Bearer $apiKey',
+        'authorization': 'Bearer $authToken',
       },
     );
     final challenges =
@@ -142,7 +142,7 @@ Future<Map<String, dynamic>> runVerificationFlow(Config config) async {
         'results': additionalResults,
       },
       'verification': {
-        'api_key': verificationData.apiKey,
+        'auth_token': verificationData.authToken,
         'expires_at': verificationData.expiresAt.toIso8601String(),
       },
       'device': {

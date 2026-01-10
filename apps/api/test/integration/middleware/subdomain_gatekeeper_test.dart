@@ -25,7 +25,7 @@ void main() {
         key: TestEnv.deviceId,
       );
       await redis.delete(
-        ns: Namespace.apiKeys,
+        ns: Namespace.authTokens,
         key: TestEnv.deviceId,
       );
     });
@@ -98,11 +98,11 @@ void main() {
     test(
       'returns 403 for invalid api key - value does not match stored',
       () async {
-        final apiKey = ChallengeVerificationResponse.random();
+        final authToken = ChallengeVerificationResponse.random();
         await redis.set(
-          ns: Namespace.apiKeys,
-          key: apiKey.apiKey,
-          value: apiKey.encode(),
+          ns: Namespace.authTokens,
+          key: authToken.authToken,
+          value: authToken.encode(),
         );
         final res = await http.get(
           TestEnv.apiUri('/echo'),
@@ -110,7 +110,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer ${apiKey.apiKey}-inalid',
+            headerAuthorization: 'Bearer ${authToken.authToken}-inalid',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -120,16 +120,16 @@ void main() {
     test(
       'returns 403 for invalid api key - key expired',
       () async {
-        final apiKey = ChallengeVerificationResponse(
-          apiKey: 'expired-key',
+        final authToken = ChallengeVerificationResponse(
+          authToken: 'expired-key',
           expiresAt: DateTime.now().subtract(
             const Duration(seconds: 30),
           ),
         );
         await redis.set(
-          ns: Namespace.apiKeys,
-          key: apiKey.apiKey,
-          value: apiKey.encode(),
+          ns: Namespace.authTokens,
+          key: authToken.authToken,
+          value: authToken.encode(),
         );
         final res = await http.get(
           TestEnv.apiUri('/echo'),
@@ -137,7 +137,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer ${apiKey.apiKey}',
+            headerAuthorization: 'Bearer ${authToken.authToken}',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -145,11 +145,11 @@ void main() {
     );
 
     test('returns 200 from upstream when api key is valid', () async {
-      final apiKey = ChallengeVerificationResponse.random();
+      final authToken = ChallengeVerificationResponse.random();
       await redis.set(
-        ns: Namespace.apiKeys,
-        key: apiKey.apiKey,
-        value: apiKey.encode(),
+        ns: Namespace.authTokens,
+        key: authToken.authToken,
+        value: authToken.encode(),
       );
       final res = await http.get(
         TestEnv.apiUri('/echo'),
@@ -157,7 +157,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
@@ -168,11 +168,11 @@ void main() {
 
     test('returns 200 from upstream when api key is valid via cookie',
         () async {
-      final apiKey = ChallengeVerificationResponse.random();
+      final authToken = ChallengeVerificationResponse.random();
       await redis.set(
-        ns: Namespace.apiKeys,
-        key: apiKey.apiKey,
-        value: apiKey.encode(),
+        ns: Namespace.authTokens,
+        key: authToken.authToken,
+        value: authToken.encode(),
       );
       final res = await http.get(
         TestEnv.apiUri('/echo'),
@@ -180,7 +180,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          cookie: 'api_key=${apiKey.apiKey}',
+          cookie: 'auth_token=${authToken.authToken}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));

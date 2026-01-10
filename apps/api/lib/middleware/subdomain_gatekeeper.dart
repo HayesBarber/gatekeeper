@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/middleware/api_key_provider.dart';
+import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
-import 'package:gatekeeper/util/api_key_validator.dart';
+import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
@@ -20,7 +20,8 @@ Middleware subdomainGatekeeper() {
       final eventBuilder = context.read<gc.WideEvent>();
       final start = DateTime.now();
 
-      final validationResult = await ApiKeyValidator.validateApiKeyContext(
+      final validationResult =
+          await AuthTokenValidator.validateAuthTokenContext(
         context: context,
       );
 
@@ -28,7 +29,7 @@ Middleware subdomainGatekeeper() {
         return validationResult.errorResponse!;
       }
 
-      final apiKeySource = context.read<ApiKeyContext>().source!;
+      final authTokenSource = context.read<AuthTokenContext>().source!;
 
       final blacklistedPaths =
           subdomainContext.config!.getBlacklistedPathsForMethod(
@@ -44,7 +45,7 @@ Middleware subdomainGatekeeper() {
         eventBuilder.authentication = gc.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
           apiKeyPresent: true,
-          apiKeySource: apiKeySource,
+          apiKeySource: authTokenSource,
           apiKeyStored: true,
           apiKeyValid: true,
           keyExpired: true,

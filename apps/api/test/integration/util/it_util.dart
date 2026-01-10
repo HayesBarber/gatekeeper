@@ -30,7 +30,7 @@ class ItUtil {
     return challenge;
   }
 
-  static Future<ChallengeVerificationResponse> verifyChallengeAndGetApiKey(
+  static Future<ChallengeVerificationResponse> verifyChallengeAndGetAuthToken(
     String challengeId,
     String challenge,
   ) async {
@@ -49,7 +49,7 @@ class ItUtil {
       ).encode(),
     );
     expect(res.statusCode, equals(HttpStatus.ok));
-    final apiKeyResponse = ChallengeVerificationResponse.decode(res.body);
-    return apiKeyResponse;
+    final authTokenResponse = ChallengeVerificationResponse.decode(res.body);
+    return authTokenResponse;
   }
 }
