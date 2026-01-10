@@ -1,0 +1,3 @@
+class GatekeeperCore {
+  const GatekeeperCore();
+}
