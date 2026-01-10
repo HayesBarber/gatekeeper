@@ -12,7 +12,7 @@ void main() {
 
       expect(config.redis.host, '192.168.1.10');
       expect(config.redis.challengesTtl, const Duration(seconds: 45));
-      expect(config.redis.apiKeysTtl, const Duration(minutes: 10));
+      expect(config.redis.authTokensTtl, const Duration(minutes: 10));
       expect(config.domain, 'test-domain.com');
       expect(
         config.logging,
@@ -67,7 +67,7 @@ void main() {
       expect(config.redis.host, '127.0.0.1');
       expect(config.redis.challengesTtl, const Duration(hours: 2));
       expect(
-        config.redis.apiKeysTtl,
+        config.redis.authTokensTtl,
         const Duration(minutes: 5),
       );
       expect(config.domain, isNull);
@@ -88,7 +88,7 @@ void main() {
         final config = service.config;
 
         expect(config.redis.challengesTtl, const Duration(seconds: 30));
-        expect(config.redis.apiKeysTtl, const Duration(minutes: 5));
+        expect(config.redis.authTokensTtl, const Duration(minutes: 5));
       });
 
       test('parses TTL with different time units', () async {
@@ -99,7 +99,7 @@ void main() {
         final config = service.config;
 
         expect(config.redis.challengesTtl, const Duration(hours: 1));
-        expect(config.redis.apiKeysTtl, const Duration(days: 2));
+        expect(config.redis.authTokensTtl, const Duration(days: 2));
       });
 
       test('parses TTL with default seconds when no unit specified', () async {
@@ -110,7 +110,7 @@ void main() {
         final config = service.config;
 
         expect(config.redis.challengesTtl, const Duration(seconds: 45));
-        expect(config.redis.apiKeysTtl, const Duration(seconds: 120));
+        expect(config.redis.authTokensTtl, const Duration(seconds: 120));
       });
 
       test('uses default TTL values when not specified', () async {
@@ -123,7 +123,7 @@ void main() {
           config.redis.challengesTtl,
           const Duration(seconds: 30),
         );
-        expect(config.redis.apiKeysTtl, const Duration(minutes: 5));
+        expect(config.redis.authTokensTtl, const Duration(minutes: 5));
       });
 
       test('handles partial TTL configuration with fallback', () async {
@@ -134,7 +134,7 @@ void main() {
 
         expect(config.redis.challengesTtl, const Duration(minutes: 15));
         expect(
-          config.redis.apiKeysTtl,
+          config.redis.authTokensTtl,
           const Duration(minutes: 5),
         );
       });
@@ -146,7 +146,7 @@ void main() {
         final config = service.config;
 
         expect(config.redis.challengesTtl, const Duration(seconds: 40));
-        expect(config.redis.apiKeysTtl, const Duration(minutes: 11));
+        expect(config.redis.authTokensTtl, const Duration(minutes: 11));
       });
 
       test('falls back to defaults for invalid TTL formats', () async {
@@ -157,7 +157,7 @@ void main() {
 
         expect(config.redis.challengesTtl, const Duration(seconds: 15));
 
-        expect(config.redis.apiKeysTtl, const Duration(minutes: 5));
+        expect(config.redis.authTokensTtl, const Duration(minutes: 5));
       });
 
       test('handles empty TTL values', () async {
@@ -169,7 +169,7 @@ void main() {
           config.redis.challengesTtl,
           const Duration(seconds: 30),
         );
-        expect(config.redis.apiKeysTtl, const Duration(minutes: 5));
+        expect(config.redis.authTokensTtl, const Duration(minutes: 5));
       });
     });
   });

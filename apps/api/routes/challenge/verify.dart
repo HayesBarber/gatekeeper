@@ -104,11 +104,11 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final apiKey = gc.ChallengeVerificationResponse.random(
-    ttl: config.config.redis.apiKeysTtl,
+  final authToken = gc.ChallengeVerificationResponse.random(
+    ttl: config.config.redis.authTokensTtl,
   );
   final verifiedChallenge = challenge.markAsVerified(
-    apiKey: apiKey.apiKey,
+    apiKey: authToken.authToken,
     pollingTtl: config.config.redis.challengesTtl,
   );
 
@@ -120,16 +120,16 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   await redis.set(
-    ns: Namespace.apiKeys,
-    key: apiKey.apiKey,
-    value: apiKey.encode(),
-    ttl: config.config.redis.apiKeysTtl,
+    ns: Namespace.authTokens,
+    key: authToken.authToken,
+    value: authToken.encode(),
+    ttl: config.config.redis.authTokensTtl,
   );
 
   eventBuilder.challenge = gc.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
   );
   return Response.json(
-    body: apiKey,
+    body: authToken,
   );
 }

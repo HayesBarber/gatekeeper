@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/yaml_config_service.dart';
-import 'package:gatekeeper/middleware/api_key_provider.dart';
+import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/middleware/cookie_provider.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/request_logger.dart' as request_logger;
@@ -24,7 +24,7 @@ Handler middleware(Handler handler) {
       .use(githubWebhook())
       .use(request_logger.requestLogger(_logger))
       .use(subdomainProvider())
-      .use(apiKeyProvider())
+      .use(authTokenProvider())
       .use(cookieProvider())
       .use(provider<SignatureVerifier>((_) => ECCKeyPair.verifySignatureStatic))
       .use(provider<Forward>((_) => _forward))

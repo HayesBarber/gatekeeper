@@ -23,7 +23,7 @@ void main() {
         ns: Namespace.challenges,
       );
       await redis.deleteAll(
-        ns: Namespace.apiKeys,
+        ns: Namespace.authTokens,
       );
     });
 
@@ -135,7 +135,7 @@ void main() {
 
     test('returns 410 when challenge has already been polled', () async {
       final sessionId = CryptoUtils.generateId();
-      final apiKey = CryptoUtils.generateId();
+      final authToken = CryptoUtils.generateId();
       final polledChallenge = ChallengeResponse(
         challengeId: CryptoUtils.generateId(),
         challenge: CryptoUtils.generateBytes(),
@@ -144,7 +144,7 @@ void main() {
         isVerified: true,
         verifiedAt: DateTime.now(),
         isPolled: true,
-        apiKey: apiKey,
+        apiKey: authToken,
       );
 
       await redis.set(
@@ -163,7 +163,7 @@ void main() {
     test('returns approved status and sets API key cookie on success',
         () async {
       final sessionId = CryptoUtils.generateId();
-      final apiKey = CryptoUtils.generateId();
+      final authToken = CryptoUtils.generateId();
       final verifiedChallenge = ChallengeResponse(
         challengeId: CryptoUtils.generateId(),
         challenge: CryptoUtils.generateBytes(),
@@ -171,7 +171,7 @@ void main() {
         sessionId: sessionId,
         isVerified: true,
         verifiedAt: DateTime.now(),
-        apiKey: apiKey,
+        apiKey: authToken,
       );
 
       await redis.set(
@@ -190,7 +190,10 @@ void main() {
       expect(body['status'], equals('approved'));
 
       expect(res.headers['set-cookie'], isNotNull);
-      expect(res.headers['set-cookie']!.contains('api_key=$apiKey'), isTrue);
+      expect(
+        res.headers['set-cookie']!.contains('auth_token=$authToken'),
+        isTrue,
+      );
 
       final updatedChallengeData = await redis.get(
         ns: Namespace.challenges,

@@ -227,7 +227,7 @@ void main() {
 
       when(
         () => redisClient.set(
-          ns: Namespace.apiKeys,
+          ns: Namespace.authTokens,
           key: any(named: 'key'),
           value: any(named: 'value'),
           ttl: any(named: 'ttl'),
@@ -247,9 +247,9 @@ void main() {
       expect(response.statusCode, equals(HttpStatus.ok));
 
       final body = await response.body();
-      final apiKeyResponse = gc.ChallengeVerificationResponse.decode(body);
-      expect(apiKeyResponse.apiKey, isNotEmpty);
-      expect(apiKeyResponse.expiresAt, isNotNull);
+      final authTokenResponse = gc.ChallengeVerificationResponse.decode(body);
+      expect(authTokenResponse.authToken, isNotEmpty);
+      expect(authTokenResponse.expiresAt, isNotNull);
     });
   });
 

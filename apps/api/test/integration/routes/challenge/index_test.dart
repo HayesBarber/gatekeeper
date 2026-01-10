@@ -63,7 +63,7 @@ void main() {
         ns: Namespace.challenges,
       );
       await redis.deleteAll(
-        ns: Namespace.apiKeys,
+        ns: Namespace.authTokens,
       );
     });
 
@@ -90,7 +90,7 @@ void main() {
 
     test('returns empty array when no challenges exist', () async {
       final challenge = await ItUtil.getChallenge();
-      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+      final authTokenResponse = await ItUtil.verifyChallengeAndGetAuthToken(
         challenge.challengeId,
         challenge.challenge,
       );
@@ -98,7 +98,7 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${apiKeyResponse.apiKey}',
+          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -111,7 +111,7 @@ void main() {
       final challenge1 = await ItUtil.getChallenge();
 
       final challenge2 = await ItUtil.getChallenge();
-      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+      final authTokenResponse = await ItUtil.verifyChallengeAndGetAuthToken(
         challenge2.challengeId,
         challenge2.challenge,
       );
@@ -119,7 +119,7 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${apiKeyResponse.apiKey}',
+          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -135,7 +135,7 @@ void main() {
 
     test('returns challenges with correct fields only', () async {
       final challenge = await ItUtil.getChallenge();
-      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+      final authTokenResponse = await ItUtil.verifyChallengeAndGetAuthToken(
         challenge.challengeId,
         challenge.challenge,
       );
@@ -145,7 +145,7 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${apiKeyResponse.apiKey}',
+          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -171,7 +171,7 @@ void main() {
 
     test('filters out expired challenges', () async {
       final challenge = await ItUtil.getChallenge();
-      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+      final authTokenResponse = await ItUtil.verifyChallengeAndGetAuthToken(
         challenge.challengeId,
         challenge.challenge,
       );
@@ -192,7 +192,7 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${apiKeyResponse.apiKey}',
+          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
         },
       );
 

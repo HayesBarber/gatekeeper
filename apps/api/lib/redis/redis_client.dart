@@ -1,7 +1,7 @@
 enum Namespace {
   devices(key: 'devices'),
   challenges(key: 'challenges'),
-  apiKeys(key: 'api_keys');
+  authTokens(key: 'auth_tokens');
 
   const Namespace({required this.key});
 

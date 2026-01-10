@@ -2,6 +2,6 @@ redis:
   host: "test-host"
   ttl:
     challenges: "45"
-    api_keys: "120"
+    auth_tokens: "120"
 subdomains:
 

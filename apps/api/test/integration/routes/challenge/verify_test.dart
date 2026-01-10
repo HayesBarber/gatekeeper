@@ -95,12 +95,12 @@ void main() {
 
     test('returns 200 and api key for valid handshake', () async {
       final challenge = await ItUtil.getChallenge();
-      final apiKeyResponse = await ItUtil.verifyChallengeAndGetApiKey(
+      final authTokenResponse = await ItUtil.verifyChallengeAndGetAuthToken(
         challenge.challengeId,
         challenge.challenge,
       );
-      expect(apiKeyResponse.apiKey, isNotEmpty);
-      expect(apiKeyResponse.expiresAt, isNotNull);
+      expect(authTokenResponse.authToken, isNotEmpty);
+      expect(authTokenResponse.expiresAt, isNotNull);
     });
   });
 

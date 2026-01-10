@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
-import 'package:gatekeeper/util/api_key_validator.dart';
+import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
@@ -58,7 +58,7 @@ Future<Response> _onPost(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
-  final validationResult = await ApiKeyValidator.validateApiKeyContext(
+  final validationResult = await AuthTokenValidator.validateAuthTokenContext(
     context: context,
   );
   if (!validationResult.isValid) {

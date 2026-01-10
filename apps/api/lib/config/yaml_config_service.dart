@@ -66,7 +66,7 @@ class YamlConfigService implements ConfigService {
         host: redis['host'] as String? ?? '127.0.0.1',
         challengesTtl: _parseDuration(ttl?['challenges'] as String?) ??
             const Duration(seconds: 30),
-        apiKeysTtl: _parseDuration(ttl?['api_keys'] as String?) ??
+        authTokensTtl: _parseDuration(ttl?['auth_tokens'] as String?) ??
             const Duration(minutes: 5),
       );
     }

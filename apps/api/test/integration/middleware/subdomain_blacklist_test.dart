@@ -25,7 +25,7 @@ void main() {
         key: TestEnv.deviceId,
       );
       await redis.delete(
-        ns: Namespace.apiKeys,
+        ns: Namespace.authTokens,
         key: TestEnv.deviceId,
       );
     });
@@ -35,18 +35,18 @@ void main() {
     });
 
     test('blocks access to blacklisted paths', () async {
-      final apiKey = ChallengeVerificationResponse.random();
+      final authToken = ChallengeVerificationResponse.random();
       await redis.set(
-        ns: Namespace.apiKeys,
-        key: apiKey.apiKey,
-        value: apiKey.encode(),
+        ns: Namespace.authTokens,
+        key: authToken.authToken,
+        value: authToken.encode(),
       );
 
       final blacklistedGetRes = await http.get(
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(blacklistedGetRes.statusCode, equals(HttpStatus.forbidden));
@@ -55,25 +55,25 @@ void main() {
         TestEnv.apiUri('/users/delete'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(blacklistedPostRes.statusCode, equals(HttpStatus.forbidden));
     });
 
     test('allows access to non-blacklisted paths', () async {
-      final apiKey = ChallengeVerificationResponse.random();
+      final authToken = ChallengeVerificationResponse.random();
       await redis.set(
-        ns: Namespace.apiKeys,
-        key: apiKey.apiKey,
-        value: apiKey.encode(),
+        ns: Namespace.authTokens,
+        key: authToken.authToken,
+        value: authToken.encode(),
       );
 
       final allowedGetRes = await http.get(
         TestEnv.apiUri('/api/data'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(allowedGetRes.statusCode, equals(HttpStatus.ok));
@@ -85,7 +85,7 @@ void main() {
         TestEnv.apiUri('/users/create'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(allowedPostRes.statusCode, equals(HttpStatus.ok));
@@ -95,18 +95,18 @@ void main() {
     });
 
     test('respects method-specific blacklists', () async {
-      final apiKey = ChallengeVerificationResponse.random();
+      final authToken = ChallengeVerificationResponse.random();
       await redis.set(
-        ns: Namespace.apiKeys,
-        key: apiKey.apiKey,
-        value: apiKey.encode(),
+        ns: Namespace.authTokens,
+        key: authToken.authToken,
+        value: authToken.encode(),
       );
 
       final getRes = await http.get(
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(getRes.statusCode, equals(HttpStatus.forbidden));
@@ -115,7 +115,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${apiKey.apiKey}',
+          headerAuthorization: 'Bearer ${authToken.authToken}',
         },
       );
       expect(putRes.statusCode, equals(HttpStatus.ok));
