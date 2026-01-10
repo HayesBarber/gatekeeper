@@ -1,11 +1,9 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/logging/logger.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
-Middleware requestLogger(Logger logger) {
+Middleware requestLogger(gc.Logger logger) {
   return (handler) {
     return (context) async {
       final requestId = logger.generateRequestId();
@@ -14,22 +12,23 @@ Middleware requestLogger(Logger logger) {
       final request = context.request;
       final subdomainContext = context.read<SubdomainContext>();
 
-      final wideEvent = we.WideEvent(
+      final wideEvent = gc.WideEvent(
         requestId: requestId,
-        request: we.RequestContext(
+        request: gc.RequestContext(
           method: request.method.value,
           path: request.uri.path,
           timestamp: startTime.millisecondsSinceEpoch,
           subdomain: subdomainContext.subdomain,
-          userAgent: request.headers[userAgent],
-          clientIp: request.headers[forwardedFor] ?? request.headers[realIp],
-          contentLength: request.headers[contentLength] != null
-              ? int.tryParse(request.headers[contentLength]!)
+          userAgent: request.headers[gc.userAgent],
+          clientIp:
+              request.headers[gc.forwardedFor] ?? request.headers[gc.realIp],
+          contentLength: request.headers[gc.contentLength] != null
+              ? int.tryParse(request.headers[gc.contentLength]!)
               : null,
         ),
       );
 
-      final contextWithProvider = context.provide<we.WideEvent>(
+      final contextWithProvider = context.provide<gc.WideEvent>(
         () => wideEvent,
       );
 
@@ -38,11 +37,11 @@ Middleware requestLogger(Logger logger) {
 
         final duration = DateTime.now().since(startTime);
 
-        wideEvent.response = we.ResponseContext(
+        wideEvent.response = gc.ResponseContext(
           durationMs: duration,
           statusCode: response.statusCode,
-          contentLength: response.headers[contentLength] != null
-              ? int.tryParse(response.headers[contentLength]!)
+          contentLength: response.headers[gc.contentLength] != null
+              ? int.tryParse(response.headers[gc.contentLength]!)
               : null,
         );
 
@@ -53,11 +52,11 @@ Middleware requestLogger(Logger logger) {
         final duration = DateTime.now().since(startTime);
 
         wideEvent
-          ..response = we.ResponseContext(
+          ..response = gc.ResponseContext(
             durationMs: duration,
             statusCode: 500,
           )
-          ..error = we.ErrorContext(
+          ..error = gc.ErrorContext(
             type: error.runtimeType.toString(),
             code: 'unhandled_exception',
             retriable: false,

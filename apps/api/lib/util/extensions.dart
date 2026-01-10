@@ -1,4 +1,4 @@
-import 'package:gatekeeper/constants/headers.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart';
 
 extension DateTimeDiff on DateTime {
   /// Duration from [start] to this DateTime (this - start) in ms

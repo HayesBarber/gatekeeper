@@ -2,13 +2,10 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/dto/challenge_response.dart';
-import 'package:gatekeeper/dto/challenge_verification_request.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
 import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -19,9 +16,9 @@ Future<Response> onRequest(RequestContext context) {
 
 Future<Response> _onPost(RequestContext context) async {
   final start = DateTime.now();
-  final eventBuilder = context.read<we.WideEvent>();
+  final eventBuilder = context.read<gc.WideEvent>();
   final bodyString = await context.request.body();
-  final request = ChallengeVerificationRequest.decode(bodyString);
+  final request = gc.ChallengeVerificationRequest.decode(bodyString);
 
   final redis = context.read<RedisClientBase>();
   final config = context.read<ConfigService>();
@@ -31,7 +28,7 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   if (publicKey == null) {
-    eventBuilder.challenge = we.ChallengeContext(
+    eventBuilder.challenge = gc.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: false,
     );
@@ -45,7 +42,7 @@ Future<Response> _onPost(RequestContext context) async {
     key: request.challengeId,
   );
   if (challengeData == null) {
-    eventBuilder.challenge = we.ChallengeContext(
+    eventBuilder.challenge = gc.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: true,
       challengePresent: false,
@@ -55,10 +52,10 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final challenge = ChallengeResponse.decode(challengeData);
+  final challenge = gc.ChallengeResponse.decode(challengeData);
 
   if (challenge.challengeId != request.challengeId) {
-    eventBuilder.challenge = we.ChallengeContext(
+    eventBuilder.challenge = gc.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: true,
       challengePresent: true,
@@ -71,7 +68,7 @@ Future<Response> _onPost(RequestContext context) async {
   }
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
-    eventBuilder.challenge = we.ChallengeContext(
+    eventBuilder.challenge = gc.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: true,
       challengePresent: true,
@@ -93,7 +90,7 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   if (!isValid) {
-    eventBuilder.challenge = we.ChallengeContext(
+    eventBuilder.challenge = gc.ChallengeContext(
       operationDurationMs: DateTime.now().since(start),
       publicKeyPresent: true,
       challengePresent: true,
@@ -107,8 +104,9 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final apiKey =
-      ChallengeVerificationResponse.random(ttl: config.config.redis.apiKeysTtl);
+  final apiKey = gc.ChallengeVerificationResponse.random(
+    ttl: config.config.redis.apiKeysTtl,
+  );
   final verifiedChallenge = challenge.markAsVerified(
     apiKey: apiKey.apiKey,
     pollingTtl: config.config.redis.challengesTtl,
@@ -128,7 +126,7 @@ Future<Response> _onPost(RequestContext context) async {
     ttl: config.config.redis.apiKeysTtl,
   );
 
-  eventBuilder.challenge = we.ChallengeContext(
+  eventBuilder.challenge = gc.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
   );
   return Response.json(
