@@ -5,12 +5,9 @@ import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/redis_config.dart';
-import 'package:gatekeeper/dto/challenge_response.dart';
-import 'package:gatekeeper/dto/challenge_verification_request.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/signature_verifier.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -24,7 +21,7 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
-class _MockWideEvent extends Mock implements we.WideEvent {}
+class _MockWideEvent extends Mock implements gc.WideEvent {}
 
 class _MockSignatureVerifier extends Mock {
   bool call(String m, String s, String k);
@@ -57,7 +54,7 @@ void main() {
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
       when(() => context.read<SignatureVerifier>()).thenReturn(verifier.call);
-      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -70,7 +67,7 @@ void main() {
 
     test('returns 401 if public key not found', () async {
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -87,7 +84,7 @@ void main() {
 
     test('returns 404 if challenge not found', () async {
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -107,14 +104,14 @@ void main() {
     });
 
     test('returns 400 if challenge ID does not match', () async {
-      final challenge = ChallengeResponse(
+      final challenge = gc.ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
         sessionId: 'test-session-id',
       );
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: 'wrong-id',
           signature: 'sig',
           deviceId: deviceId,
@@ -134,7 +131,7 @@ void main() {
     });
 
     test('returns 400 if challenge is expired', () async {
-      final challenge = ChallengeResponse(
+      final challenge = gc.ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
@@ -142,7 +139,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -162,7 +159,7 @@ void main() {
     });
 
     test('returns 403 if signature is invalid', () async {
-      final challenge = ChallengeResponse(
+      final challenge = gc.ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
@@ -170,7 +167,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'bad-sig',
           deviceId: deviceId,
@@ -197,7 +194,7 @@ void main() {
     });
 
     test('returns 200 and api key for valid challenge verification', () async {
-      final challenge = ChallengeResponse(
+      final challenge = gc.ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
@@ -205,7 +202,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => ChallengeVerificationRequest(
+        (_) async => gc.ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'valid-signature',
           deviceId: deviceId,
@@ -250,7 +247,7 @@ void main() {
       expect(response.statusCode, equals(HttpStatus.ok));
 
       final body = await response.body();
-      final apiKeyResponse = ChallengeVerificationResponse.decode(body);
+      final apiKeyResponse = gc.ChallengeVerificationResponse.decode(body);
       expect(apiKeyResponse.apiKey, isNotEmpty);
       expect(apiKeyResponse.expiresAt, isNotNull);
     });

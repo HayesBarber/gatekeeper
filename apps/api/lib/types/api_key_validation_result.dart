@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart';
 
 enum ApiKeyValidationError {
   noApiKey,

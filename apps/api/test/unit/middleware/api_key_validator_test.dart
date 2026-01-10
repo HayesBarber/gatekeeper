@@ -1,19 +1,17 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
-
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/api_key_validation_result.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
-class _MockWideEvent extends Mock implements we.WideEvent {}
+class _MockWideEvent extends Mock implements gc.WideEvent {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
@@ -32,7 +30,7 @@ void main() {
         apiKey: 'provided_api_key',
         source: 'header',
       );
-      when(() => mockContext.read<we.WideEvent>()).thenReturn(mockEventBuilder);
+      when(() => mockContext.read<gc.WideEvent>()).thenReturn(mockEventBuilder);
       when(() => mockContext.read<RedisClientBase>()).thenReturn(mockRedis);
     });
 
@@ -73,7 +71,7 @@ void main() {
 
       test('returns failure when API key does not match stored value',
           () async {
-        final storedApiKey = ChallengeVerificationResponse(
+        final storedApiKey = gc.ChallengeVerificationResponse(
           apiKey: 'stored_api_key',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -96,7 +94,7 @@ void main() {
       });
 
       test('returns failure when API key has expired', () async {
-        final expiredApiKey = ChallengeVerificationResponse(
+        final expiredApiKey = gc.ChallengeVerificationResponse(
           apiKey: 'provided_api_key',
           expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
         );
@@ -119,7 +117,7 @@ void main() {
       });
 
       test('returns success when API key is valid', () async {
-        final validApiKey = ChallengeVerificationResponse(
+        final validApiKey = gc.ChallengeVerificationResponse(
           apiKey: 'provided_api_key',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -143,7 +141,7 @@ void main() {
       });
 
       test('updates event builder with validation results', () async {
-        final validApiKey = ChallengeVerificationResponse(
+        final validApiKey = gc.ChallengeVerificationResponse(
           apiKey: 'provided_api_key',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -160,7 +158,7 @@ void main() {
         expect(result.isValid, isTrue);
         verify(
           () => mockEventBuilder.authentication = any(
-            that: isA<we.AuthenticationContext>(),
+            that: isA<gc.AuthenticationContext>(),
           ),
         ).called(1);
       });
@@ -168,7 +166,7 @@ void main() {
 
     group('validateApiKey', () {
       test('returns success when all parameters are valid', () async {
-        final validApiKey = ChallengeVerificationResponse(
+        final validApiKey = gc.ChallengeVerificationResponse(
           apiKey: 'provided_api_key',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );

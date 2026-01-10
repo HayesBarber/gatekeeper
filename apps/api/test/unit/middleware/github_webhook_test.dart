@@ -6,11 +6,10 @@ import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/config/subdomain_config.dart';
-import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -24,7 +23,7 @@ class _MockSubdomainContext extends Mock implements SubdomainContext {}
 
 class _MockForward extends Mock implements Forward {}
 
-class _MockWideEvent extends Mock implements we.WideEvent {}
+class _MockWideEvent extends Mock implements gc.WideEvent {}
 
 void main() {
   group('GitHub webhook middleware', () {
@@ -57,7 +56,7 @@ void main() {
       when(() => context.request).thenReturn(request);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<Forward>()).thenReturn(forward);
-      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
       when(() => context.read<SubdomainContext>()).thenReturn(subdomainContext);
 
       when(() => subdomainContext.subdomain).thenReturn('api');
@@ -167,7 +166,7 @@ void main() {
           logging: const LoggingConfig.defaultConfig(),
         ),
       );
-      when(() => request.headers).thenReturn({hubSignature: 'invalid'});
+      when(() => request.headers).thenReturn({gc.hubSignature: 'invalid'});
       when(() => request.body()).thenAnswer(
         (_) async => 'invalid',
       );
@@ -205,7 +204,9 @@ void main() {
           logging: const LoggingConfig.defaultConfig(),
         ),
       );
-      when(() => request.headers).thenReturn({hubSignature: expectedSignature});
+      when(() => request.headers).thenReturn({
+        gc.hubSignature: expectedSignature,
+      });
       when(() => request.body()).thenAnswer(
         (_) async => payload,
       );

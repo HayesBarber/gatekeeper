@@ -1,18 +1,17 @@
 import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/dto/challenge_verification_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/api_key_validation_result.dart';
 import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 class ApiKeyValidator {
   static Future<ApiKeyValidationResult> validateApiKey({
     required String apiKey,
     required String apiKeySource,
     required RedisClientBase redis,
-    required we.WideEvent eventBuilder,
+    required gc.WideEvent eventBuilder,
   }) async {
     if (apiKey.isEmpty) {
       return ApiKeyValidationResult.noApiKey();
@@ -26,7 +25,9 @@ class ApiKeyValidator {
       return ApiKeyValidationResult.notFound();
     }
 
-    final storedApiKey = ChallengeVerificationResponse.decode(storedApiKeyData);
+    final storedApiKey = gc.ChallengeVerificationResponse.decode(
+      storedApiKeyData,
+    );
 
     if (!CryptoUtils.constantTimeCompare(apiKey, storedApiKey.apiKey)) {
       return ApiKeyValidationResult.invalid();
@@ -42,11 +43,11 @@ class ApiKeyValidator {
   static Future<ApiKeyValidationResult> validateApiKeyContext({
     required RequestContext context,
   }) async {
-    final eventBuilder = context.read<we.WideEvent>();
+    final eventBuilder = context.read<gc.WideEvent>();
 
     final apiKeyContext = context.read<ApiKeyContext>();
     if (!apiKeyContext.apiKeyFound) {
-      eventBuilder.authentication = we.AuthenticationContext(
+      eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: 0,
         apiKeyPresent: false,
       );
@@ -63,7 +64,7 @@ class ApiKeyValidator {
     );
 
     if (!result.isValid) {
-      eventBuilder.authentication = we.AuthenticationContext(
+      eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: DateTime.now().since(start),
         apiKeyPresent: true,
         apiKeySource: apiKeyContext.source,
@@ -72,7 +73,7 @@ class ApiKeyValidator {
         keyExpired: result.error == ApiKeyValidationError.apiKeyExpired,
       );
     } else {
-      eventBuilder.authentication = we.AuthenticationContext(
+      eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: DateTime.now().since(start),
       );
     }

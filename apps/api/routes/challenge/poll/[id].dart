@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/dto/challenge_response.dart';
 import 'package:gatekeeper/middleware/cookie_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Future<Response> onRequest(
   RequestContext context,
@@ -40,7 +39,7 @@ Future<Response> _onGet(
     return Response(statusCode: HttpStatus.notFound);
   }
 
-  final challenge = ChallengeResponse.decode(challengeData);
+  final challenge = gc.ChallengeResponse.decode(challengeData);
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
     return Response(statusCode: HttpStatus.badRequest);
@@ -81,7 +80,7 @@ Future<Response> _onGet(
   return Response.json(
     body: {'status': 'approved'},
     headers: {
-      headerSetCookie: setCookieHeader,
+      gc.headerSetCookie: setCookieHeader,
     },
   );
 }

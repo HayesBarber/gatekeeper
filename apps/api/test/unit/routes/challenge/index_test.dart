@@ -6,9 +6,8 @@ import 'package:gatekeeper/config/app_config.dart';
 import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/redis_config.dart';
-import 'package:gatekeeper/dto/challenge_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -22,7 +21,7 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
-class _MockWideEvent extends Mock implements we.WideEvent {}
+class _MockWideEvent extends Mock implements gc.WideEvent {}
 
 void main() {
   group('POST /challenge', () {
@@ -45,7 +44,7 @@ void main() {
       when(() => request.method).thenReturn(HttpMethod.post);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
-      when(() => context.read<we.WideEvent>()).thenReturn(wideEvent);
+      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
         AppConfig(
@@ -80,7 +79,7 @@ void main() {
 
       final body = await response.body();
       final jsonBody = jsonDecode(body) as Map<String, dynamic>;
-      final challenge = ChallengeResponse(
+      final challenge = gc.ChallengeResponse(
         challengeId: jsonBody['challenge_id'] as String,
         challenge: jsonBody['challenge'] as String,
         expiresAt: DateTime.parse(jsonBody['expires_at'] as String),

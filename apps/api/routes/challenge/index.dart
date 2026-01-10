@@ -2,13 +2,11 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/config/config_service.dart';
-import 'package:gatekeeper/constants/headers.dart';
-import 'package:gatekeeper/dto/challenge_response.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
 import 'package:gatekeeper/util/extensions.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -20,13 +18,13 @@ Future<Response> onRequest(RequestContext context) {
 
 Future<Response> _onPost(RequestContext context) async {
   final start = DateTime.now();
-  final eventBuilder = context.read<we.WideEvent>();
+  final eventBuilder = context.read<gc.WideEvent>();
 
   final redis = context.read<RedisClientBase>();
   final config = context.read<ConfigService>();
 
   final challenge =
-      ChallengeResponse.random(ttl: config.config.redis.challengesTtl);
+      gc.ChallengeResponse.random(ttl: config.config.redis.challengesTtl);
 
   await redis.set(
     ns: Namespace.challenges,
@@ -35,7 +33,7 @@ Future<Response> _onPost(RequestContext context) async {
     ttl: config.config.redis.challengesTtl,
   );
 
-  eventBuilder.challenge = we.ChallengeContext(
+  eventBuilder.challenge = gc.ChallengeContext(
     operationDurationMs: DateTime.now().since(start),
     challengeId: challenge.challengeId,
   );
@@ -54,7 +52,7 @@ Future<Response> _onPost(RequestContext context) async {
       'challenge_code': challenge.challengeCode,
     },
     headers: {
-      headerSetCookie: setCookieHeader,
+      gc.headerSetCookie: setCookieHeader,
     },
   );
 }
@@ -70,7 +68,7 @@ Future<Response> _onGet(RequestContext context) async {
   final redis = context.read<RedisClientBase>();
   final collection = await redis.getAll(
     ns: Namespace.challenges,
-    parser: ChallengeResponse.decode,
+    parser: gc.ChallengeResponse.decode,
   );
 
   final now = DateTime.now().toUtc();

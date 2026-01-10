@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:curveauth_dart/curveauth_dart.dart';
-import 'package:gatekeeper/constants/headers.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 

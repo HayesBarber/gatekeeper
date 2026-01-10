@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/logging/wide_event.dart' as we;
 import 'package:gatekeeper/middleware/api_key_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/api_key_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Middleware subdomainGatekeeper() {
   return (handler) {
@@ -17,7 +17,7 @@ Middleware subdomainGatekeeper() {
         return handler(context);
       }
 
-      final eventBuilder = context.read<we.WideEvent>();
+      final eventBuilder = context.read<gc.WideEvent>();
       final start = DateTime.now();
 
       final validationResult = await ApiKeyValidator.validateApiKeyContext(
@@ -41,7 +41,7 @@ Middleware subdomainGatekeeper() {
           );
 
       if (pathBlacklisted) {
-        eventBuilder.authentication = we.AuthenticationContext(
+        eventBuilder.authentication = gc.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
           apiKeyPresent: true,
           apiKeySource: apiKeySource,
@@ -59,7 +59,7 @@ Middleware subdomainGatekeeper() {
 
       final forward = context.read<Forward>();
 
-      eventBuilder.authentication = we.AuthenticationContext(
+      eventBuilder.authentication = gc.AuthenticationContext(
         authDurationMs: DateTime.now().since(start),
       );
       return forward.toUpstream(

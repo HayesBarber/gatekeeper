@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:gatekeeper/dto/challenge_response.dart';
-import 'package:gatekeeper/dto/challenge_verification_request.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
+import 'package:gatekeeper_core/gatekeeper_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
