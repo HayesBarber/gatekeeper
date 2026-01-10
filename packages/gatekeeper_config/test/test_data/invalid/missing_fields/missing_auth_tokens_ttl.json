@@ -1,0 +1,16 @@
+{
+  "redis": {
+    "host": "127.0.0.1",
+    "ttl": {
+      "challenges": "30s"
+    }
+  },
+  "subdomains": {
+    "api": {
+      "url": "http://localhost:3000"
+    }
+  },
+  "logging": {
+    "enabled": true
+  }
+}
