@@ -1,4 +1,4 @@
-import 'package:curveauth_dart/curveauth_dart.dart';
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:test/test.dart';
 
 void main() {
