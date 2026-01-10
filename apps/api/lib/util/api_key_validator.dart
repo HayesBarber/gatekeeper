@@ -1,10 +1,10 @@
-import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/middleware/api_key_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/api_key_validation_result.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 
 class ApiKeyValidator {
   static Future<ApiKeyValidationResult> validateApiKey({

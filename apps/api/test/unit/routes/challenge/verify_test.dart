@@ -6,8 +6,8 @@ import 'package:gatekeeper/config/config_service.dart';
 import 'package:gatekeeper/config/logging_config.dart';
 import 'package:gatekeeper/config/redis_config.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
-import 'package:gatekeeper/types/signature_verifier.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
