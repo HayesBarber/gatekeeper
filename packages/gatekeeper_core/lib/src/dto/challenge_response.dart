@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:curveauth_dart/curveauth_dart.dart';
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 
 class ChallengeResponse {
   ChallengeResponse({
