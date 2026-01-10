@@ -118,6 +118,7 @@ Future<Response> _onPost(RequestContext context) async {
     ns: Namespace.challenges,
     key: verifiedChallenge.challengeId,
     value: verifiedChallenge.encode(),
+    ttl: config.config.redis.challengesTtl,
   );
 
   await redis.set(
