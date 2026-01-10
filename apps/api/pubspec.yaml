@@ -7,16 +7,18 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
-  curveauth_dart:
-    git:
-      url: https://github.com/HayesBarber/curveauth-dart
-      ref: v5.0.0
   dart_frog: ^1.1.0
   gatekeeper_core:
     git:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_core
       ref: main
+  gatekeeper_crypto:
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_crypto
+      ref: gatekeeper-cyrpto-package
+
   shorebird_redis_client: ^0.0.12
   yaml: ^3.1.3
 

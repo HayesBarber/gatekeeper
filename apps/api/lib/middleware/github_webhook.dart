@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:curveauth_dart/curveauth_dart.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 
 Middleware githubWebhook() {
   return (handler) {
