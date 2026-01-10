@@ -7,10 +7,11 @@ environment:
   sdk: ^3.9.0
 
 dependencies:
-  curveauth_dart:
+  gatekeeper_crypto:
     git:
-      url: https://github.com/HayesBarber/curveauth-dart
-      ref: v5.0.0
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_crypto
+      ref: main
   uuid: ^4.5.2
 
 dev_dependencies:
