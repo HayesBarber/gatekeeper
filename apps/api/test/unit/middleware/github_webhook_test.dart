@@ -134,10 +134,10 @@ void main() {
             'ttl': {'challenges': '30s', 'auth_tokens': '5m'},
           },
           'subdomains': {
-            'github': SubdomainConfig(
-              url: 'testing',
-              secret: 'invalid',
-            ),
+            'github': {
+              'url': 'testing',
+              'secret': 'invalid',
+            },
           },
           'logging': {'enabled': true},
           'domain': 'test-domain.com',
