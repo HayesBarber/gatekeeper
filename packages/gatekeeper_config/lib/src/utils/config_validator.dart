@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../exceptions/config_validation_exception.dart';
 import 'ttl_parser.dart';
 import 'subdomain_validator.dart';
@@ -22,13 +21,13 @@ class ConfigValidator {
     _validateRequiredFields(json, ['redis', 'subdomains', 'logging'], '\$');
 
     // Validate redis section
-    _validateRedisSection(json['redis'] as Map<String, dynamic>);
+    _validateRedisSection(json['redis']);
 
     // Validate subdomains section
-    _validateSubdomainsSection(json['subdomains'] as Map<String, dynamic>);
+    _validateSubdomainsSection(json['subdomains']);
 
     // Validate logging section
-    _validateLoggingSection(json['logging'] as Map<String, dynamic>);
+    _validateLoggingSection(json['logging']);
   }
 
   static void _validateRequiredFields(
@@ -79,7 +78,7 @@ class ConfigValidator {
       );
     }
 
-    _validateTtlSection(ttl as Map<String, dynamic>, basePath + '.ttl');
+    _validateTtlSection(ttl, basePath + '.ttl');
   }
 
   static void _validateTtlSection(Map<String, dynamic> ttl, String basePath) {
@@ -98,7 +97,7 @@ class ConfigValidator {
     }
 
     try {
-      TtlParser.parse(value as String);
+      TtlParser.parse(value);
     } catch (e) {
       throw ConfigValidationException(e.toString(), path);
     }
@@ -132,7 +131,7 @@ class ConfigValidator {
       }
 
       _validateSubdomainConfig(
-        subdomainConfig as Map<String, dynamic>,
+        subdomainConfig,
         basePath + '["' + subdomainName + '"]',
       );
     }
@@ -171,10 +170,7 @@ class ConfigValidator {
         );
       }
 
-      _validateBlacklist(
-        blacklist as Map<String, dynamic>,
-        basePath + '.blacklist',
-      );
+      _validateBlacklist(blacklist, basePath + '.blacklist');
     }
 
     // Validate optional secret
@@ -215,7 +211,7 @@ class ConfigValidator {
         );
       }
 
-      final pathsList = paths as List<dynamic>;
+      final pathsList = paths;
       for (var i = 0; i < pathsList.length; i++) {
         final path = pathsList[i];
         if (path is! String) {
@@ -226,7 +222,7 @@ class ConfigValidator {
         }
 
         PathValidator.validate(
-          path as String,
+          path,
           basePath + '.' + method + '[' + i.toString() + ']',
         );
       }

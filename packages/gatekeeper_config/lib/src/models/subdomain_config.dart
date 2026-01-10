@@ -1,9 +1,5 @@
 /// Configuration for a subdomain with URL, blacklist, and optional secret.
 class SubdomainConfig {
-  final String url;
-  final Map<String, List<String>>? blacklistedPaths;
-  final String? secret;
-
   SubdomainConfig({required this.url, this.blacklistedPaths, this.secret});
 
   factory SubdomainConfig.fromJson(Map<String, dynamic> json) {
@@ -26,6 +22,10 @@ class SubdomainConfig {
       secret: json['secret'] as String?,
     );
   }
+
+  final String url;
+  final Map<String, List<String>>? blacklistedPaths;
+  final String? secret;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{'url': url};

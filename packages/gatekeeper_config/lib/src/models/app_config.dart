@@ -4,10 +4,6 @@ import 'subdomain_config.dart';
 
 /// Main application configuration container.
 class AppConfig {
-  final RedisConfig redis;
-  final Map<String, SubdomainConfig> subdomains;
-  final LoggingConfig logging;
-
   AppConfig({
     required this.redis,
     required this.subdomains,
@@ -36,6 +32,10 @@ class AppConfig {
 
     return AppConfig(redis: redis, subdomains: subdomains, logging: logging);
   }
+
+  final RedisConfig redis;
+  final Map<String, SubdomainConfig> subdomains;
+  final LoggingConfig logging;
 
   Map<String, dynamic> toJson() {
     return {

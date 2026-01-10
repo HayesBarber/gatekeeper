@@ -1,9 +1,5 @@
 /// Configuration for Redis connection and TTL settings.
 class RedisConfig {
-  final String host;
-  final Duration challengesTtl;
-  final Duration authTokensTtl;
-
   RedisConfig({
     required this.host,
     required this.challengesTtl,
@@ -17,6 +13,10 @@ class RedisConfig {
       authTokensTtl: _parseDuration(json['auth_tokens'] as String),
     );
   }
+
+  final String host;
+  final Duration challengesTtl;
+  final Duration authTokensTtl;
 
   static Duration _parseDuration(String durationStr) {
     final regex = RegExp(r'^(\d+)([smhd])?$');

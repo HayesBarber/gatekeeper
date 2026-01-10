@@ -1,8 +1,8 @@
 class ConfigValidationException implements Exception {
+  ConfigValidationException(this.message, [this.path]);
+
   final String message;
   final String? path;
-
-  ConfigValidationException(this.message, [this.path]);
 
   @override
   String toString() {
