@@ -24,7 +24,9 @@ dependencies:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_crypto
       ref: main
+  http: ^1.1.0
   mason_logger: ^0.3.3
+  path: ^1.8.3
 
 dev_dependencies:
   build_runner: ^2.8.0

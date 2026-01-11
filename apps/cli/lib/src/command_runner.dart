@@ -26,7 +26,7 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
         help: 'Noisy logging, including all shell commands executed.',
       );
 
-    addCommand(SampleCommand(logger: _logger));
+    addCommand(InitCommand(logger: _logger));
   }
 
   @override

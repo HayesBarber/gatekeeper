@@ -1,1 +1,1 @@
-export 'sample_command.dart';
+export 'init_command.dart';
