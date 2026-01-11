@@ -9,6 +9,21 @@ environment:
 dependencies:
   args: ^2.7.0
   cli_completion: ^0.5.1
+  gatekeeper_config:
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_config
+      ref: main
+  gatekeeper_core:
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_core
+      ref: main
+  gatekeeper_crypto:
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_crypto
+      ref: main
   mason_logger: ^0.3.3
 
 dev_dependencies:
