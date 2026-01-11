@@ -1,0 +1,82 @@
+import 'dart:convert';
+
+import 'package:gatekeeper_cli/src/models/cli_config.dart';
+import 'package:gatekeeper_cli/src/services/api_client.dart';
+import 'package:gatekeeper_cli/src/services/key_manager.dart';
+import 'package:gatekeeper_cli/src/services/token_manager.dart';
+import 'package:gatekeeper_cli/src/utils/file_utils.dart';
+import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
+import 'package:mason_logger/mason_logger.dart';
+
+class AuthService {
+  AuthService(
+    this._logger,
+    this._keyManager,
+    this._tokenManager,
+  );
+
+  final Logger _logger;
+  final KeyManager _keyManager;
+  final TokenManager _tokenManager;
+
+  Future<void> getAuthToken() async {
+    try {
+      // Load CLI configuration to get domain
+      final config = await _loadCliConfig();
+      final baseUrl = 'https://${config.gatekeeper.domain}';
+      final apiClient = ApiClient(baseUrl, _logger);
+
+      // Load existing keypair
+      if (!await _keyManager.keypairExists()) {
+        throw Exception('No keypair found. Run "gk keypair generate" first.');
+      }
+
+      final keypairData = await _keyManager.loadKeypair();
+      final publicKey = keypairData['publicKey'] as String;
+      final privateKey = keypairData['privateKey'] as String;
+
+      // Request challenge from API
+      _logger.info('Requesting challenge from API...');
+      final challenge = await apiClient.postChallenge();
+
+      // Sign challenge with private key
+      _logger.info('Signing challenge with private key...');
+      final keyPair = ECCKeyPair.fromJson({
+        'privateKey': privateKey,
+        'publicKeyX': keypairData['publicKeyX'] as String,
+        'publicKeyY': keypairData['publicKeyY'] as String,
+      });
+
+      final signature = await keyPair.createSignature(challenge.challenge);
+
+      // Verify challenge to get auth token
+      _logger.info('Verifying challenge with API...');
+      final authToken = await apiClient.postChallengeVerification({
+        'device_id': publicKey,
+        'challenge_id': challenge.challengeId,
+        'signature': signature,
+      });
+
+      // Store token for CLI use
+      await _tokenManager.saveAuthToken(authToken);
+
+      // Output token in JSON format
+      _logger.write(jsonEncode(authToken.toJson()));
+    } catch (e) {
+      _logger.err('Authentication failed: $e');
+      rethrow;
+    }
+  }
+
+  Future<CliConfig> _loadCliConfig() async {
+    try {
+      final content = await FileUtils.readFileAsString(
+        FileUtils.resolvePath('~/.gatekeeper/config.json'),
+      );
+      final jsonData = jsonDecode(content) as Map<String, dynamic>;
+      return CliConfig.fromJson(jsonData);
+    } catch (e) {
+      throw Exception('Failed to load CLI configuration: $e');
+    }
+  }
+}
