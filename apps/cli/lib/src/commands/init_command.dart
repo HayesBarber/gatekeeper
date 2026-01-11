@@ -19,19 +19,19 @@ class InitCommand extends Command<int> {
       ..addOption(
         'from',
         mandatory: true,
-        help: 'Path to the Gatekeeper configuration JSON file',
+        help: 'Path to the gatekeeper configuration JSON file',
       )
       ..addFlag(
         'force',
         abbr: 'f',
-        help: 'Overwrite existing configuration',
+        help: 'Overwrite existing configuration and key pair',
         negatable: false,
       );
   }
 
   @override
   String get description =>
-      'Initialize CLI configuration from Gatekeeper config';
+      'Initialize CLI configuration and generate a key pair';
 
   @override
   String get name => 'init';
