@@ -144,7 +144,7 @@ void main() {
         isVerified: true,
         verifiedAt: DateTime.now(),
         isPolled: true,
-        apiKey: authToken,
+        authToken: authToken,
       );
 
       await redis.set(
@@ -171,7 +171,7 @@ void main() {
         sessionId: sessionId,
         isVerified: true,
         verifiedAt: DateTime.now(),
-        apiKey: authToken,
+        authToken: authToken,
       );
 
       await redis.set(

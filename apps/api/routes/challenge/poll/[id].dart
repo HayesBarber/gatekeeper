@@ -72,7 +72,7 @@ Future<Response> _onGet(
 
   final setCookieHeader = CookieUtil.buildSetCookieHeader(
     'auth_token',
-    challenge.apiKey!,
+    challenge.authToken!,
     path: '/',
     domain: config.config.domain,
   );
