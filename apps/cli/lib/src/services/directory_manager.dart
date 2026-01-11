@@ -26,7 +26,7 @@ class DirectoryManager {
       await Directory(_gatekeeperDir).create(recursive: true);
 
       // Set directory permissions to 700 (rwx------)
-      await FileUtils.setDirectoryPermissions(_gatekeeperDir, 448);
+      await FileUtils.setDirectoryPermissions(_gatekeeperDir, 700);
     }
   }
 
@@ -35,7 +35,7 @@ class DirectoryManager {
     await FileUtils.writeFileAsString(_configPath, content);
 
     // Set file permissions to 600 (rw-------)
-    await FileUtils.setFilePermissions(_configPath, 384);
+    await FileUtils.setFilePermissions(_configPath, 600);
   }
 
   Future<void> writeKeypair(String content) async {
@@ -43,7 +43,7 @@ class DirectoryManager {
     await FileUtils.writeFileAsString(_keypairPath, content);
 
     // Set file permissions to 600 (rw-------)
-    await FileUtils.setFilePermissions(_keypairPath, 384);
+    await FileUtils.setFilePermissions(_keypairPath, 600);
   }
 
   String get configPath => _configPath;
