@@ -8,6 +8,7 @@ import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
+import 'package:gatekeeper/util/request_util.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
@@ -17,6 +18,7 @@ import '../main.dart';
 final _redis = ShorebirdRedisClient.instance();
 final _logger = Logger.instance();
 final _forward = Forward();
+final _requestUtil = RequestUtil();
 
 Handler middleware(Handler handler) {
   return handler
@@ -27,6 +29,7 @@ Handler middleware(Handler handler) {
       .use(authTokenProvider())
       .use(cookieProvider())
       .use(provider<SignatureVerifier>((_) => ECCKeyPair.verifySignatureStatic))
+      .use(provider<RequestUtil>((_) => _requestUtil))
       .use(provider<Forward>((_) => _forward))
       .use(provider<ConfigService>((_) => configService))
       .use(provider<RedisClientBase>((_) => _redis));
