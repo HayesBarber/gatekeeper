@@ -110,17 +110,12 @@ class InitCommand extends Command<int> {
   ) {
     _logger
       ..success(
-        '✅ Gatekeeper configuration loaded and validated successfully',
+        'Gatekeeper configuration loaded and validated successfully',
       )
-      ..success('🔑 ECC key pair generated and stored')
+      ..success('ECC key pair generated and stored')
       ..success(
-        '📁 CLI configuration created at ${directoryManager.configPath}',
+        'CLI configuration created at ${directoryManager.configPath}',
       )
-      ..success('🌐 Discovered subdomains: ${subdomains.join(', ')}')
-      ..info('')
-      ..info('📖 Next steps:')
-      ..info('   gk auth challenge request')
-      ..info('   gk auth challenge verify <challenge-id>')
-      ..info('   gk request get /health --subdomain ${subdomains.first}');
+      ..success('Discovered subdomains: ${subdomains.join(', ')}');
   }
 }
