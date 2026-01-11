@@ -21,7 +21,7 @@ class ChallengeVerificationResponse {
 
   factory ChallengeVerificationResponse.fromJson(Map<String, dynamic> json) {
     return ChallengeVerificationResponse(
-      authToken: json['api_key'] as String,
+      authToken: json['auth_token'] as String,
       expiresAt: DateTime.parse(json['expires_at'] as String),
     );
   }
@@ -39,7 +39,7 @@ class ChallengeVerificationResponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'api_key': authToken,
+      'auth_token': authToken,
       'expires_at': expiresAt.toUtc().toIso8601String(),
     };
   }

@@ -12,7 +12,7 @@ class ChallengeResponse {
     this.isVerified = false,
     this.verifiedAt,
     this.isPolled = false,
-    this.apiKey,
+    this.authToken,
   }) : challengeCode = challengeCode ?? CryptoUtils.generateThreeDigitCode();
 
   factory ChallengeResponse.random({Duration? ttl}) {
@@ -43,7 +43,7 @@ class ChallengeResponse {
           ? DateTime.parse(json['verified_at'] as String)
           : null,
       isPolled: json['is_polled'] as bool? ?? false,
-      apiKey: json['api_key'] as String?,
+      authToken: json['auth_token'] as String?,
       sessionId: json['session_id'] as String,
     );
   }
@@ -73,7 +73,7 @@ class ChallengeResponse {
   final bool isPolled;
 
   /// API key generated when challenge was verified (for polling)
-  final String? apiKey;
+  final String? authToken;
 
   /// Session ID for challenge validation
   final String sessionId;
@@ -87,7 +87,7 @@ class ChallengeResponse {
       'is_verified': isVerified,
       'verified_at': verifiedAt?.toUtc().toIso8601String(),
       'is_polled': isPolled,
-      'api_key': apiKey,
+      'auth_token': authToken,
       'session_id': sessionId,
     };
   }
@@ -108,7 +108,7 @@ class ChallengeResponse {
       isVerified: true,
       verifiedAt: now,
       isPolled: isPolled,
-      apiKey: apiKey,
+      authToken: apiKey,
       sessionId: sessionId,
     );
   }
@@ -122,7 +122,7 @@ class ChallengeResponse {
       isVerified: isVerified,
       verifiedAt: verifiedAt,
       isPolled: true,
-      apiKey: apiKey,
+      authToken: authToken,
       sessionId: sessionId,
     );
   }

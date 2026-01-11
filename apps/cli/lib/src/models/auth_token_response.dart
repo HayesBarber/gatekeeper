@@ -6,7 +6,7 @@ class AuthTokenResponse {
 
   factory AuthTokenResponse.fromJson(Map<String, dynamic> json) {
     return AuthTokenResponse(
-      apiKey: json['api_key'] as String,
+      apiKey: json['auth_token'] as String,
       expiresAt: DateTime.parse(json['expires_at'] as String),
     );
   }
@@ -16,7 +16,7 @@ class AuthTokenResponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'api_key': apiKey,
+      'auth_token': apiKey,
       'expires_at': expiresAt.toIso8601String(),
     };
   }
