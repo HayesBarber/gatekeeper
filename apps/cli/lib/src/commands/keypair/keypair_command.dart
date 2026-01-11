@@ -25,18 +25,4 @@ class KeypairCommand extends Command<int> {
   String get name => 'keypair';
 
   final Logger _logger;
-
-  @override
-  Future<int> run() async {
-    _logger
-      ..info('Manage ECC key pairs for Gatekeeper authentication')
-      ..info('')
-      ..info('Available subcommands:')
-      ..info('  export   Export public key in base64 format')
-      ..info('  info     Display keypair information')
-      ..info('  generate Generate new key pair')
-      ..info('')
-      ..info('Use "gk keypair <subcommand> --help" for more information.');
-    return ExitCode.success.code;
-  }
 }
