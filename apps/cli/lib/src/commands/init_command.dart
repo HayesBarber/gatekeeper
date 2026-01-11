@@ -21,6 +21,10 @@ class InitCommand extends Command<int> {
         mandatory: true,
         help: 'Path to the gatekeeper configuration JSON file',
       )
+      ..addOption(
+        'device-id',
+        help: 'Device ID for authentication (required)',
+      )
       ..addFlag(
         'force',
         abbr: 'f',
@@ -43,6 +47,21 @@ class InitCommand extends Command<int> {
     try {
       final fromPath = argResults!['from'] as String;
       final force = argResults!['force'] as bool;
+
+      // Get device ID from flag or prompt
+      String deviceId;
+      final deviceIdFlag = argResults!['device-id'] as String?;
+
+      if (deviceIdFlag != null) {
+        deviceId = deviceIdFlag;
+      } else {
+        deviceId = _logger.prompt('Enter device ID:');
+      }
+
+      if (deviceId.isEmpty) {
+        _logger.err('Device ID is required');
+        return ExitCode.usage.code;
+      }
 
       // Validate input file exists and is readable
       _validateInputFile(fromPath);
@@ -74,6 +93,7 @@ class InitCommand extends Command<int> {
         appConfig,
         fromPath,
         generatedAt,
+        deviceId,
       );
 
       // Write files

@@ -126,22 +126,26 @@ class AuthConfig {
   AuthConfig({
     required this.keypairPath,
     required this.generatedAt,
+    required this.deviceId,
   });
 
   factory AuthConfig.fromJson(Map<String, dynamic> json) {
     return AuthConfig(
       keypairPath: json['keypair_path'] as String,
       generatedAt: json['generated_at'] as String,
+      deviceId: json['device_id'] as String,
     );
   }
 
   final String keypairPath;
   final String generatedAt;
+  final String deviceId;
 
   Map<String, dynamic> toJson() {
     return {
       'keypair_path': keypairPath,
       'generated_at': generatedAt,
+      'device_id': deviceId,
     };
   }
 }
