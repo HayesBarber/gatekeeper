@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gatekeeper_cli/src/models/auth_token_response.dart';
+import 'package:gatekeeper_cli/src/models/challenge_info.dart';
 import 'package:gatekeeper_cli/src/models/challenge_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:mason_logger/mason_logger.dart';
@@ -53,6 +54,31 @@ class ApiClient {
       return AuthTokenResponse.fromJson(responseData);
     } catch (e) {
       throw Exception('Network error during challenge verification: $e');
+    }
+  }
+
+  Future<List<ChallengeInfo>> getChallenges(String authToken) async {
+    _logger.detail('GETing challenges from $_baseUrl/challenge');
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/challenge'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to get challenges: ${response.statusCode}');
+      }
+
+      final responseData = jsonDecode(response.body) as List;
+      return responseData
+          .map((json) => ChallengeInfo.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Network error during challenges request: $e');
     }
   }
 }
