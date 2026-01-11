@@ -71,6 +71,9 @@ class ShorebirdRedisClient extends RedisClientBase {
   }) async {
     final pattern = '${ns.key}:*';
     final fullKeys = await _client.keys(pattern: pattern);
+    if (fullKeys.isEmpty) {
+      return [];
+    }
     final values = await _client.mget(keys: fullKeys);
     final results = values
         .whereType<String>()
