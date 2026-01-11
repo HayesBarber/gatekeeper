@@ -21,9 +21,10 @@ class AuthService {
 
   Future<void> getAuthToken() async {
     try {
-      // Load CLI configuration to get domain
+      // Load CLI configuration to get domain and device ID
       final config = await _loadCliConfig();
       final baseUrl = 'https://${config.gatekeeper.domain}';
+      final deviceId = config.auth.deviceId;
       final apiClient = ApiClient(baseUrl, _logger);
 
       // Load existing keypair
@@ -32,7 +33,6 @@ class AuthService {
       }
 
       final keypairData = await _keyManager.loadKeypair();
-      final publicKey = keypairData['publicKey'] as String;
       final privateKey = keypairData['privateKey'] as String;
 
       // Request challenge from API
@@ -52,7 +52,7 @@ class AuthService {
       // Verify challenge to get auth token
       _logger.detail('Verifying challenge with API...');
       final authToken = await apiClient.postChallengeVerification({
-        'device_id': publicKey,
+        'device_id': deviceId,
         'challenge_id': challenge.challengeId,
         'signature': signature,
       });

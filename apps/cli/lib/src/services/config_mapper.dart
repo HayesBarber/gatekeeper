@@ -7,6 +7,7 @@ class ConfigMapper {
     AppConfig appConfig,
     String configPath,
     String generatedAt,
+    String deviceId,
   ) {
     final cliInfo = CliInfo(
       version: '1.0.0',
@@ -22,6 +23,7 @@ class ConfigMapper {
     final authConfig = AuthConfig(
       keypairPath: '~/.gatekeeper/keypair.json',
       generatedAt: generatedAt,
+      deviceId: deviceId,
     );
 
     final defaultsConfig = DefaultsConfig(

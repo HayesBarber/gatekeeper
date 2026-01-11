@@ -104,6 +104,10 @@ class ListCommand extends Command<int> {
     List<ChallengeInfo> challenges,
     String baseUrl,
   ) async {
+    // Load device ID from CLI config
+    final config = await _loadCliConfig();
+    final deviceId = config.auth.deviceId;
+
     var attempts = 0;
     const maxAttempts = 3;
 
@@ -154,7 +158,7 @@ class ListCommand extends Command<int> {
           'POSTing challenge verification to $baseUrl/challenge/verify',
         );
         await apiClient.postChallengeVerification({
-          'device_id': 'cli-device', // Hardcoded device ID
+          'device_id': deviceId,
           'challenge_id': selectedChallenge.challengeId,
           'signature': signature,
         });
