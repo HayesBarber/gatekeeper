@@ -27,6 +27,7 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
       );
 
     addCommand(InitCommand(logger: _logger));
+    addCommand(KeypairCommand(logger: _logger));
   }
 
   @override
