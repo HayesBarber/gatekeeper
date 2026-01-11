@@ -58,14 +58,14 @@ class InitCommand extends Command<int> {
       }
 
       // Load and validate Gatekeeper configuration
-      _logger.info('Loading and validating Gatekeeper configuration...');
+      _logger.detail('Loading and validating Gatekeeper configuration...');
       final appConfig = await _loadGatekeeperConfig(fromPath);
 
       // Create CLI directory structure
       await directoryManager.createGatekeeperDirectory();
 
       // Generate key pair
-      _logger.info('Generating ECC key pair...');
+      _logger.detail('Generating ECC key pair...');
       final keypairJson = await keyManager.generateKeypair();
 
       // Map to CLI configuration
