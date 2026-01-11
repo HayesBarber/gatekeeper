@@ -9,8 +9,8 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class AuthCommand extends Command<int> {
   /// {@macro auth_command}
-  AuthCommand({required Logger logger}) : _logger = logger {
-    addSubcommand(TokenCommand(logger: _logger));
+  AuthCommand({required Logger logger, required bool Function() isDev}) {
+    addSubcommand(TokenCommand(logger: logger, isDev: isDev));
   }
 
   @override
@@ -18,6 +18,4 @@ class AuthCommand extends Command<int> {
 
   @override
   String get name => 'auth';
-
-  final Logger _logger;
 }

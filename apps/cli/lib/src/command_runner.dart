@@ -24,23 +24,30 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
       ..addFlag(
         'verbose',
         help: 'Noisy logging, including all shell commands executed.',
+      )
+      ..addFlag(
+        'dev',
+        help: 'Use HTTP for local development (insecure)',
+        negatable: false,
       );
 
     addCommand(InitCommand(logger: _logger));
     addCommand(KeypairCommand(logger: _logger));
-    addCommand(AuthCommand(logger: _logger));
-    addCommand(ChallengeCommand(logger: _logger));
+    addCommand(AuthCommand(logger: _logger, isDev: () => _isDevFlag));
+    addCommand(ChallengeCommand(logger: _logger, isDev: () => _isDevFlag));
   }
 
   @override
   void printUsage() => _logger.info(usage);
 
   final Logger _logger;
+  bool _isDevFlag = false;
 
   @override
   Future<int> run(Iterable<String> args) async {
     try {
       final topLevelResults = parse(args);
+      _isDevFlag = topLevelResults['dev'] == true;
       if (topLevelResults['verbose'] == true) {
         _logger.level = Level.verbose;
       }

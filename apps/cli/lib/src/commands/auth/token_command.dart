@@ -11,7 +11,9 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class TokenCommand extends Command<int> {
   /// {@macro token_command}
-  TokenCommand({required Logger logger}) : _logger = logger;
+  TokenCommand({required Logger logger, required bool Function() isDev})
+    : _logger = logger,
+      _isDev = isDev;
 
   @override
   String get description => 'Get authentication token from API';
@@ -20,6 +22,7 @@ class TokenCommand extends Command<int> {
   String get name => 'token';
 
   final Logger _logger;
+  final bool Function() _isDev;
 
   @override
   Future<int> run() async {
@@ -31,7 +34,7 @@ class TokenCommand extends Command<int> {
         keyManager,
         tokenManager,
       );
-      await authService.getAuthToken();
+      await authService.getAuthToken(useHttps: !_isDev());
 
       return ExitCode.success.code;
     } on Exception catch (e) {
