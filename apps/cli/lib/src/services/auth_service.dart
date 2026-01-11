@@ -4,6 +4,7 @@ import 'package:gatekeeper_cli/src/models/cli_config.dart';
 import 'package:gatekeeper_cli/src/services/api_client.dart';
 import 'package:gatekeeper_cli/src/services/key_manager.dart';
 import 'package:gatekeeper_cli/src/services/token_manager.dart';
+import 'package:gatekeeper_cli/src/services/url_builder.dart';
 import 'package:gatekeeper_cli/src/utils/file_utils.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -19,11 +20,15 @@ class AuthService {
   final KeyManager _keyManager;
   final TokenManager _tokenManager;
 
-  Future<void> getAuthToken() async {
+  Future<void> getAuthToken({bool useHttps = true}) async {
     try {
       // Load CLI configuration to get domain and device ID
       final config = await _loadCliConfig();
-      final baseUrl = 'https://${config.gatekeeper.domain}';
+      final baseUrl = UrlBuilder.buildBaseUrl(
+        config.gatekeeper.domain,
+        useHttps: useHttps,
+        logger: _logger,
+      );
       final deviceId = config.auth.deviceId;
       final apiClient = ApiClient(baseUrl, _logger);
 

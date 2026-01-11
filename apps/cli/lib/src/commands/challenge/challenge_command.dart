@@ -3,8 +3,8 @@ import 'package:gatekeeper_cli/src/commands/challenge/list_command.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class ChallengeCommand extends Command<int> {
-  ChallengeCommand({required Logger logger}) {
-    addSubcommand(ListCommand(logger: logger));
+  ChallengeCommand({required Logger logger, required bool Function() isDev}) {
+    addSubcommand(ListCommand(logger: logger, isDev: isDev));
   }
 
   @override

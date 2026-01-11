@@ -8,19 +8,22 @@ import 'package:gatekeeper_cli/src/services/api_client.dart';
 import 'package:gatekeeper_cli/src/services/auth_service.dart';
 import 'package:gatekeeper_cli/src/services/key_manager.dart';
 import 'package:gatekeeper_cli/src/services/token_manager.dart';
+import 'package:gatekeeper_cli/src/services/url_builder.dart';
 import 'package:gatekeeper_cli/src/utils/file_utils.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class ListCommand extends Command<int> {
-  ListCommand({required Logger logger})
+  ListCommand({required Logger logger, required bool Function() isDev})
     : _logger = logger,
       _keyManager = KeyManager(logger),
-      _tokenManager = TokenManager();
+      _tokenManager = TokenManager(),
+      _isDev = isDev;
 
   final Logger _logger;
   final KeyManager _keyManager;
   final TokenManager _tokenManager;
+  final bool Function() _isDev;
 
   @override
   String get description => 'List and verify challenges';
@@ -36,7 +39,11 @@ class ListCommand extends Command<int> {
 
       // Load CLI configuration to get domain
       final config = await _loadCliConfig();
-      final baseUrl = 'https://${config.gatekeeper.domain}';
+      final baseUrl = UrlBuilder.buildBaseUrl(
+        config.gatekeeper.domain,
+        useHttps: !_isDev(),
+        logger: _logger,
+      );
       final apiClient = ApiClient(baseUrl, _logger);
 
       // Get challenges list
