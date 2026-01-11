@@ -7,12 +7,7 @@ class TokenManager {
   TokenManager();
 
   Future<void> saveAuthToken(AuthTokenResponse token) async {
-    final tokenData = AuthTokenResponse(
-      apiKey: token.apiKey,
-      expiresAt: token.expiresAt,
-    );
-
-    final jsonContent = FileUtils.encodeJsonFile(tokenData.toJson());
+    final jsonContent = FileUtils.encodeJsonFile(token.toJson());
     await FileUtils.writeFileAsString(
       FileUtils.resolvePath('~/.gatekeeper/auth_token.json'),
       jsonContent,
