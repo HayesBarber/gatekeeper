@@ -43,7 +43,6 @@ class ConfigMapper {
       final subdomainName = entry.key;
       final subdomainConfig = entry.value;
 
-      // Always construct HTTPS URLs using the domain
       final httpsUrl = 'https://$subdomainName.${appConfig.domain}';
 
       subdomains[subdomainName] = SubdomainInfo(
