@@ -7,7 +7,7 @@ class ConfigService {
   ConfigService();
   CliConfig? _config;
 
-  Future<CliConfig> loadCliConfig() async {
+  Future<CliConfig> getCliConfig() async {
     if (_config != null) {
       return _config!;
     }
