@@ -23,8 +23,6 @@ class AuthService {
 
   Future<void> getAuthToken() async {
     try {
-      // Load CLI configuration to get domain and device ID
-
       // Load existing keypair
       if (!await _keyManager.keypairExists()) {
         throw Exception('No keypair found. Run "gk keypair generate" first.');
