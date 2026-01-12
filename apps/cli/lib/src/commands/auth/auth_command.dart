@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:gatekeeper_cli/src/commands/auth/token_command.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 /// {@template auth_command}
@@ -9,8 +10,8 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class AuthCommand extends Command<int> {
   /// {@macro auth_command}
-  AuthCommand({required Logger logger}) {
-    addSubcommand(TokenCommand(logger: logger));
+  AuthCommand({required Logger logger, required Registry registry}) {
+    addSubcommand(TokenCommand(logger: logger, registry: registry));
   }
 
   @override
