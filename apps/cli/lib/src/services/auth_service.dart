@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:gatekeeper_cli/src/services/api_client.dart';
 import 'package:gatekeeper_cli/src/services/key_manager.dart';
-import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_cli/src/services/token_manager.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -11,18 +11,19 @@ class AuthService {
     this._logger,
     this._keyManager,
     this._tokenManager,
+    this._apiClient,
+    this._deviceId,
   );
 
   final Logger _logger;
   final KeyManager _keyManager;
   final TokenManager _tokenManager;
+  final ApiClient _apiClient;
+  final String _deviceId;
 
   Future<void> getAuthToken() async {
     try {
       // Load CLI configuration to get domain and device ID
-      final deviceId =
-          (await Registry.I.configService.getCliConfig()).auth.deviceId;
-      final apiClient = await Registry.I.apiClient;
 
       // Load existing keypair
       if (!await _keyManager.keypairExists()) {
@@ -34,7 +35,7 @@ class AuthService {
 
       // Request challenge from API
       _logger.detail('Requesting challenge from API...');
-      final challenge = await apiClient.postChallenge();
+      final challenge = await _apiClient.postChallenge();
 
       // Sign challenge with private key
       _logger.detail('Signing challenge with private key...');
@@ -48,8 +49,8 @@ class AuthService {
 
       // Verify challenge to get auth token
       _logger.detail('Verifying challenge with API...');
-      final authToken = await apiClient.postChallengeVerification({
-        'device_id': deviceId,
+      final authToken = await _apiClient.postChallengeVerification({
+        'device_id': _deviceId,
         'challenge_id': challenge.challengeId,
         'signature': signature,
       });

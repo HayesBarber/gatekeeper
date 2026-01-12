@@ -9,7 +9,9 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class ExportCommand extends Command<int> {
   /// {@macro export_command}
-  ExportCommand({required Logger logger}) : _logger = logger;
+  ExportCommand({required Logger logger, required Registry registry})
+    : _logger = logger,
+      _registry = registry;
 
   @override
   String get description =>
@@ -19,11 +21,12 @@ class ExportCommand extends Command<int> {
   String get name => 'export';
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   Future<int> run() async {
     try {
-      final keyManager = Registry.I.keyManager;
+      final keyManager = _registry.keyManager;
 
       if (!await keyManager.keypairExists()) {
         _logger.err(

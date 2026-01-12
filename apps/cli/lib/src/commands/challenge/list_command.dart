@@ -7,9 +7,12 @@ import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class ListCommand extends Command<int> {
-  ListCommand({required Logger logger}) : _logger = logger;
+  ListCommand({required Logger logger, required Registry registry})
+    : _logger = logger,
+      _registry = registry;
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   String get description => 'List and verify challenges';
@@ -23,7 +26,7 @@ class ListCommand extends Command<int> {
       // Check and refresh auth token if needed
       final authToken = await _ensureValidAuthToken();
 
-      final apiClient = await Registry.I.apiClient;
+      final apiClient = await _registry.apiClient;
 
       // Get challenges list
       final challenges = await apiClient.getChallenges(authToken.authToken);
@@ -59,7 +62,7 @@ class ListCommand extends Command<int> {
   Future<AuthTokenResponse> _ensureValidAuthToken() async {
     _logger.detail('Checking stored auth token...');
 
-    final storedToken = await Registry.I.tokenManager.getStoredToken();
+    final storedToken = await _registry.tokenManager.getStoredToken();
 
     // Check if token exists and is not expired
     if (storedToken != null && storedToken.expiresAt.isAfter(DateTime.now())) {
@@ -72,10 +75,10 @@ class ListCommand extends Command<int> {
     );
 
     // Refresh auth token using the same flow as auth command
-    final authService = Registry.I.authService;
+    final authService = await _registry.authService;
     await authService.getAuthToken();
 
-    final newToken = await Registry.I.tokenManager.getStoredToken();
+    final newToken = await _registry.tokenManager.getStoredToken();
     if (newToken == null) {
       throw Exception('Failed to refresh auth token');
     }
@@ -89,7 +92,7 @@ class ListCommand extends Command<int> {
     List<ChallengeInfo> challenges,
   ) async {
     // Load device ID from CLI config
-    final config = await Registry.I.configService.getCliConfig();
+    final config = await _registry.configService.getCliConfig();
     final deviceId = config.auth.deviceId;
 
     var attempts = 0;
@@ -122,7 +125,7 @@ class ListCommand extends Command<int> {
         }
 
         // Load keypair for signing
-        final keypairData = await Registry.I.keyManager.loadKeypair();
+        final keypairData = await _registry.keyManager.loadKeypair();
         final privateKey = keypairData['privateKey'] as String;
 
         final keyPair = ECCKeyPair.fromJson({

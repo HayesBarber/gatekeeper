@@ -9,7 +9,11 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class TokenCommand extends Command<int> {
   /// {@macro token_command}
-  TokenCommand({required Logger logger}) : _logger = logger;
+  TokenCommand({
+    required Logger logger,
+    required Registry registry,
+  }) : _logger = logger,
+       _registry = registry;
 
   @override
   String get description => 'Get authentication token from API';
@@ -18,11 +22,12 @@ class TokenCommand extends Command<int> {
   String get name => 'token';
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   Future<int> run() async {
     try {
-      await Registry.I.authService.getAuthToken();
+      await (await _registry.authService).getAuthToken();
 
       return ExitCode.success.code;
     } on Exception catch (e) {
