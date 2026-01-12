@@ -9,7 +9,9 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class InfoCommand extends Command<int> {
   /// {@macro info_command}
-  InfoCommand({required Logger logger}) : _logger = logger;
+  InfoCommand({required Logger logger, required Registry registry})
+    : _logger = logger,
+      _registry = registry;
 
   @override
   String get description => 'Display keypair information';
@@ -18,11 +20,12 @@ class InfoCommand extends Command<int> {
   String get name => 'info';
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   Future<int> run() async {
     try {
-      final keyManager = Registry.I.keyManager;
+      final keyManager = _registry.keyManager;
 
       if (!await keyManager.keypairExists()) {
         _logger.err(

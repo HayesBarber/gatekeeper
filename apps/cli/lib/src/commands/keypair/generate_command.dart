@@ -10,7 +10,9 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class GenerateCommand extends Command<int> {
   /// {@macro generate_command}
-  GenerateCommand({required Logger logger}) : _logger = logger {
+  GenerateCommand({required Logger logger, required Registry registry})
+    : _logger = logger,
+      _registry = registry {
     argParser.addFlag(
       'force',
       abbr: 'f',
@@ -26,12 +28,13 @@ class GenerateCommand extends Command<int> {
   String get name => 'generate';
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   Future<int> run() async {
     try {
       final force = argResults!['force'] as bool;
-      final keyManager = Registry.I.keyManager;
+      final keyManager = _registry.keyManager;
 
       // Check if keypair exists and get confirmation if needed
       if (await keyManager.keypairExists() && !force) {
