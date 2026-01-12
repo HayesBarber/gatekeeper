@@ -6,6 +6,8 @@ import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
+import 'package:gatekeeper/util/request_util.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Middleware subdomainGatekeeper() {
@@ -45,6 +47,19 @@ Middleware subdomainGatekeeper() {
       );
 
       if (!validationResult.isValid) {
+        final requestUtil = context.read<RequestUtil>();
+        if (requestUtil.isBrowserRequest(context.request)) {
+          final config = context.read<ConfigService>();
+          return Response(
+            statusCode: HttpStatus.temporaryRedirect,
+            headers: {
+              HttpHeaders.locationHeader: context.request.uri.replace(
+                host: config.config.domain,
+                path: '/index.html',
+              ),
+            },
+          );
+        }
         return validationResult.errorResponse!;
       }
 
