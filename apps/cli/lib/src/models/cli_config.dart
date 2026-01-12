@@ -4,7 +4,6 @@ class CliConfig {
     required this.cli,
     required this.gatekeeper,
     required this.auth,
-    required this.defaults,
   });
 
   factory CliConfig.fromJson(Map<String, dynamic> json) {
@@ -14,23 +13,18 @@ class CliConfig {
         json['gatekeeper'] as Map<String, dynamic>,
       ),
       auth: AuthConfig.fromJson(json['auth'] as Map<String, dynamic>),
-      defaults: DefaultsConfig.fromJson(
-        json['defaults'] as Map<String, dynamic>,
-      ),
     );
   }
 
   final CliInfo cli;
   final GatekeeperConfig gatekeeper;
   final AuthConfig auth;
-  final DefaultsConfig defaults;
 
   Map<String, dynamic> toJson() {
     return {
       'cli': cli.toJson(),
       'gatekeeper': gatekeeper.toJson(),
       'auth': auth.toJson(),
-      'defaults': defaults.toJson(),
     };
   }
 }
@@ -146,26 +140,6 @@ class AuthConfig {
       'keypair_path': keypairPath,
       'generated_at': generatedAt,
       'device_id': deviceId,
-    };
-  }
-}
-
-class DefaultsConfig {
-  DefaultsConfig({
-    required this.outputFormat,
-  });
-
-  factory DefaultsConfig.fromJson(Map<String, dynamic> json) {
-    return DefaultsConfig(
-      outputFormat: json['output_format'] as String,
-    );
-  }
-
-  final String outputFormat;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'output_format': outputFormat,
     };
   }
 }

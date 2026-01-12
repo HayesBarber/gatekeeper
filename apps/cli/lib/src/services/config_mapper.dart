@@ -26,15 +26,10 @@ class ConfigMapper {
       deviceId: deviceId,
     );
 
-    final defaultsConfig = DefaultsConfig(
-      outputFormat: 'text',
-    );
-
     return CliConfig(
       cli: cliInfo,
       gatekeeper: gatekeeperConfig,
       auth: authConfig,
-      defaults: defaultsConfig,
     );
   }
 
