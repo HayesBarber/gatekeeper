@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:gatekeeper_cli/src/services/api_client.dart';
+import 'package:gatekeeper_cli/src/services/auth_service.dart';
 import 'package:gatekeeper_cli/src/services/config_service.dart';
+import 'package:gatekeeper_cli/src/services/directory_manager.dart';
+import 'package:gatekeeper_cli/src/services/key_manager.dart';
+import 'package:gatekeeper_cli/src/services/token_manager.dart';
 import 'package:gatekeeper_cli/src/services/url_builder.dart';
 import 'package:mason_logger/mason_logger.dart';
 
@@ -19,7 +23,7 @@ class Registry {
   static Registry get I {
     if (_instance == null) {
       throw StateError(
-        'Registery not initialized',
+        'Registry not initialized',
       );
     }
     return _instance!;
@@ -49,5 +53,29 @@ class Registry {
     );
     _apiClient = ApiClient(baseUrl, _logger);
     return _apiClient!;
+  }
+
+  KeyManager? _keyManager;
+  KeyManager get keyManager {
+    _keyManager ??= KeyManager(_logger);
+    return _keyManager!;
+  }
+
+  TokenManager? _tokenManager;
+  TokenManager get tokenManager {
+    _tokenManager ??= TokenManager();
+    return _tokenManager!;
+  }
+
+  DirectoryManager? _directoryManager;
+  DirectoryManager get directoryManager {
+    _directoryManager ??= DirectoryManager(_logger);
+    return _directoryManager!;
+  }
+
+  AuthService? _authService;
+  AuthService get authService {
+    _authService ??= AuthService(_logger, keyManager, tokenManager);
+    return _authService!;
   }
 }
