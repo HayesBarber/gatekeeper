@@ -3,6 +3,7 @@ import 'package:args/command_runner.dart';
 import 'package:gatekeeper_cli/src/services/config_mapper.dart';
 import 'package:gatekeeper_cli/src/services/directory_manager.dart';
 import 'package:gatekeeper_cli/src/services/key_manager.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_cli/src/utils/file_utils.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:mason_logger/mason_logger.dart';
@@ -67,8 +68,8 @@ class InitCommand extends Command<int> {
       _validateInputFile(fromPath);
 
       // Initialize services
-      final directoryManager = DirectoryManager(_logger);
-      final keyManager = KeyManager(_logger);
+      final directoryManager = Registry.I.directoryManager;
+      final keyManager = Registry.I.keyManager;
 
       // Check for existing configuration
       if (await directoryManager.configExists() && !force) {
