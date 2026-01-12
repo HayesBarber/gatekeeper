@@ -6,6 +6,10 @@ import 'package:gatekeeper_cli/src/services/url_builder.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class Registery {
+  factory Registery.init(Logger logger, bool Function() isDev) {
+    _instance = Registery._(logger, isDev);
+    return _instance!;
+  }
   Registery._(
     this._logger,
     this._isDev,
