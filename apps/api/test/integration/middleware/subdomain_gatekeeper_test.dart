@@ -52,6 +52,22 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.forbidden));
     });
 
+    test('returns 307 for un-authed browser', () async {
+      final uri = TestEnv.apiUri('/echo');
+      final request = http.Request('GET', uri)
+        ..followRedirects = false
+        ..headers.addAll({
+          'sec-fetch-mode': 'test',
+          ...TestEnv.headersWithSubdomain('api'),
+        });
+
+      final res = await http.Client().send(request);
+
+      expect(res.statusCode, equals(HttpStatus.temporaryRedirect));
+      expect(res.headers[HttpHeaders.locationHeader], contains('/index.html'));
+      expect(res.headers[HttpHeaders.locationHeader], isNot(contains('api')));
+    });
+
     test('returns 403 for missing api key', () async {
       final res = await http.get(
         TestEnv.apiUri('/echo'),

@@ -53,10 +53,12 @@ Middleware subdomainGatekeeper() {
           return Response(
             statusCode: HttpStatus.temporaryRedirect,
             headers: {
-              HttpHeaders.locationHeader: context.request.uri.replace(
-                host: config.config.domain,
-                path: '/index.html',
-              ),
+              HttpHeaders.locationHeader: context.request.uri
+                  .replace(
+                    host: config.config.domain,
+                    path: '/index.html',
+                  )
+                  .toString(),
             },
           );
         }
