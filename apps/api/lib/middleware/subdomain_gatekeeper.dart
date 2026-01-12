@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
@@ -20,16 +19,6 @@ Middleware subdomainGatekeeper() {
       final eventBuilder = context.read<gc.WideEvent>();
       final start = DateTime.now();
 
-      final validationResult =
-          await AuthTokenValidator.validateAuthTokenContext(
-        context: context,
-      );
-
-      if (!validationResult.isValid) {
-        return validationResult.errorResponse!;
-      }
-
-      final authTokenSource = context.read<AuthTokenContext>().source!;
       final blacklistedPaths = subdomainContext
               .config!.blacklistedPaths?[context.request.method.value] ??
           [];
@@ -43,16 +32,20 @@ Middleware subdomainGatekeeper() {
       if (pathBlacklisted) {
         eventBuilder.authentication = gc.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          authTokenPresent: true,
-          authTokenSource: authTokenSource,
-          authTokenStored: true,
-          authTokenValid: true,
-          keyExpired: true,
           pathBlacklisted: true,
         );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
+      }
+
+      final validationResult =
+          await AuthTokenValidator.validateAuthTokenContext(
+        context: context,
+      );
+
+      if (!validationResult.isValid) {
+        return validationResult.errorResponse!;
       }
 
       final upstreamUrl = Uri.parse(subdomainContext.config!.url);

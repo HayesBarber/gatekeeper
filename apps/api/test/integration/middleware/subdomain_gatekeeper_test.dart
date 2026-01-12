@@ -42,14 +42,14 @@ void main() {
       expect(res.body, equals('healthy'));
     });
 
-    test('returns 403 for missing client id', () async {
+    test('returns 403 for blacklisted path', () async {
       final res = await http.get(
         TestEnv.apiUri('/health'),
         headers: TestEnv.headersWithSubdomain(
           'api',
         ),
       );
-      expect(res.statusCode, equals(HttpStatus.unauthorized));
+      expect(res.statusCode, equals(HttpStatus.forbidden));
     });
 
     test('returns 403 for missing api key', () async {
