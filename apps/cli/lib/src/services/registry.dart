@@ -38,6 +38,12 @@ class Registry {
     return _configService!;
   }
 
+  UrlBuilder? _urlBuilder;
+  UrlBuilder get urlBuilder {
+    _urlBuilder ??= UrlBuilder();
+    return _urlBuilder!;
+  }
+
   ApiClient? _apiClient;
   FutureOr<ApiClient> get apiClient async {
     if (_apiClient != null) {
@@ -46,7 +52,7 @@ class Registry {
 
     final domain = (await configService.getCliConfig()).gatekeeper.domain;
 
-    final baseUrl = UrlBuilder().buildBaseUrl(
+    final baseUrl = urlBuilder.buildBaseUrl(
       domain,
       useHttps: !_isDev(),
       logger: _logger,
@@ -75,7 +81,13 @@ class Registry {
 
   AuthService? _authService;
   AuthService get authService {
-    _authService ??= AuthService(_logger, keyManager, tokenManager);
+    _authService ??= AuthService(
+      _logger,
+      keyManager,
+      tokenManager,
+      _isDev,
+      urlBuilder,
+    );
     return _authService!;
   }
 }

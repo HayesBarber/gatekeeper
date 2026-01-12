@@ -36,7 +36,7 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
 
     addCommand(InitCommand(logger: _logger));
     addCommand(KeypairCommand(logger: _logger));
-    addCommand(AuthCommand(logger: _logger, isDev: () => _isDevFlag));
+    addCommand(AuthCommand(logger: _logger));
     addCommand(ChallengeCommand(logger: _logger));
   }
 

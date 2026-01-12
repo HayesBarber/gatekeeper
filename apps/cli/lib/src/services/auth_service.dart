@@ -14,19 +14,23 @@ class AuthService {
     this._logger,
     this._keyManager,
     this._tokenManager,
+    this._isDev,
+    this._urlBuilder,
   );
 
   final Logger _logger;
   final KeyManager _keyManager;
   final TokenManager _tokenManager;
+  final bool Function() _isDev;
+  final UrlBuilder _urlBuilder;
 
-  Future<void> getAuthToken({bool useHttps = true}) async {
+  Future<void> getAuthToken() async {
     try {
       // Load CLI configuration to get domain and device ID
       final config = await _loadCliConfig();
-      final baseUrl = UrlBuilder().buildBaseUrl(
+      final baseUrl = _urlBuilder.buildBaseUrl(
         config.gatekeeper.domain,
-        useHttps: useHttps,
+        useHttps: !_isDev(),
         logger: _logger,
       );
       final deviceId = config.auth.deviceId;
