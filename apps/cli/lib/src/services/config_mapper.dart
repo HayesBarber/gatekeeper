@@ -1,4 +1,5 @@
 import 'package:gatekeeper_cli/src/models/cli_config.dart';
+import 'package:gatekeeper_cli/src/version.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
 
 /// Maps Gatekeeper configuration to CLI configuration.
@@ -10,7 +11,7 @@ class ConfigMapper {
     String deviceId,
   ) {
     final cliInfo = CliInfo(
-      version: '1.0.0',
+      version: packageVersion,
       initializedAt: generatedAt,
       gatekeeperConfigPath: configPath,
     );
