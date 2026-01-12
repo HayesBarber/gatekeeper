@@ -10,24 +10,10 @@ import 'package:gatekeeper_cli/src/services/url_builder.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class Registry {
-  factory Registry.init(Logger logger, bool Function() isDev) {
-    _instance = Registry._(logger, isDev);
-    return _instance!;
-  }
-  Registry._(
+  Registry(
     this._logger,
     this._isDev,
   );
-  static Registry? _instance;
-
-  static Registry get I {
-    if (_instance == null) {
-      throw StateError(
-        'Registry not initialized',
-      );
-    }
-    return _instance!;
-  }
 
   final Logger _logger;
   final bool Function() _isDev;

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:gatekeeper_cli/src/services/config_mapper.dart';
 import 'package:gatekeeper_cli/src/services/directory_manager.dart';
-import 'package:gatekeeper_cli/src/services/key_manager.dart';
 import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_cli/src/utils/file_utils.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
@@ -15,7 +14,9 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class InitCommand extends Command<int> {
   /// {@macro init_command}
-  InitCommand({required Logger logger}) : _logger = logger {
+  InitCommand({required Logger logger, required Registry registry})
+    : _logger = logger,
+      _registry = registry {
     argParser
       ..addOption(
         'from',
@@ -42,6 +43,7 @@ class InitCommand extends Command<int> {
   String get name => 'init';
 
   final Logger _logger;
+  final Registry _registry;
 
   @override
   Future<int> run() async {
@@ -68,8 +70,8 @@ class InitCommand extends Command<int> {
       _validateInputFile(fromPath);
 
       // Initialize services
-      final directoryManager = Registry.I.directoryManager;
-      final keyManager = Registry.I.keyManager;
+      final directoryManager = _registry.directoryManager;
+      final keyManager = _registry.keyManager;
 
       // Check for existing configuration
       if (await directoryManager.configExists() && !force) {
