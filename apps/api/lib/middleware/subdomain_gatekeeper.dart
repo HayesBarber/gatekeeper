@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
+import 'package:gatekeeper/util/request_util.dart';
+import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Middleware subdomainGatekeeper() {
@@ -20,16 +21,6 @@ Middleware subdomainGatekeeper() {
       final eventBuilder = context.read<gc.WideEvent>();
       final start = DateTime.now();
 
-      final validationResult =
-          await AuthTokenValidator.validateAuthTokenContext(
-        context: context,
-      );
-
-      if (!validationResult.isValid) {
-        return validationResult.errorResponse!;
-      }
-
-      final authTokenSource = context.read<AuthTokenContext>().source!;
       final blacklistedPaths = subdomainContext
               .config!.blacklistedPaths?[context.request.method.value] ??
           [];
@@ -43,16 +34,35 @@ Middleware subdomainGatekeeper() {
       if (pathBlacklisted) {
         eventBuilder.authentication = gc.AuthenticationContext(
           authDurationMs: DateTime.now().since(start),
-          authTokenPresent: true,
-          authTokenSource: authTokenSource,
-          authTokenStored: true,
-          authTokenValid: true,
-          keyExpired: true,
           pathBlacklisted: true,
         );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
+      }
+
+      final validationResult =
+          await AuthTokenValidator.validateAuthTokenContext(
+        context: context,
+      );
+
+      if (!validationResult.isValid) {
+        final requestUtil = context.read<RequestUtil>();
+        if (requestUtil.isBrowserRequest(context.request)) {
+          final config = context.read<ConfigService>();
+          return Response(
+            statusCode: HttpStatus.temporaryRedirect,
+            headers: {
+              HttpHeaders.locationHeader: context.request.uri
+                  .replace(
+                    host: config.config.domain,
+                    path: '/index.html',
+                  )
+                  .toString(),
+            },
+          );
+        }
+        return validationResult.errorResponse!;
       }
 
       final upstreamUrl = Uri.parse(subdomainContext.config!.url);
