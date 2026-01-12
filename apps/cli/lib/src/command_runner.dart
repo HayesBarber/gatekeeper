@@ -34,7 +34,7 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
 
     final registry = Registry(_logger, () => _isDevFlag);
 
-    addCommand(InitCommand(logger: _logger));
+    addCommand(InitCommand(logger: _logger, registry: registry));
     addCommand(KeypairCommand(logger: _logger));
     addCommand(AuthCommand(logger: _logger));
     addCommand(ChallengeCommand(logger: _logger));

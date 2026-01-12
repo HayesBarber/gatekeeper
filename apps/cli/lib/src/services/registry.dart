@@ -66,11 +66,13 @@ class Registry {
   }
 
   AuthService? _authService;
-  AuthService get authService {
+  FutureOr<AuthService> get authService async {
     _authService ??= AuthService(
       _logger,
       keyManager,
       tokenManager,
+      await apiClient,
+      (await configService.getCliConfig()).auth.deviceId,
     );
     return _authService!;
   }
