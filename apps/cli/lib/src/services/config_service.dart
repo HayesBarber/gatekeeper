@@ -4,6 +4,7 @@ import 'package:gatekeeper_cli/src/models/cli_config.dart';
 import 'package:gatekeeper_cli/src/utils/file_utils.dart';
 
 class ConfigService {
+  ConfigService();
   CliConfig? _config;
 
   Future<CliConfig> loadCliConfig() async {
