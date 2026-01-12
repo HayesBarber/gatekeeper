@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:gatekeeper_cli/src/services/key_manager.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 /// {@template export_command}
@@ -23,7 +23,7 @@ class ExportCommand extends Command<int> {
   @override
   Future<int> run() async {
     try {
-      final keyManager = KeyManager(_logger);
+      final keyManager = Registry.I.keyManager;
 
       if (!await keyManager.keypairExists()) {
         _logger.err(

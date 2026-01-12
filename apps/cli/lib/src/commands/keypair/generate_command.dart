@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:gatekeeper_cli/src/services/key_manager.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 /// {@template generate_command}
@@ -30,7 +31,7 @@ class GenerateCommand extends Command<int> {
   Future<int> run() async {
     try {
       final force = argResults!['force'] as bool;
-      final keyManager = KeyManager(_logger);
+      final keyManager = Registry.I.keyManager;
 
       // Check if keypair exists and get confirmation if needed
       if (await keyManager.keypairExists() && !force) {

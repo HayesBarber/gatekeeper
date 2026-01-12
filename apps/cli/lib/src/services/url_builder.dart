@@ -2,9 +2,9 @@ import 'package:gatekeeper_cli/src/constants/protocols.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class UrlBuilder {
-  UrlBuilder._();
+  UrlBuilder();
 
-  static String buildBaseUrl(
+  String buildBaseUrl(
     String domain, {
     bool useHttps = true,
     Logger? logger,

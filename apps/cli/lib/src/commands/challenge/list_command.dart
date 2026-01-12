@@ -1,29 +1,15 @@
-import 'dart:convert';
-
 import 'package:args/command_runner.dart';
 import 'package:gatekeeper_cli/src/models/auth_token_response.dart';
 import 'package:gatekeeper_cli/src/models/challenge_info.dart';
-import 'package:gatekeeper_cli/src/models/cli_config.dart';
 import 'package:gatekeeper_cli/src/services/api_client.dart';
-import 'package:gatekeeper_cli/src/services/auth_service.dart';
-import 'package:gatekeeper_cli/src/services/key_manager.dart';
-import 'package:gatekeeper_cli/src/services/token_manager.dart';
-import 'package:gatekeeper_cli/src/services/url_builder.dart';
-import 'package:gatekeeper_cli/src/utils/file_utils.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class ListCommand extends Command<int> {
-  ListCommand({required Logger logger, required bool Function() isDev})
-    : _logger = logger,
-      _keyManager = KeyManager(logger),
-      _tokenManager = TokenManager(),
-      _isDev = isDev;
+  ListCommand({required Logger logger}) : _logger = logger;
 
   final Logger _logger;
-  final KeyManager _keyManager;
-  final TokenManager _tokenManager;
-  final bool Function() _isDev;
 
   @override
   String get description => 'List and verify challenges';
@@ -37,17 +23,9 @@ class ListCommand extends Command<int> {
       // Check and refresh auth token if needed
       final authToken = await _ensureValidAuthToken();
 
-      // Load CLI configuration to get domain
-      final config = await _loadCliConfig();
-      final baseUrl = UrlBuilder.buildBaseUrl(
-        config.gatekeeper.domain,
-        useHttps: !_isDev(),
-        logger: _logger,
-      );
-      final apiClient = ApiClient(baseUrl, _logger);
+      final apiClient = await Registry.I.apiClient;
 
       // Get challenges list
-      _logger.detail('GETing challenges from $baseUrl/challenge');
       final challenges = await apiClient.getChallenges(authToken.authToken);
 
       if (challenges.isEmpty) {
@@ -69,7 +47,7 @@ class ListCommand extends Command<int> {
       }
 
       // Interactive challenge selection and verification
-      await _selectAndVerifyChallenge(apiClient, challenges, baseUrl);
+      await _selectAndVerifyChallenge(apiClient, challenges);
 
       return ExitCode.success.code;
     } on Exception catch (e) {
@@ -81,7 +59,7 @@ class ListCommand extends Command<int> {
   Future<AuthTokenResponse> _ensureValidAuthToken() async {
     _logger.detail('Checking stored auth token...');
 
-    final storedToken = await _tokenManager.getStoredToken();
+    final storedToken = await Registry.I.tokenManager.getStoredToken();
 
     // Check if token exists and is not expired
     if (storedToken != null && storedToken.expiresAt.isAfter(DateTime.now())) {
@@ -94,10 +72,10 @@ class ListCommand extends Command<int> {
     );
 
     // Refresh auth token using the same flow as auth command
-    final authService = AuthService(_logger, _keyManager, _tokenManager);
+    final authService = Registry.I.authService;
     await authService.getAuthToken();
 
-    final newToken = await _tokenManager.getStoredToken();
+    final newToken = await Registry.I.tokenManager.getStoredToken();
     if (newToken == null) {
       throw Exception('Failed to refresh auth token');
     }
@@ -109,10 +87,9 @@ class ListCommand extends Command<int> {
   Future<void> _selectAndVerifyChallenge(
     ApiClient apiClient,
     List<ChallengeInfo> challenges,
-    String baseUrl,
   ) async {
     // Load device ID from CLI config
-    final config = await _loadCliConfig();
+    final config = await Registry.I.configService.getCliConfig();
     final deviceId = config.auth.deviceId;
 
     var attempts = 0;
@@ -145,7 +122,7 @@ class ListCommand extends Command<int> {
         }
 
         // Load keypair for signing
-        final keypairData = await _keyManager.loadKeypair();
+        final keypairData = await Registry.I.keyManager.loadKeypair();
         final privateKey = keypairData['privateKey'] as String;
 
         final keyPair = ECCKeyPair.fromJson({
@@ -161,9 +138,6 @@ class ListCommand extends Command<int> {
         );
 
         // Verify challenge
-        _logger.detail(
-          'POSTing challenge verification to $baseUrl/challenge/verify',
-        );
         await apiClient.postChallengeVerification({
           'device_id': deviceId,
           'challenge_id': selectedChallenge.challengeId,
@@ -183,17 +157,5 @@ class ListCommand extends Command<int> {
 
     _logger.err('Too many invalid attempts. Exiting.');
     return;
-  }
-
-  Future<CliConfig> _loadCliConfig() async {
-    try {
-      final content = await FileUtils.readFileAsString(
-        FileUtils.resolvePath('~/.gatekeeper/config.json'),
-      );
-      final jsonData = jsonDecode(content) as Map<String, dynamic>;
-      return CliConfig.fromJson(jsonData);
-    } catch (e) {
-      throw Exception('Failed to load CLI configuration: $e');
-    }
   }
 }

@@ -1,7 +1,5 @@
 import 'package:args/command_runner.dart';
-import 'package:gatekeeper_cli/src/services/auth_service.dart';
-import 'package:gatekeeper_cli/src/services/key_manager.dart';
-import 'package:gatekeeper_cli/src/services/token_manager.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 /// {@template token_command}
@@ -11,9 +9,7 @@ import 'package:mason_logger/mason_logger.dart';
 /// {@endtemplate}
 class TokenCommand extends Command<int> {
   /// {@macro token_command}
-  TokenCommand({required Logger logger, required bool Function() isDev})
-    : _logger = logger,
-      _isDev = isDev;
+  TokenCommand({required Logger logger}) : _logger = logger;
 
   @override
   String get description => 'Get authentication token from API';
@@ -22,19 +18,11 @@ class TokenCommand extends Command<int> {
   String get name => 'token';
 
   final Logger _logger;
-  final bool Function() _isDev;
 
   @override
   Future<int> run() async {
     try {
-      final keyManager = KeyManager(_logger);
-      final tokenManager = TokenManager();
-      final authService = AuthService(
-        _logger,
-        keyManager,
-        tokenManager,
-      );
-      await authService.getAuthToken(useHttps: !_isDev());
+      await Registry.I.authService.getAuthToken();
 
       return ExitCode.success.code;
     } on Exception catch (e) {
