@@ -23,10 +23,6 @@ class KeyManager {
     return jsonContent;
   }
 
-  Future<String> generateNewKeypair() async {
-    return generateKeypair();
-  }
-
   Future<void> saveKeypair(String jsonContent) async {
     await FileUtils.writeFileAsString(
       FileUtils.resolvePath('~/.gatekeeper/keypair.json'),

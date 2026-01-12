@@ -53,7 +53,7 @@ class GenerateCommand extends Command<int> {
       }
 
       // Generate new keypair
-      final keypairJson = await keyManager.generateNewKeypair();
+      final keypairJson = await keyManager.generateKeypair();
       await keyManager.saveKeypair(keypairJson);
 
       // Extract public key for display
