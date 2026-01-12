@@ -85,8 +85,6 @@ class Registry {
       _logger,
       keyManager,
       tokenManager,
-      _isDev,
-      urlBuilder,
     );
     return _authService!;
   }
