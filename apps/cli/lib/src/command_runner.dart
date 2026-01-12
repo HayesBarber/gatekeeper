@@ -2,6 +2,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:gatekeeper_cli/src/commands/commands.dart';
+import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_cli/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 
@@ -30,6 +31,8 @@ class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
         help: 'Use HTTP for local development (insecure)',
         negatable: false,
       );
+
+    Registry.init(_logger, () => _isDevFlag);
 
     addCommand(InitCommand(logger: _logger));
     addCommand(KeypairCommand(logger: _logger));
