@@ -24,7 +24,7 @@ class AuthService {
     try {
       // Load CLI configuration to get domain and device ID
       final config = await _loadCliConfig();
-      final baseUrl = UrlBuilder.buildBaseUrl(
+      final baseUrl = UrlBuilder().buildBaseUrl(
         config.gatekeeper.domain,
         useHttps: useHttps,
         logger: _logger,

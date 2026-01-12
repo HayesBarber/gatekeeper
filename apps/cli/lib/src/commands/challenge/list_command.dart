@@ -39,7 +39,7 @@ class ListCommand extends Command<int> {
 
       // Load CLI configuration to get domain
       final config = await _loadCliConfig();
-      final baseUrl = UrlBuilder.buildBaseUrl(
+      final baseUrl = UrlBuilder().buildBaseUrl(
         config.gatekeeper.domain,
         useHttps: !_isDev(),
         logger: _logger,
