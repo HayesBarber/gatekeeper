@@ -24,9 +24,10 @@ final class TestEnv {
   }
 
   static Map<String, String> headersWithSubdomain(String subdomain) {
+    final extension = _baseUri.host == 'localhost' ? '.com' : '';
     final host = _baseUri.hasPort
-        ? '$subdomain.${_baseUri.host}:${_baseUri.port}'
-        : '$subdomain.${_baseUri.host}';
+        ? '$subdomain.${_baseUri.host}$extension:${_baseUri.port}'
+        : '$subdomain.${_baseUri.host}$extension';
 
     return {
       'host': host,
