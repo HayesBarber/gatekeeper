@@ -35,8 +35,11 @@ class InfoCommand extends Command<int> {
       }
 
       final info = await keyManager.getKeypairInfo();
+      final deviceId =
+          (await _registry.configService.getCliConfig()).auth.deviceId;
 
       _logger
+        ..info('Device Id: $deviceId')
         ..info('Public Key: ${info['publicKey']}')
         ..info('Generated: ${info['generatedAt']}')
         ..info('Keypair Path: ${info['path']}');
