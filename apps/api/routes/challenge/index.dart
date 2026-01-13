@@ -52,7 +52,7 @@ Future<Response> _onPost(RequestContext context) async {
       'challenge_code': challenge.challengeCode,
     },
     headers: {
-      gc.headerSetCookie: setCookieHeader,
+      HttpHeaders.setCookieHeader: setCookieHeader,
     },
   );
 }

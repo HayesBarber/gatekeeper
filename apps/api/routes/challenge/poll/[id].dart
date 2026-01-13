@@ -80,7 +80,7 @@ Future<Response> _onGet(
   return Response.json(
     body: {'status': 'approved'},
     headers: {
-      gc.headerSetCookie: setCookieHeader,
+      HttpHeaders.setCookieHeader: setCookieHeader,
     },
   );
 }
