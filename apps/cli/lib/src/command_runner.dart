@@ -1,6 +1,5 @@
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
-import 'package:cli_completion/cli_completion.dart';
 import 'package:gatekeeper_cli/src/commands/commands.dart';
 import 'package:gatekeeper_cli/src/services/registry.dart';
 import 'package:gatekeeper_cli/src/version.dart';
@@ -10,7 +9,7 @@ const executableName = 'gk';
 const packageName = 'gatekeeper_cli';
 const description = 'gatekeeper cli';
 
-class GatekeeperCliCommandRunner extends CompletionCommandRunner<int> {
+class GatekeeperCliCommandRunner extends CommandRunner<int> {
   GatekeeperCliCommandRunner({
     Logger? logger,
   }) : _logger = logger ?? Logger(),
