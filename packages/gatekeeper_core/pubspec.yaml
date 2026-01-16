@@ -12,7 +12,6 @@ dependencies:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_crypto
       ref: main
-  uuid: ^4.5.2
 
 dev_dependencies:
   mocktail: ^1.0.4
