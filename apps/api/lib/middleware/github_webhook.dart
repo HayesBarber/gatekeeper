@@ -1,17 +1,16 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/constants/constants.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
-import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 
 Middleware githubWebhook() {
   return (handler) {
     return (context) async {
       final subdomainContext = context.read<SubdomainContext>();
-      if (subdomainContext.subdomain != gc.github) {
+      if (subdomainContext.subdomain != Constants.github) {
         return handler(context);
       }
 
@@ -20,20 +19,8 @@ Middleware githubWebhook() {
         return handler(context);
       }
 
-      final eventBuilder = context.read<gc.WideEvent>();
-      final start = DateTime.now();
-
-      final eventType = context.request.headers[gc.githubEvent];
-      final deliveryId = context.request.headers[gc.githubDelivery];
-
-      final signature = context.request.headers[gc.hubSignature];
+      final signature = context.request.headers[Constants.hubSignature];
       if (signature == null) {
-        eventBuilder.webhook = gc.WebhookContext(
-          verificationDurationMs: DateTime.now().since(start),
-          eventType: eventType,
-          deliveryId: deliveryId,
-          signaturePresent: false,
-        );
         return Response(
           statusCode: HttpStatus.unauthorized,
         );
@@ -46,13 +33,6 @@ Middleware githubWebhook() {
         secret: subdomainContext.config!.secret!,
       );
       if (!verified) {
-        eventBuilder.webhook = gc.WebhookContext(
-          verificationDurationMs: DateTime.now().since(start),
-          eventType: eventType,
-          deliveryId: deliveryId,
-          signaturePresent: true,
-          signatureValid: false,
-        );
         return Response(
           statusCode: HttpStatus.unauthorized,
         );
@@ -62,11 +42,6 @@ Middleware githubWebhook() {
 
       final forward = context.read<Forward>();
 
-      eventBuilder.webhook = gc.WebhookContext(
-        verificationDurationMs: DateTime.now().since(start),
-        eventType: eventType,
-        deliveryId: deliveryId,
-      );
       return forward.toUpstream(
         context,
         upstreamUrl,

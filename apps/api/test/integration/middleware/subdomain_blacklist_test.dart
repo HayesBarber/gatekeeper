@@ -46,7 +46,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(blacklistedGetRes.statusCode, equals(HttpStatus.forbidden));
@@ -55,7 +55,7 @@ void main() {
         TestEnv.apiUri('/users/delete'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(blacklistedPostRes.statusCode, equals(HttpStatus.forbidden));
@@ -73,7 +73,7 @@ void main() {
         TestEnv.apiUri('/api/data'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(allowedGetRes.statusCode, equals(HttpStatus.ok));
@@ -85,7 +85,7 @@ void main() {
         TestEnv.apiUri('/users/create'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(allowedPostRes.statusCode, equals(HttpStatus.ok));
@@ -106,7 +106,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(getRes.statusCode, equals(HttpStatus.forbidden));
@@ -115,7 +115,7 @@ void main() {
         TestEnv.apiUri('/admin/users'),
         headers: {
           ...TestEnv.headersWithSubdomain('api'),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(putRes.statusCode, equals(HttpStatus.ok));

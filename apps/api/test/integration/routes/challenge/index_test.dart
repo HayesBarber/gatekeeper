@@ -82,7 +82,7 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer invalid-key',
+          HttpHeaders.authorizationHeader: 'Bearer invalid-key',
         },
       );
       expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -98,7 +98,8 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
+          HttpHeaders.authorizationHeader:
+              'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -119,7 +120,8 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
+          HttpHeaders.authorizationHeader:
+              'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -145,7 +147,8 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
+          HttpHeaders.authorizationHeader:
+              'Bearer ${authTokenResponse.authToken}',
         },
       );
 
@@ -192,7 +195,8 @@ void main() {
       final res = await http.get(
         TestEnv.apiUri('/challenge'),
         headers: {
-          headerAuthorization: 'Bearer ${authTokenResponse.authToken}',
+          HttpHeaders.authorizationHeader:
+              'Bearer ${authTokenResponse.authToken}',
         },
       );
 

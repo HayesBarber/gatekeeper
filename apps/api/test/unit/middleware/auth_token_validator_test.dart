@@ -11,26 +11,21 @@ import 'package:test/test.dart';
 
 class _MockRequestContext extends Mock implements RequestContext {}
 
-class _MockWideEvent extends Mock implements gc.WideEvent {}
-
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
 void main() {
   group('AuthTokenValidator', () {
     late _MockRequestContext mockContext;
-    late _MockWideEvent mockEventBuilder;
     late _MockRedisClient mockRedis;
     late AuthTokenContext authTokenContext;
 
     setUp(() {
       mockContext = _MockRequestContext();
-      mockEventBuilder = _MockWideEvent();
       mockRedis = _MockRedisClient();
       authTokenContext = const AuthTokenContext(
         authToken: 'provided_auth_token',
         source: 'header',
       );
-      when(() => mockContext.read<gc.WideEvent>()).thenReturn(mockEventBuilder);
       when(() => mockContext.read<RedisClientBase>()).thenReturn(mockRedis);
     });
 
@@ -197,11 +192,6 @@ void main() {
         );
 
         expect(result.isValid, isTrue);
-        verify(
-          () => mockEventBuilder.authentication = any(
-            that: isA<gc.AuthenticationContext>(),
-          ),
-        ).called(1);
       });
     });
 
@@ -223,7 +213,6 @@ void main() {
           authToken: 'provided_auth_token',
           authTokenSource: 'header',
           redis: mockRedis,
-          eventBuilder: mockEventBuilder,
         );
 
         expect(result.isValid, isTrue);
@@ -245,7 +234,6 @@ void main() {
           authToken: '',
           authTokenSource: 'header',
           redis: mockRedis,
-          eventBuilder: mockEventBuilder,
         );
 
         expect(result.isValid, isFalse);
@@ -268,7 +256,6 @@ void main() {
           authToken: 'provided_auth_token',
           authTokenSource: 'header',
           redis: mockRedis,
-          eventBuilder: mockEventBuilder,
         );
 
         expect(result.isValid, isFalse);

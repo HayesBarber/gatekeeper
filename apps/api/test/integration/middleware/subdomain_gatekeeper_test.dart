@@ -87,7 +87,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer dummy-key',
+            HttpHeaders.authorizationHeader: 'Bearer dummy-key',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -104,7 +104,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer dummy-key',
+            HttpHeaders.authorizationHeader: 'Bearer dummy-key',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -126,7 +126,8 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer ${authToken.authToken}-inalid',
+            HttpHeaders.authorizationHeader:
+                'Bearer ${authToken.authToken}-inalid',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -153,7 +154,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'api',
             ),
-            headerAuthorization: 'Bearer ${authToken.authToken}',
+            HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
           },
         );
         expect(res.statusCode, equals(HttpStatus.forbidden));
@@ -173,7 +174,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          headerAuthorization: 'Bearer ${authToken.authToken}',
+          HttpHeaders.authorizationHeader: 'Bearer ${authToken.authToken}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));
@@ -196,7 +197,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'api',
           ),
-          cookie: 'auth_token=${authToken.authToken}',
+          HttpHeaders.cookieHeader: 'auth_token=${authToken.authToken}',
         },
       );
       expect(res.statusCode, equals(HttpStatus.ok));

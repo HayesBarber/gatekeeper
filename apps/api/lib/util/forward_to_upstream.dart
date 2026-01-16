@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:gatekeeper/util/extensions.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 class Forward {
   Future<Response> toUpstream(
@@ -10,11 +8,8 @@ class Forward {
     Uri upstreamBase, {
     String? body,
   }) async {
-    final start = DateTime.now();
     final client = HttpClient();
     try {
-      final eventBuilder = context.read<gc.WideEvent>();
-
       final request = context.request;
 
       final upstreamUri = upstreamBase.replace(
@@ -54,11 +49,6 @@ class Forward {
 
         responseHeaders[key] = values.join(',');
       });
-
-      eventBuilder.upstream = gc.UpstreamContext(
-        targetHost: upstreamBase.host,
-        forwardDurationMs: DateTime.now().since(start),
-      );
 
       return Response.bytes(
         body: responseBytes,

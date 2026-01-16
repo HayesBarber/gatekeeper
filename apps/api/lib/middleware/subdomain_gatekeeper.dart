@@ -3,12 +3,10 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
-import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper/util/path_matcher.dart';
 import 'package:gatekeeper/util/request_util.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
 Middleware subdomainGatekeeper() {
   return (handler) {
@@ -17,9 +15,6 @@ Middleware subdomainGatekeeper() {
       if (!subdomainContext.isValid) {
         return handler(context);
       }
-
-      final eventBuilder = context.read<gc.WideEvent>();
-      final start = DateTime.now();
 
       final blacklistedPaths = subdomainContext
               .config!.blacklistedPaths?[context.request.method.value] ??
@@ -32,10 +27,6 @@ Middleware subdomainGatekeeper() {
           );
 
       if (pathBlacklisted) {
-        eventBuilder.authentication = gc.AuthenticationContext(
-          authDurationMs: DateTime.now().since(start),
-          pathBlacklisted: true,
-        );
         return Response(
           statusCode: HttpStatus.forbidden,
         );
@@ -69,9 +60,6 @@ Middleware subdomainGatekeeper() {
 
       final forward = context.read<Forward>();
 
-      eventBuilder.authentication = gc.AuthenticationContext(
-        authDurationMs: DateTime.now().since(start),
-      );
       return forward.toUpstream(
         context,
         upstreamUrl,

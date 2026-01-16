@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gatekeeper_core/gatekeeper_core.dart';
+import 'package:gatekeeper/constants/constants.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -35,7 +35,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'github',
           ),
-          hubSignature: 'invalid',
+          Constants.hubSignature: 'invalid',
         },
       );
       expect(res.statusCode, equals(HttpStatus.unauthorized));
@@ -56,7 +56,7 @@ void main() {
             ...TestEnv.headersWithSubdomain(
               'github',
             ),
-            hubSignature: signature,
+            Constants.hubSignature: signature,
           },
           body: payload,
         );
@@ -80,7 +80,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'github',
           ),
-          hubSignature: signature,
+          Constants.hubSignature: signature,
         },
         body: payload,
       );
@@ -104,7 +104,7 @@ void main() {
           ...TestEnv.headersWithSubdomain(
             'github',
           ),
-          hubSignature: signature,
+          Constants.hubSignature: signature,
         },
         body: largePayload,
       );

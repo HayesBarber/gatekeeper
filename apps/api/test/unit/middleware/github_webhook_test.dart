@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:gatekeeper/constants/constants.dart';
 import 'package:gatekeeper/middleware/github_webhook.dart';
 import 'package:gatekeeper/middleware/subdomain_provider.dart';
 import 'package:gatekeeper/util/forward_to_upstream.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -19,15 +19,12 @@ class _MockSubdomainContext extends Mock implements SubdomainContext {}
 
 class _MockForward extends Mock implements Forward {}
 
-class _MockWideEvent extends Mock implements gc.WideEvent {}
-
 void main() {
   group('GitHub webhook middleware', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockConfigService configService;
     late _MockForward forward;
-    late _MockWideEvent wideEvent;
     late _MockSubdomainContext subdomainContext;
 
     const fallthroughResponseBody = 'hello world';
@@ -46,13 +43,11 @@ void main() {
       request = _MockRequest();
       configService = _MockConfigService();
       forward = _MockForward();
-      wideEvent = _MockWideEvent();
       subdomainContext = _MockSubdomainContext();
 
       when(() => context.request).thenReturn(request);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<Forward>()).thenReturn(forward);
-      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
       when(() => context.read<SubdomainContext>()).thenReturn(subdomainContext);
 
       when(() => subdomainContext.subdomain).thenReturn('api');
@@ -178,7 +173,8 @@ void main() {
           'domain': 'test-domain.com',
         }),
       );
-      when(() => request.headers).thenReturn({gc.hubSignature: 'invalid'});
+      when(() => request.headers)
+          .thenReturn({Constants.hubSignature: 'invalid'});
       when(() => request.body()).thenAnswer(
         (_) async => 'invalid',
       );
@@ -221,7 +217,7 @@ void main() {
         }),
       );
       when(() => request.headers).thenReturn({
-        gc.hubSignature: expectedSignature,
+        Constants.hubSignature: expectedSignature,
       });
       when(() => request.body()).thenAnswer(
         (_) async => payload,

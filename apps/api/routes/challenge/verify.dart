@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
-import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
@@ -15,8 +14,6 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final start = DateTime.now();
-  final eventBuilder = context.read<gc.WideEvent>();
   final bodyString = await context.request.body();
   final request = gc.ChallengeVerificationRequest.decode(bodyString);
 
@@ -28,10 +25,6 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   if (publicKey == null) {
-    eventBuilder.challenge = gc.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: false,
-    );
     return Response(
       statusCode: HttpStatus.unauthorized,
     );
@@ -42,11 +35,6 @@ Future<Response> _onPost(RequestContext context) async {
     key: request.challengeId,
   );
   if (challengeData == null) {
-    eventBuilder.challenge = gc.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: true,
-      challengePresent: false,
-    );
     return Response(
       statusCode: HttpStatus.notFound,
     );
@@ -55,27 +43,12 @@ Future<Response> _onPost(RequestContext context) async {
   final challenge = gc.ChallengeResponse.decode(challengeData);
 
   if (challenge.challengeId != request.challengeId) {
-    eventBuilder.challenge = gc.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: true,
-      challengePresent: true,
-      challengeId: challenge.challengeId,
-      challengeIdMismatch: true,
-    );
     return Response(
       statusCode: HttpStatus.badRequest,
     );
   }
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
-    eventBuilder.challenge = gc.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: true,
-      challengePresent: true,
-      challengeId: challenge.challengeId,
-      challengeIdMismatch: false,
-      challengeExpired: true,
-    );
     return Response(
       statusCode: HttpStatus.badRequest,
     );
@@ -90,15 +63,6 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   if (!isValid) {
-    eventBuilder.challenge = gc.ChallengeContext(
-      operationDurationMs: DateTime.now().since(start),
-      publicKeyPresent: true,
-      challengePresent: true,
-      challengeId: challenge.challengeId,
-      challengeIdMismatch: false,
-      challengeExpired: false,
-      signatureValid: false,
-    );
     return Response(
       statusCode: HttpStatus.forbidden,
     );
@@ -126,9 +90,6 @@ Future<Response> _onPost(RequestContext context) async {
     ttl: config.config.redis.authTokensTtl,
   );
 
-  eventBuilder.challenge = gc.ChallengeContext(
-    operationDurationMs: DateTime.now().since(start),
-  );
   return Response.json(
     body: authToken,
   );

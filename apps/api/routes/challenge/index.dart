@@ -4,7 +4,6 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
-import 'package:gatekeeper/util/extensions.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
 import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 
@@ -17,9 +16,6 @@ Future<Response> onRequest(RequestContext context) {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final start = DateTime.now();
-  final eventBuilder = context.read<gc.WideEvent>();
-
   final redis = context.read<RedisClientBase>();
   final config = context.read<ConfigService>();
 
@@ -31,11 +27,6 @@ Future<Response> _onPost(RequestContext context) async {
     key: challenge.challengeId,
     value: challenge.encode(),
     ttl: config.config.redis.challengesTtl,
-  );
-
-  eventBuilder.challenge = gc.ChallengeContext(
-    operationDurationMs: DateTime.now().since(start),
-    challengeId: challenge.challengeId,
   );
 
   final setCookieHeader = CookieUtil.buildSetCookieHeader(

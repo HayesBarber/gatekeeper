@@ -18,15 +18,12 @@ class _MockConfigService extends Mock implements ConfigService {}
 
 class _MockRedisClient extends Mock implements RedisClientBase {}
 
-class _MockWideEvent extends Mock implements gc.WideEvent {}
-
 void main() {
   group('POST /challenge', () {
     late _MockRequestContext context;
     late _MockRequest request;
     late _MockConfigService configService;
     late _MockRedisClient redisClient;
-    late _MockWideEvent wideEvent;
 
     const redisUserKey = 'user-123';
 
@@ -35,13 +32,11 @@ void main() {
       request = _MockRequest();
       configService = _MockConfigService();
       redisClient = _MockRedisClient();
-      wideEvent = _MockWideEvent();
 
       when(() => context.request).thenReturn(request);
       when(() => request.method).thenReturn(HttpMethod.post);
       when(() => context.read<ConfigService>()).thenReturn(configService);
       when(() => context.read<RedisClientBase>()).thenReturn(redisClient);
-      when(() => context.read<gc.WideEvent>()).thenReturn(wideEvent);
 
       when(() => configService.config).thenReturn(
         AppConfig.fromJson({
