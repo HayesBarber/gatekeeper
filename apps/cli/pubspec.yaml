@@ -13,11 +13,6 @@ dependencies:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_config
       ref: main
-  gatekeeper_core:
-    git:
-      url: https://github.com/HayesBarber/gatekeeper
-      path: packages/gatekeeper_core
-      ref: main
   gatekeeper_crypto:
     git:
       url: https://github.com/HayesBarber/gatekeeper

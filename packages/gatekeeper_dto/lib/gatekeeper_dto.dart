@@ -1,4 +1,4 @@
-/// gatekeeper_core
+/// gatekeeper_dto
 library;
 
 export 'src/challenge_response.dart';
