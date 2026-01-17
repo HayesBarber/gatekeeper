@@ -92,6 +92,15 @@ class ChallengeResponse {
     };
   }
 
+  Map<String, dynamic> toPublicJson() {
+    return {
+      'challenge_id': challengeId,
+      'challenge': challenge,
+      'challenge_code': challengeCode,
+      'expires_at': expiresAt.toUtc().toIso8601String(),
+    };
+  }
+
   ChallengeResponse markAsVerified({
     required String apiKey,
     Duration? pollingTtl,
