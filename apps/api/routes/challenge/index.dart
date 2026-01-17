@@ -36,12 +36,7 @@ Future<Response> _onPost(RequestContext context) async {
   );
 
   return Response.json(
-    body: {
-      'challenge_id': challenge.challengeId,
-      'challenge': challenge.challenge,
-      'expires_at': challenge.expiresAt.toUtc().toIso8601String(),
-      'challenge_code': challenge.challengeCode,
-    },
+    body: challenge.toPublicJson(),
     headers: {
       HttpHeaders.setCookieHeader: setCookieHeader,
     },
@@ -69,12 +64,7 @@ Future<Response> _onGet(RequestContext context) async {
             !challenge.isVerified && !challenge.expiresAt.isBefore(now),
       )
       .map(
-        (challenge) => {
-          'challenge_id': challenge.challengeId,
-          'challenge': challenge.challenge,
-          'expires_at': challenge.expiresAt.toUtc().toIso8601String(),
-          'challenge_code': challenge.challengeCode,
-        },
+        (challenge) => challenge.toPublicJson(),
       )
       .toList();
 

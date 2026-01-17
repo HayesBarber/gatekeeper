@@ -20,7 +20,12 @@ void main() {
       expect(res.statusCode, equals(HttpStatus.ok));
       expect(res.body, isNotEmpty);
       final jsonBody = jsonDecode(res.body) as Map<String, dynamic>;
+      expect(jsonBody.keys.length, equals(4));
       expect(jsonBody.keys, isNot(contains('session_id')));
+      expect(jsonBody.keys, isNot(contains('auth_token')));
+      expect(jsonBody.keys, isNot(contains('is_polled')));
+      expect(jsonBody.keys, isNot(contains('verified_at')));
+      expect(jsonBody.keys, isNot(contains('is_verified')));
       final challenge = ChallengeResponse(
         challengeId: jsonBody['challenge_id'] as String,
         challenge: jsonBody['challenge'] as String,
