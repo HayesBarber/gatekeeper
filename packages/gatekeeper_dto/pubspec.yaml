@@ -1,5 +1,5 @@
-name: gatekeeper_core
-description: gatekeeper core
+name: gatekeeper_dto
+description: gatekeeper dto
 version: 0.1.0+1
 publish_to: none
 
