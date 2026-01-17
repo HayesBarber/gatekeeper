@@ -13,15 +13,15 @@ dependencies:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_config
       ref: main
-  gatekeeper_core:
-    git:
-      url: https://github.com/HayesBarber/gatekeeper
-      path: packages/gatekeeper_core
-      ref: main
   gatekeeper_crypto:
     git:
       url: https://github.com/HayesBarber/gatekeeper
       path: packages/gatekeeper_crypto
+      ref: main
+  gatekeeper_dto:
+    git:
+      url: https://github.com/HayesBarber/gatekeeper
+      path: packages/gatekeeper_dto
       ref: main
   shorebird_redis_client: ^0.0.12
 

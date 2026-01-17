@@ -2,8 +2,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/auth_token_validation_result.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 
 class AuthTokenValidator {
   static Future<AuthTokenValidationResult> validateAuthToken({
@@ -23,7 +23,7 @@ class AuthTokenValidator {
       return AuthTokenValidationResult.notFound();
     }
 
-    final storedAuthToken = gc.ChallengeVerificationResponse.decode(
+    final storedAuthToken = ChallengeVerificationResponse.decode(
       storedAuthTokenData,
     );
 

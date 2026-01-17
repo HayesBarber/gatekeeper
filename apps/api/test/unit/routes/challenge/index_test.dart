@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -75,7 +75,7 @@ void main() {
 
       final body = await response.body();
       final jsonBody = jsonDecode(body) as Map<String, dynamic>;
-      final challenge = gc.ChallengeResponse(
+      final challenge = ChallengeResponse(
         challengeId: jsonBody['challenge_id'] as String,
         challenge: jsonBody['challenge'] as String,
         expiresAt: DateTime.parse(jsonBody['expires_at'] as String),

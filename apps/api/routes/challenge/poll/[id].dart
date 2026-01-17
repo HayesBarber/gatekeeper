@@ -5,7 +5,7 @@ import 'package:gatekeeper/middleware/cookie_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 
 Future<Response> onRequest(
   RequestContext context,
@@ -39,7 +39,7 @@ Future<Response> _onGet(
     return Response(statusCode: HttpStatus.notFound);
   }
 
-  final challenge = gc.ChallengeResponse.decode(challengeData);
+  final challenge = ChallengeResponse.decode(challengeData);
 
   if (challenge.expiresAt.isBefore(DateTime.now())) {
     return Response(statusCode: HttpStatus.badRequest);

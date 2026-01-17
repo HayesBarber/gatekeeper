@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -63,7 +63,7 @@ void main() {
 
     test('returns 401 if public key not found', () async {
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -80,7 +80,7 @@ void main() {
 
     test('returns 404 if challenge not found', () async {
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -100,14 +100,14 @@ void main() {
     });
 
     test('returns 400 if challenge ID does not match', () async {
-      final challenge = gc.ChallengeResponse(
+      final challenge = ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
         sessionId: 'test-session-id',
       );
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: 'wrong-id',
           signature: 'sig',
           deviceId: deviceId,
@@ -127,7 +127,7 @@ void main() {
     });
 
     test('returns 400 if challenge is expired', () async {
-      final challenge = gc.ChallengeResponse(
+      final challenge = ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().subtract(const Duration(seconds: 1)),
@@ -135,7 +135,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'sig',
           deviceId: deviceId,
@@ -155,7 +155,7 @@ void main() {
     });
 
     test('returns 403 if signature is invalid', () async {
-      final challenge = gc.ChallengeResponse(
+      final challenge = ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
@@ -163,7 +163,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'bad-sig',
           deviceId: deviceId,
@@ -190,7 +190,7 @@ void main() {
     });
 
     test('returns 200 and api key for valid challenge verification', () async {
-      final challenge = gc.ChallengeResponse(
+      final challenge = ChallengeResponse(
         challengeId: challengeId,
         challenge: challengeValue,
         expiresAt: DateTime.now().add(const Duration(seconds: 30)),
@@ -198,7 +198,7 @@ void main() {
       );
 
       when(() => request.body()).thenAnswer(
-        (_) async => gc.ChallengeVerificationRequest(
+        (_) async => ChallengeVerificationRequest(
           challengeId: challengeId,
           signature: 'valid-signature',
           deviceId: deviceId,
@@ -243,7 +243,7 @@ void main() {
       expect(response.statusCode, equals(HttpStatus.ok));
 
       final body = await response.body();
-      final authTokenResponse = gc.ChallengeVerificationResponse.decode(body);
+      final authTokenResponse = ChallengeVerificationResponse.decode(body);
       expect(authTokenResponse.authToken, isNotEmpty);
       expect(authTokenResponse.expiresAt, isNotNull);
     });

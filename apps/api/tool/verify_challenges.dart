@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:args/args.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/redis/shorebird_redis_client.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart';
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 import 'package:http/http.dart' as http;
 
 class Config {

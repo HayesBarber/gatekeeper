@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
 import 'package:gatekeeper_crypto/gatekeeper_crypto.dart';
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -15,7 +15,7 @@ Future<Response> onRequest(RequestContext context) {
 
 Future<Response> _onPost(RequestContext context) async {
   final bodyString = await context.request.body();
-  final request = gc.ChallengeVerificationRequest.decode(bodyString);
+  final request = ChallengeVerificationRequest.decode(bodyString);
 
   final redis = context.read<RedisClientBase>();
   final config = context.read<ConfigService>();
@@ -40,7 +40,7 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final challenge = gc.ChallengeResponse.decode(challengeData);
+  final challenge = ChallengeResponse.decode(challengeData);
 
   if (challenge.challengeId != request.challengeId) {
     return Response(
@@ -68,7 +68,7 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  final authToken = gc.ChallengeVerificationResponse.random(
+  final authToken = ChallengeVerificationResponse.random(
     ttl: config.config.redis.authTokensTtl,
   );
   final verifiedChallenge = challenge.markAsVerified(

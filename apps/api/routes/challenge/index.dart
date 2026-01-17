@@ -5,7 +5,7 @@ import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
 import 'package:gatekeeper/util/cookie_util.dart';
 import 'package:gatekeeper_config/gatekeeper_config.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 
 Future<Response> onRequest(RequestContext context) {
   return switch (context.request.method) {
@@ -20,7 +20,7 @@ Future<Response> _onPost(RequestContext context) async {
   final config = context.read<ConfigService>();
 
   final challenge =
-      gc.ChallengeResponse.random(ttl: config.config.redis.challengesTtl);
+      ChallengeResponse.random(ttl: config.config.redis.challengesTtl);
 
   await redis.set(
     ns: Namespace.challenges,
@@ -59,7 +59,7 @@ Future<Response> _onGet(RequestContext context) async {
   final redis = context.read<RedisClientBase>();
   final collection = await redis.getAll(
     ns: Namespace.challenges,
-    parser: gc.ChallengeResponse.decode,
+    parser: ChallengeResponse.decode,
   );
 
   final now = DateTime.now().toUtc();

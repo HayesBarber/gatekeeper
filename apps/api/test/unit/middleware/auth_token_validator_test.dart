@@ -5,7 +5,7 @@ import 'package:gatekeeper/middleware/auth_token_provider.dart';
 import 'package:gatekeeper/redis/redis_client.dart';
 import 'package:gatekeeper/types/auth_token_validation_result.dart';
 import 'package:gatekeeper/util/auth_token_validator.dart';
-import 'package:gatekeeper_core/gatekeeper_core.dart' as gc;
+import 'package:gatekeeper_dto/gatekeeper_dto.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -79,7 +79,7 @@ void main() {
 
       test('returns failure when API key does not match stored value',
           () async {
-        final storedAuthToken = gc.ChallengeVerificationResponse(
+        final storedAuthToken = ChallengeVerificationResponse(
           authToken: 'stored_auth_token',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -109,7 +109,7 @@ void main() {
       });
 
       test('returns failure when API key has expired', () async {
-        final expiredAuthToken = gc.ChallengeVerificationResponse(
+        final expiredAuthToken = ChallengeVerificationResponse(
           authToken: 'provided_auth_token',
           expiresAt: DateTime.now().subtract(const Duration(hours: 1)),
         );
@@ -139,7 +139,7 @@ void main() {
       });
 
       test('returns success when API key is valid', () async {
-        final validAuthToken = gc.ChallengeVerificationResponse(
+        final validAuthToken = ChallengeVerificationResponse(
           authToken: 'provided_auth_token',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -173,7 +173,7 @@ void main() {
       });
 
       test('updates event builder with validation results', () async {
-        final validAuthToken = gc.ChallengeVerificationResponse(
+        final validAuthToken = ChallengeVerificationResponse(
           authToken: 'provided_auth_token',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
@@ -197,7 +197,7 @@ void main() {
 
     group('validateAuthToken', () {
       test('returns success when all parameters are valid', () async {
-        final validAuthToken = gc.ChallengeVerificationResponse(
+        final validAuthToken = ChallengeVerificationResponse(
           authToken: 'provided_auth_token',
           expiresAt: DateTime.now().add(const Duration(hours: 1)),
         );
